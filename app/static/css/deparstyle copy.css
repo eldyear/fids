@@ -1,0 +1,244 @@
+body {
+    /* width: 100vw;
+    height: 100vh; */
+    font-family: 'Montserrat', sans-serif; /* Везде шрифт Montserrat */
+    background-color: #393939; /* Темная тема */
+    background-image: url('arnament.svg');
+    background-repeat: no-repeat;
+    background-position: 110%;
+    background-position-y: -50%;
+    background-size: 60em;
+    margin: 0;
+    padding: 0;
+
+}
+
+.roboto-light {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    margin: 0;
+    padding: 0;
+  }
+
+.roboto-bold {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    color: #fff !important;
+    font-size: 30px;
+    padding: 0;
+    margin: 0;
+}
+
+table {
+    width: 100vw;
+    /* height: 100vh; */
+    border-collapse: collapse;
+    text-align: center;
+    margin: 0 auto;
+    border: 0;
+
+}
+
+thead{
+    background-color: #393939;
+}
+
+tbody td {
+    height: 18px !important; /* Высота строк в tbody */
+    font-size: clamp(0.1em, 0.6em + 0.9rem, 14rem);
+    /* border-color: #393939; */
+    
+
+}
+
+th, td {
+    margin-left: 30px;
+    margin-right: 30px;
+    height: 42px; /* Увеличенная высота строк для вылета и прилета */
+}
+
+th {
+    /* border: 2px solid #393939;
+    border-bottom: 10px solid #393939; */
+    color: #A2A0A1;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: clamp(0.1em, 0.9em + 0.9rem, 14rem);
+    margin-left: 40px;
+}
+
+.depart {
+    font-size: clamp(0.2em, 3vw + 1rem, 14rem);
+    color: #F1C14B;
+    display: flex;
+    justify-content: center;
+}
+
+.depart-text {
+    margin-left: 20px;
+}
+
+.depart-logo {
+    height: 8vh;
+}
+
+#current-date-ru, #current-date-ky, #current-date-en, #current-time-ru, #current-time-ky, #current-time-en {
+    /* font-weight: bold; */
+    color: #A2A0A1; /* Белый текст для текущей даты и времени */
+}
+
+.hidden {
+    display: none;
+}
+
+/* Стилизация для полосатой таблицы */
+tbody tr:nth-child(even) {
+    background-color: #494949 !important; /* Цвет для четных строк */
+    color: #A2A0A1 !important; /* Цвет текста для четных строк */
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #A2A0A1 !important; /* Цвет для нечетных строк */
+    color: #000 !important; /* Цвет текста для нечетных строк */
+}
+
+#ch {
+    width: 25px;
+    height: 30px;
+    background-color: rgb(51, 132, 253);
+    border-top: 1px solid #494949 !important;
+    border-bottom: 1px solid #494949 !important;
+}
+#ar {
+    width: 25px;
+    height: 30px;
+    background-color: rgb(132, 253, 51);
+    border-top: 1px solid #494949 !important;
+    border-bottom: 1px solid #494949 !important;
+}
+
+#dp {
+    width: 25px;
+    height: 30px;
+    background-color: rgb(132, 253, 51);
+    border-top: 1px solid #494949 !important;
+    border-bottom: 1px solid #494949 !important;
+}
+
+#cd {
+    width: 25px;
+    height: 30px;
+    background-color: red;
+    border-top: 1px solid #494949 !important;
+    border-bottom: 1px solid #494949 !important;
+}
+
+#bd {
+    width: 25px;
+    height: 30px;
+    background-color: rgb(44, 193, 252);
+    border-top: 1px solid #494949 !important;
+    border-bottom: 1px solid #494949 !important;
+}
+
+#cb {
+    width: 25px;
+    height: 30px;
+    background-color: rgb(44, 193, 252);
+    border-top: 1px solid #494949 !important;
+    border-bottom: 1px solid #494949 !important;
+}
+
+#rd {
+    width: 25px;
+    height: 30px;
+    background-color: rgb(255, 238, 0);
+    border-top: 1px solid #494949 !important;
+    border-bottom: 1px solid #494949 !important;
+    
+}
+
+.align-right {
+    padding-left: 0px;
+}
+
+#status-cell {
+    text-align: left;
+
+}
+
+.table-bar {
+    background-color: #393939 !important;
+    border: 3px solid #393939;
+    border-top: 6px solid #393939;
+    border-bottom: 6px solid #393939;
+}
+
+.table-header th {
+    background-color: #494949 !important;
+    border: 3px solid #393939;
+    border-top: 6px solid #393939;
+    border-bottom: 10px solid #393939;
+}
+
+.second-text {
+    font-size: 20px;
+}
+
+#table-body-ru{
+    background-image: url('arnament.svg');
+}
+#table-body-ky{
+    background-image: url('arnament.svg');
+}
+#table-body-en{
+    background-image: url('arnament.svg');
+}
+
+#top-header {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+#bttm {
+    padding-bottom: 40px !important;
+    margin-bottom: 40px !important;
+}
+
+.text-right {
+    text-align: right !important;
+    padding-right: 20px !important;
+}
+
+.text-left {
+    text-align: left !important;
+    padding-left: 20px !important;
+}
+
+.logo {
+    width: 20vh;
+    height: 40px;
+    display: block;
+    
+    
+}
+
+.logo-container {
+    height: 4vh;
+    /* width: 17vw; */
+    background-color: #fff;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    margin-left: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.weather-icon{
+    width: 50px;
+    height: auto;
+}

@@ -1,0 +1,348 @@
+body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden; /* Отключаем прокрутку */
+    background-color: #393939;
+    color: rgb(255, 255, 255);
+    font-family: 'Montserrat', sans-serif; /* Добавлен шрифт Montserrat */
+}
+
+.vvertical {
+    display: flex;
+    flex-direction: column; /* Вертикальное выравнивание */
+}
+
+.horizontal {
+    display: flex;
+    flex-direction: row; /* Горизонтальное выравнивание */
+}
+
+.airline-logo {
+    max-width: 48vw;
+    width: auto;
+    max-height: 19vh;
+    display: block;
+}
+
+.half-width .airline-logo {
+    max-width: 35vw;
+    width: auto;
+    max-height: 15vh;
+    display: block;
+}
+
+.stoika-logo {
+    height: 20vh;
+    width: 50vw;
+    margin-left: 12vw;
+    background-color: white;
+    mask-mode: alpha; /* Важно для прозрачности */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.half-width .stoika-logo {
+    height: clamp(1vh, 14vh + 1rem, 100rem);
+    width: clamp(1vw, 35vw + 1rem, 100vw);
+    margin-left: 0px;
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* .checkin-number {
+    height: 900px;
+    width: 180px;
+    background-color: #F0C14B;
+    font-size: 120px;
+    font-weight: 600;
+    color: #393939;
+    position: absolute;
+    top: 8px; left: 0px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+} */
+
+.checkin-number.half-width {
+    height: 160px;
+    width: 160px;
+    background-color: #F0C14B;
+    font-size: 100px;
+    font-weight: 600;
+    color: #393939;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 10; /* Привязываем к верхней части контейнера */
+    left: 50%; /* Центрируем по горизонтали */
+    transform: translateX(-50%); /* Корректировка на половину ширины */
+}
+
+.checkin-number.full-width {
+    height: 90vh;
+    width: 300px;
+    background-color: #F0C14B;
+    font-size: 320px;
+    font-weight: 600;
+    color: #393939;
+    position: absolute;
+    top: 8px; left: 0px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.checkin-number {
+    height: 300px;
+    width: 300px;
+    background-color: #F0C14B;
+    font-size: 180px;
+    font-weight: 600;
+    color: #393939;
+    position: absolute;
+    top: 8px; left: 0px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+/* Стили для случая, когда рейсов два */
+.half-width {
+width: 55vw;
+height: 98vh;
+border: 4px solid #F0C14B;
+display: flex;
+align-items: center;
+flex-direction: column;
+justify-content: center;
+/* padding-left: 50px;
+padding-right: 50px; */
+}
+
+/* Стили для одного или более двух рейсов (на всю ширину) */
+.full-width {
+width: 89vw;
+margin: 40px;
+margin-left: 10vw;
+display: flex;
+justify-content: space-around;
+flex-direction: column;
+}
+
+.time-weather-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: -100px;
+}
+
+.half-width .time-weather-container {
+    width: 90%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+/* Стили для блока погоды */
+.weather {
+margin-top: 10px;
+font-size: 6em;
+font-weight: 500;
+display: flex;
+flex-direction: column;
+align-items: end;
+}
+
+.half-width .weather {
+margin-top: 10px;
+font-size: 5em;
+font-weight: 500;
+display: flex;
+flex-direction: column;
+align-items: end;
+}
+
+.weather-icon {
+width: 100px;
+height: auto;
+margin-right: 10px;
+vertical-align: middle;
+}
+
+.half-width .weather-icon {
+width: 70px;
+height: auto;
+margin-right: 10px;
+vertical-align: middle;
+}
+
+
+.flight-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.half-width .flight-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.flight-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.flight-number {
+    margin-left: 180px;
+    font-size: clamp(0.2em, 5vw + 1rem, 14rem);
+    font-weight: 500;
+    margin-top: 50px;
+}
+
+.half-width .flight-number {
+    font-size: 6em;
+    font-weight: 500;
+    margin-top: 20px;
+    margin-left: 0px;
+    text-align: center;
+}
+
+.flight-time {
+    font-size: 6em;
+    font-weight: 500;
+}
+
+.half-width .flight-time {
+    font-size: 5em;
+    font-weight: 500;
+}
+
+.destination-container {
+    text-align: center;
+    margin-left: 200px;
+    height: 550px;
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: center;
+    align-items: center;
+    
+}
+.half-width .destination-container {
+    text-align: center;
+    height: 450px;
+    width: 47%;
+    margin-left: 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    
+}
+.destination {
+    font-size: clamp(0.2em, 9vw + 1rem, 14rem);
+    font-weight: 600;
+    color: #F0C14B;
+    
+}
+
+.half-width .destination {
+    font-size: clamp(0.2em, 7vw + 1rem, 14rem);
+    font-weight: 600;
+    color: #F0C14B;
+    
+}
+
+.iata {
+    font-size: 6em;
+    font-weight: 600;
+    text-align: center;
+    color: #F0C14B;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    margin-bottom: -20px;
+    
+}
+.half-width .iata {
+    font-size: 4em;
+    font-weight: 600;
+    text-align: center;
+    color: #F0C14B;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    
+}
+
+.second-text {
+    font-size: 3em;
+    color: #A2A0A1;
+    text-transform: uppercase;
+}
+.half-width .second-text {
+    display: none;
+}
+
+.advert {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 800px;
+    font-size: 6em;
+    font-weight: 400;
+}
+
+.error_400 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 800px;
+    font-size: 4em;
+    font-weight: 400;
+    color: red;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.advert {
+    width: 100%;
+    display: flex;
+    justify-content: initial;
+    align-items: center;
+    object-fit: fill;
+}
+
+.advert-image {
+    position: fixed; /* Остается на месте при прокрутке */
+    top: -50%;
+    left: -50%;
+    width: 200vw; /* Занимает всю ширину окна */
+    height: 200vh; /* Занимает всю высоту окна */
+    object-fit: cover; /* Обрезка изображения для заполнения экрана с сохранением пропорций */
+    z-index: -1; /* Ставим изображение на задний план */
+}

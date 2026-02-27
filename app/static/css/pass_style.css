@@ -1,0 +1,478 @@
+@media print {
+    body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        background-color: #fff;
+    }
+
+    .pass-container {
+        width: 54mm; /* Ширина пропуска */
+        height: 84mm; /* Высота пропуска */
+        border: none; /* Убираем границы */
+        page-break-inside: avoid; /* Запрет на разрыв страницы */
+        page-break-after: auto;
+    }
+
+    .ptichka {
+        width: 48mm;
+        position: absolute;
+        top: 17px;
+    }
+
+    .name-info {
+        margin-top: -10px;
+        width: 52mm;
+        max-height: 16mm;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: absolute;
+        top: 230px;
+        text-align: center;
+        
+    }
+    
+    .name {
+        font-size: (10px, 5vh, 22px); /* Размер шрифта автоматически изменяется от 10px до 24px */
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #00AEEF;
+        overflow: hidden;
+        /* display: flex;
+        flex-direction: row; */
+        text-align: center;
+        justify-content: center;
+        /* white-space: nowrap; */
+    }
+    
+    .position {
+        font-size: (6px, 5vh, 22px);
+        font-weight: 600;
+        max-height: 29px;
+        /* white-space: nowrap; */
+        color: #034EA2;
+        overflow: hidden;
+        text-align: center;
+    }
+    
+    .dates {
+        background-color: #034da29c;
+        position: absolute;
+        top: 275px;
+        width: 54mm;
+        height: 11.5mm;
+        display: flex;
+        flex-direction: row;
+        color: #fff;
+    }
+    
+    .date-title {
+        font-size: 7px;
+        font-weight: 600;
+        margin-left: 7px;
+        margin-right: 7px;
+        letter-spacing: 0.5px;
+    }
+    
+    .date {
+        font-size: 18px;
+        font-weight: 600;
+        margin-left: 7px;
+        margin-right: 7px;
+        margin-top: -5px;
+    }
+
+    .back1 {
+        height: 84mm;
+        width: 50mm;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 10px;
+        page-break-before: always; /* Начать с новой страницы */
+        page-break-inside: avoid;  /* Избежать разрывов внутри */
+    }
+
+    .back1 {
+        page-break-after: auto; /* Последняя страница не требует разделения */
+    }
+    
+    .back {
+        padding-top: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 10px;
+        font-weight: 700;
+    }
+    
+    .back p {
+        margin: 4px;
+        text-indent: 0.5em;
+    }
+    
+    .sign-back {
+        height: 40px;
+    }
+    
+    .stamp-back {
+        height: 40px;
+    }
+    
+    .back-stamp {
+        width: 34mm;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    
+    .mam {
+        font-size: 8px;
+    }
+    
+    .mamdir {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: end;
+    }
+
+    .print-button-container {
+        display: none; /* Скрыть кнопку при печати */
+    }
+
+    /* Опционально: убираем отступы браузера */
+    @page {
+        margin: 0;
+    }
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    font-family: "Montserrat", sans-serif;
+    background-color: #fff;
+}
+
+.button {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+button {
+    width: 200px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #fff;
+    font-family: "Montserrat", sans-serif;
+    border-radius: 0;
+    border: 0px;
+    background: #21b466;
+}
+
+.pass-container {
+    width: 57mm;
+    height: 84mm;
+    background-color: white;
+    /* border: 1px solid #0078d7; */
+    padding: 10px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    margin: auto;
+}
+
+.header {
+    width: 50mm;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: -5px;
+}
+
+.logo {
+    height: 30px;
+    width: auto;
+}
+
+.id-number {
+    font-size: 20px;
+    font-weight: 600;
+    color: #034EA2;
+}
+
+.img-zone {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 54mm;
+    margin: auto;
+}
+
+.photo-container {
+    width: 32mm;
+    object-fit: cover;
+    overflow: hidden;
+}
+
+.photo {
+    width: 35mm;
+    margin-top: 0px;
+    margin-left: -13px;
+}
+
+.ptichka {
+    width: 50mm;
+    position: absolute;
+    top: 10px;
+    margin-left: -6px;
+}
+
+.zones {
+    width: 26mm;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    left: -10px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.zone-group {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    margin: 2.5px;
+    align-items: center;
+}
+
+.zone {
+    width: 5.3mm;
+    height: 6.3mm;
+    border: 3px solid #00AEEF;
+    font-size: 24px;
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #034EA2;
+}
+
+.signature-stamp {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    position: relative;
+    top: -50px; left: 25px;
+    height: 100px;
+}
+
+.signature img {
+    width: 60px;
+    margin-top: -10px;
+}
+
+.stamp {
+    width: 70px;
+    position: relative;
+    top: -40px; left: 0px;
+}
+
+.a1 {
+    height: 200px;
+}
+
+.name-info {
+    margin-top: -6px;
+    width: 54mm;
+    max-height: 65px;
+    box-sizing: content-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: absolute;
+    top: 230px;
+    text-align: center;
+    box-sizing: border-box;
+    
+}
+
+.name {
+    font-size: clamp(10px, calc(20px + (36–20) * (5vw)), 48px); /* Размер шрифта автоматически изменяется от 10px до 24px */
+    font-weight: 700;
+    height: 30px;
+    max-height: 30px;
+    text-transform: uppercase;
+    color: #00AEEF;
+    overflow: hidden;
+    /* display: flex;
+    flex-direction: row; */
+    /* text-align: center; */
+    /* justify-content: center; */
+    /* white-space: nowrap; */
+}
+
+.position {
+    font-size: (16px, 20px, 22px);
+    font-weight: 700;
+    height: 40px;
+    max-height: 40px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+    /* white-space: nowrap; */
+    color: #034EA2;
+    overflow: hidden;
+    text-align: center;
+}
+.department {
+    color: #00AEEF;
+    margin: 0;
+}
+.pos {
+    /* color: #00AEEF; */
+    margin: 0;
+    /* border-bottom: 1px solid #00AEEF; */
+    width: 90%;
+}
+
+.active-class {
+    background-color: #034da2;
+    position: absolute;
+    margin-bottom: -50px;
+    align-items: center;
+    top: 294px;
+    width: 54mm;
+    height: 10mm;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    color: #fff;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.inactive-class {
+    /* background-color: #034da2; */
+    position: absolute;
+    margin-bottom: -50px;
+    align-items: center;
+    top: 294px;
+    width: 54mm;
+    height: 10mm;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    color: #034da2;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.date-title {
+    font-size: 7px;
+    font-weight: 600;
+    margin: 0;
+    /* margin-top: 15px; */
+    letter-spacing: 0.5px;
+}
+
+.date {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+
+}
+
+.valid-to {
+    max-height: 10mm;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.valid-from {
+    max-height: 10mm;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.back1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.back {
+    padding-top: 10px;
+    padding-left: 20px;
+    height: 85mm;
+    width: 50mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.back p {
+    margin: 4px;
+    text-indent: 0.5em;
+}
+
+.sign-back {
+    height: 40px;
+}
+
+.stamp-back {
+    height: 40px;
+}
+
+.back-stamp {
+    width: 34mm;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.mam {
+    font-size: 8px;
+}
+
+.mamdir {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: end;
+    padding-top: 20px;
+}
+
+.edit-button {
+    background-color: orange;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.edit-button:hover {
+    background-color: #45a049;
+}

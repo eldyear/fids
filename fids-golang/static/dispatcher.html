@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Диспетчерское Табло: Актуальные Рейсы</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #23243a 0%, #181c2b 100%);
+            color: #f3f6fa;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            min-width: 100vw;
+            min-height: 100vh;
+            max-width: 100vw;
+            max-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        body::before, body::after {
+            content: "";
+            position: absolute;
+            z-index: 0;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.18;
+            pointer-events: none;
+        }
+        body::before {
+            width: 520px;
+            height: 520px;
+            left: -180px;
+            top: 0;
+            background: radial-gradient(circle, #2ecc71 0%, #23243a 80%);
+        }
+        body::after {
+            width: 420px;
+            height: 420px;
+            right: -120px;
+            bottom: -80px;
+            background: radial-gradient(circle, #3498db 0%, #23243a 80%);
+        }
+        main {
+            width: 100vw;
+            height: 100vh;
+            min-width: 100vw;
+            min-height: 100vh;
+            max-width: 100vw;
+            max-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0;
+        }
+        #activeRegistrationsList {
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            list-style: none;
+            /* margin: 12vh 3vw 4vh 3vw; */
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(19vw, 1fr));
+            grid-auto-rows: 1fr;
+            gap: 1vw 1.5vw;
+            justify-items: center;
+            align-items: center;
+            max-width: 100vw;
+            height: 86vh;
+            padding: 3vw;
+            place-content: center;
+        }
+        .flight-item {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            justify-content: flex-start;
+            width: 100%;
+            min-width: 0;
+            max-width: 19vw;
+            margin: 0;
+            padding: 2vw 0.7vw 1.2vw 1.7vw;
+            border-radius: 0.8vw;
+            background: rgba(35,36,58,0.55);
+            box-shadow: 0 2px 16px 0 rgba(0,0,0,0.18), 0 0 0 1.5px rgba(255,255,255,0.10) inset;
+            border: 1.5px solid rgba(255,255,255,0.18);
+            font-size: 1.08em;
+            font-weight: 500;
+            letter-spacing: 0.22px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            z-index: 1;
+        }
+        .flight-item .flight-card-content {
+            position: relative;
+            z-index: 1;
+        }
+        .flight-item .flight-bg-blur {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%;
+            background-position: center;
+            background-size: 95% auto;
+            background-repeat: no-repeat;
+            filter: blur(2px) brightness(0.8);
+            opacity: 0.09;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .flight-item::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.13;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.5"/></svg>');
+            background-size: cover;
+        }
+        .flight-item.status-boarding {
+            box-shadow: 0 8px 36px 0 rgba(243,156,18,0.22), 0 2px 16px 0 rgba(0,0,0,0.18), 0 0 0 1.5px rgba(255,255,255,0.10) inset;
+            border: 1.5px solid rgba(243,156,18,0.22);
+        }
+        .flight-item:before {
+            content: "";
+            position: absolute;
+            top: -40px; left: -40px; right: -40px; bottom: -40px;
+            background: radial-gradient(circle at 70% 10%, rgba(46,204,64,0.06) 0%, rgba(46,204,64,0.01) 80%, transparent 100%);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .flight-item:last-child {
+            margin-bottom: 0;
+        }
+        .flight-item.new-arrival {
+            background: linear-gradient(90deg, #1e2e1e 60%, #233b2b 100%);
+            border: 2.5px solid #2ecc71;
+            outline: 3px solid #2ecc71;
+            outline-offset: 4px;
+            animation: fadeInOut 2s ease-in-out forwards;
+        }
+        .flight-info {
+            width: 100%;
+            text-align: center;
+            margin: 0 0 18px 0;
+            font-size: 1.13em;
+            font-weight: 500;
+            color: #f3f6fa;
+            letter-spacing: 0.12px;
+            word-break: break-word;
+            line-height: 1.45;
+            display: block;
+        }
+        .flight-info.flight-number {
+            font-size: 1.38em;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+            color: #fff;
+            text-shadow: 0 2px 8px rgba(46,204,64,0.10);
+        }
+        .flight-info.flight-time {
+            font-size: 1.18em;
+            font-weight: 700;
+            color: #2ecc71;
+            margin-bottom: 8px;
+            letter-spacing: 0.2px;
+            text-shadow: 0 1px 4px rgba(46,204,64,0.10);
+        }
+        .flight-info.flight-destination {
+            font-size: 1.15em;
+            font-weight: 600;
+            color: #7ed6a7;
+            margin-bottom: 8px;
+            letter-spacing: 0.18px;
+        }
+        .flight-info.flight-status {
+            font-size: 1.13em;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0;
+            letter-spacing: 0.18px;
+            text-shadow: 0 1px 4px rgba(46,204,64,0.10);
+        }
+        .control-panel {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            z-index: 1099;
+            margin: 0;
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            background: rgba(30, 36, 56, 0.97);
+            padding: 10px 22px 10px 16px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(46,204,64,0.10);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .sound-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: rgba(30,36,56,0.97);
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(46,204,64,0.10);
+            cursor: pointer;
+            z-index: 1100;
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            opacity: 1;
+            transition: box-shadow 0.2s;
+        }
+        .sound-icon svg {
+            width: 22px;
+            height: 22px;
+            display: block;
+            fill: #2ecc71;
+        }
+        .control-panel {
+            position: fixed;
+            top: 24px;
+            left: 64px;
+            z-index: 1099;
+            margin: 0;
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            background: rgba(30, 36, 56, 0.97);
+            padding: 10px 22px 10px 16px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(46,204,64,0.10);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .sound-icon:hover ~ .control-panel,
+        .control-panel:hover,
+        .control-panel:focus-within {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        button {
+            background-color: #2ecc71;
+            color: #181c1f;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 1.25em;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #27ae60;
+        }
+        button.sound-on {
+            background-color: #2ecc71;
+        }
+        button.sound-off {
+            background-color: #e74c3c;
+        }
+        #volumeSlider {
+            width: 170px;
+            height: 7px;
+        }
+        .sound-icon {
+            font-size: 1.7em;
+            color: #2ecc71;
+            margin-right: 8px;
+            vertical-align: middle;
+            transition: color 0.3s;
+            user-select: none;
+        }
+        .switch-label {
+            margin-left: 12px;
+            font-size: 1.15em;
+            color: #f3f6fa;
+            user-select: none;
+            margin-right: 8px;
+        }
+        /* .airline-logo — больше не нужен */
+        .flight-card-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            width: 100%;
+            gap: 10px;
+            margin-top: 0;
+        }
+        .flight-number-main {
+            font-size: 1.6em;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 1.2px;
+            margin-bottom: 0;
+            text-shadow: 0 2px 8px rgba(46,204,64,0.10);
+            line-height: 1.1;
+        }
+        .flight-time-badge {
+            display: inline-block;
+            background: #2ecc71;
+            color: #23243a;
+            font-size: 1.08em;
+            font-weight: 700;
+            border-radius: 8px;
+            padding: 4px 16px;
+            margin-bottom: 0;
+            letter-spacing: 0.2px;
+            box-shadow: 0 1px 4px rgba(46,204,64,0.10);
+            margin-top: 0;
+        }
+        .flight-destination-main {
+            font-size: 1.08em;
+            font-weight: 600;
+            color: #7ed6a7;
+            margin-bottom: 0;
+            letter-spacing: 0.18px;
+            text-align: left;
+        }
+        .flight-status-badge {
+            display: inline-block;
+            font-size: 1em;
+            font-weight: 700;
+            border-radius: 8px;
+            padding: 5px 16px;
+            margin-top: 6px;
+            margin-bottom: 0;
+            letter-spacing: 0.18px;
+            text-align: left;
+            box-shadow: 0 1px 4px rgba(46,204,64,0.10);
+            background: #2ecc71;
+            color: #23243a;
+            transition: background 0.3s, color 0.3s;
+        }
+        .flight-status-badge.status-orange {
+            background: #f39c12;
+            color: #fff;
+        }
+
+        /* Анимация для нового рейса */
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            10% { opacity: 1; transform: translateY(0); background-color: #27ae60; border-color: #2ecc71; outline: 3px solid #2ecc71; outline-offset: 4px; }
+            90% { opacity: 1; background-color: #27ae60; border-color: #2ecc71; outline: 3px solid #2ecc71; outline-offset: 4px; }
+            100% { opacity: 1; background-color: #2c517c; border-color: transparent; outline: none; }
+        }
+
+        /* Стили для мигающих статусов */
+        /* Быстрое мигание и рамка */
+        @keyframes blink-green {
+            0%, 49% { background-color: #2c517c; border-color: transparent; outline: none; }
+            50%, 100% { background-color: #2ecc71; border-color: #2ecc71; outline: 3px solid #2ecc71; outline-offset: 4px; }
+        }
+
+        @keyframes blink-orange {
+            0%, 49% { background-color: #2c517c; border-color: transparent; outline: none; }
+            50%, 100% { background-color: #f39c12; border-color: #f39c12; outline: 3px solid #2ecc71; outline-offset: 4px; }
+        }
+
+        .status-check-in.blink {
+            animation: blink-green 0.7s 10 alternate forwards; /* 6 раз (3 полных вспышки), потом останавливается */
+            color: #2ecc71;
+        }
+
+        .status-boarding.blink {
+            animation: blink-orange 0.7s 10 alternate forwards; /* 6 раз (3 полных вспышки), потом останавливается */
+            color: #f39c12;
+        }
+        .status-boarding.blink,
+        .flight-item.new-arrival.status-boarding {
+            outline: 3px solid #f39c12 !important;
+            outline-offset: 4px;
+            border-color: #f39c12 !important;
+        }
+        .flight-info.flight-status.status-green {
+            color: #2ecc71 !important;
+        }
+        .flight-info.flight-status.status-orange {
+            color: #f39c12 !important;
+        }
+        /* Во время мигания делаем текст белым */
+        .flight-item.blink *,
+        .flight-item.status-check-in.blink *,
+        .flight-item.status-boarding.blink * {
+            color: #fff !important;
+        }
+        /* Стили для переключателя звука */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 56px;
+            height: 32px;
+            vertical-align: middle;
+        }
+        .switch input { display: none; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 32px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+        }
+        input:checked + .slider {
+            background-color: #2ecc71;
+        }
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+#soundPromptOverlay {
+    position: fixed;
+    z-index: 2000;
+    left: 0; top: 0; right: 0; bottom: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(24,28,43,0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s;
+}
+.sound-prompt-modal {
+    background: rgba(35,36,58,0.95);
+    border-radius: 18px;
+    box-shadow: 0 4px 32px rgba(46,204,64,0.12);
+    padding: 48px 36px 36px 36px;
+    text-align: center;
+    color: #f3f6fa;
+    max-width: 400px;
+}
+.sound-prompt-modal h2 {
+    margin-bottom: 18px;
+    font-size: 1.5em;
+    font-weight: 800;
+}
+.sound-prompt-modal p {
+    margin-bottom: 28px;
+    font-size: 1.1em;
+}
+.sound-prompt-modal button {
+    background: #2ecc71;
+    color: #23243a;
+    font-size: 1.15em;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 38px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.sound-prompt-modal button:hover {
+    background: #27ae60;
+}
+.sound-prompt-modal button#disableSoundBtn {
+    background: #e74c3c;
+    color: #fff;
+}
+.sound-prompt-modal button#disableSoundBtn:hover {
+    background: #c0392b;
+}
+    </style>
+</head>
+<body>
+    <!-- <h1>Уведомления о рейсах</h1> -->
+
+    <span class="sound-icon" id="soundIcon" aria-label="Управление звуком" tabindex="0">
+        <svg viewBox="0 0 24 24"><path d="M3 10v4h4l5 5V5l-5 5H3zm13.5 2c0-1.77-1.02-3.29-2.5-4.03v8.06c1.48-.74 2.5-2.26 2.5-4.03z"/></svg>
+    </span>
+    <div class="control-panel">
+        <label class="switch">
+            <input type="checkbox" id="toggleSound" checked>
+            <span class="slider"></span>
+        </label>
+        <span class="switch-label">Звук</span>
+        <label for="volumeSlider">Громкость:</label>
+        <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.7">
+    </div>
+
+    <div id="soundPromptOverlay" style="display:flex;">
+      <div class="sound-prompt-modal">
+        <h2>Звук уведомлений</h2>
+        <p>Хотите включить звук для оповещений о рейсах?</p>
+        <div style="display: flex; gap: 18px; justify-content: center;">
+          <button id="enableSoundBtn">Включить звук</button>
+          <button id="disableSoundBtn" style="background:#e74c3c;color:#fff;">Отключить звук</button>
+        </div>
+      </div>
+    </div>
+
+    <ul id="activeRegistrationsList">
+        <li class="flight-item">
+            <div class="flight-info">Загрузка данных...</div>
+        </li>
+    </ul>
+
+    <audio id="notificationSound" src="/go/static/notification.mp3" preload="auto"></audio> 
+    <script>
+        const activeRegistrationsList = document.getElementById('activeRegistrationsList');
+        const notificationSound = document.getElementById('notificationSound');
+        const toggleSoundButton = document.getElementById('toggleSound');
+        const volumeSlider = document.getElementById('volumeSlider');
+
+        let isSoundEnabled = true; // Звук по умолчанию включен
+        let previousFlightIDs = new Set(); // Для отслеживания новых рейсов
+        let ws;
+        let reconnectTimeout = null;
+        let isInitialData = false;
+        let initialDataTimeout = null;
+        let previousFlightsMap = {};
+
+        // Устанавливаем начальную громкость
+        notificationSound.volume = parseFloat(volumeSlider.value);
+
+        volumeSlider.addEventListener('input', () => {
+            notificationSound.volume = parseFloat(volumeSlider.value);
+        });
+
+        const soundIcon = document.getElementById('soundIcon');
+        toggleSoundButton.addEventListener('change', () => {
+            isSoundEnabled = toggleSoundButton.checked;
+            // Меняем SVG цвет
+            const svg = soundIcon.querySelector('svg');
+            if (isSoundEnabled) {
+                svg.style.fill = '#2ecc71';
+            } else {
+                svg.style.fill = '#ccc';
+                notificationSound.pause();
+                notificationSound.currentTime = 0;
+            }
+        });
+        // Инициализация SVG цвета
+        (function(){
+            const svg = soundIcon.querySelector('svg');
+            if (!isSoundEnabled) {
+                svg.style.fill = '#ccc';
+            } else {
+                svg.style.fill = '#2ecc71';
+            }
+        })();
+
+        function playNotificationSound() {
+            if (isSoundEnabled) {
+                notificationSound.play().catch(e => console.error("Ошибка воспроизведения звука:", e));
+            }
+        }
+
+        function updateDisplay(flights) {
+            const currentFlightIDs = new Set();
+            let newFlightDetected = false;
+
+            // Сначала очищаем список, чтобы избежать дубликатов при перерисовке
+            activeRegistrationsList.innerHTML = ''; 
+
+            if (flights && flights.length > 0) {
+                // Сортируем рейсы по времени вылета для более логичного отображения
+                flights.sort((a, b) => {
+                    const timeA = a.time1 || '00:00:00';
+                    const timeB = b.time1 || '00:00:00';
+                    return timeA.localeCompare(timeB);
+                });
+
+                flights.forEach(flight => {
+                    currentFlightIDs.add(flight.id);
+                    const listItem = document.createElement('li');
+                    listItem.classList.add('flight-item');
+
+                    const isNew = !previousFlightIDs.has(flight.id);
+                    const prevFlight = previousFlightsMap[flight.id];
+                    const statusEn = flight.status ? flight.status.name_en : '';
+                    const statusRu = flight.status ? (flight.status.name_ru || flight.status.name_en) : '';
+                    let shouldBlink = false;
+                    let blinkType = '';
+
+                    // Только для новых рейсов
+                    if (isNew) {
+                        if (!isInitialData) { // Убедимся, что это не reconnect
+                            listItem.classList.add('new-arrival');
+                            if (statusEn === 'CHECK-IN' || statusEn === 'CHECK-IN BOARDING') {
+                                shouldBlink = true;
+                                blinkType = 'check-in';
+                            } else if (
+                                statusEn === 'BOARDING' || statusEn === 'LAST CALL' || statusEn === 'CHECK-IN BOARDING' ||
+                                statusRu === 'ПОСАДКА' || statusRu === 'РЕГИС_ПОСАД' || statusRu === 'РЕГИС_ПОСАДКА'
+                            ) {
+                                shouldBlink = true;
+                                blinkType = 'boarding';
+                            }
+                        }
+                        newFlightDetected = true;
+                    }
+                    // Только если рейс был и остался, и статус изменился с регистрации на посадку
+                    else if (
+                        prevFlight &&
+                        prevFlight.status &&
+                        (prevFlight.status.name_en === 'CHECK-IN' || prevFlight.status.name_en === 'CHECK-IN BOARDING' || prevFlight.status.name_ru === 'РЕГИСТРАЦИЯ') &&
+                        (statusEn === 'BOARDING' || statusEn === 'LAST CALL' || statusEn === 'CHECK-IN BOARDING' || statusRu === 'ПОСАДКА' || statusRu === 'РЕГИС_ПОСАД' || statusRu === 'РЕГИС_ПОСАДКА') &&
+                        // Только если статус реально изменился!
+                        (prevFlight.status.name_en !== statusEn || prevFlight.status.name_ru !== statusRu)
+                    ) {
+                        if (!isInitialData) { // Убедимся, что это не reconnect
+                            shouldBlink = true;
+                            blinkType = 'boarding';
+                        }
+                        newFlightDetected = true;
+                    }
+
+                    if (shouldBlink) {
+                        if (blinkType === 'check-in') {
+                            listItem.classList.add('status-check-in', 'blink');
+                        } else if (blinkType === 'boarding') {
+                            listItem.classList.add('status-boarding', 'blink');
+                        }
+                        // Для универсальности: добавляем класс blink к flight-item
+                        listItem.classList.add('blink');
+                    }
+
+                    const flightNumber = flight.flight || 'N/A';
+                    const destination = flight.destination ? (flight.destination.name_ru || flight.destination.name_en) : 'N/A';
+                    let time = 'N/A';
+                    if (flight.time1) {
+                        if (flight.time1.includes('T')) {
+                            // Просто берём время из строки, без перевода в локальное
+                            time = flight.time1.substring(11, 16);
+                        } else {
+                            time = flight.time1.substring(0, 5);
+                        }
+                    }
+                    // Логотип авиакомпании (как в dep.js)
+                    const airlineCode = (flight.airline || '').trim().toUpperCase();
+                    const logoPath = airlineCode ? `/static/images/airlines/${airlineCode}.svg` : '';
+                    // Добавляем классы для мигания в зависимости от статуса
+                    // if ((statusEn === 'CHECK-IN' || statusEn === 'CHECK-IN BOARDING') && !skipNotification) {
+                    //     listItem.classList.add('status-check-in', 'blink');
+                    // } else if ((statusEn === 'BOARDING' || statusEn === 'LAST CALL') && !skipNotification) {
+                    //     listItem.classList.add('status-boarding', 'blink');
+                    // }
+
+                    let statusColorClass = '';
+                    let cardStatusClass = '';
+                    if (
+                        statusEn === 'CHECK-IN' || statusEn === 'CHECK-IN BOARDING' || statusRu === 'РЕГИСТРАЦИЯ' || statusRu === 'REGISTRATION'
+                    ) {
+                        statusColorClass = 'status-green';
+                    } else if (
+                        statusEn === 'BOARDING' || statusEn === 'LAST CALL' || statusEn === 'CHECK-IN BOARDING' ||
+                        statusRu === 'ПОСАДКА' || statusRu === 'РЕГИС_ПОСАД' || statusRu === 'РЕГИС_ПОСАДКА'
+                    ) {
+                        statusColorClass = 'status-orange';
+                        cardStatusClass = 'status-boarding';
+                    }
+
+                    listItem.innerHTML = `
+                        ${logoPath ? `<div class='flight-bg-blur' style="background-image:url('${logoPath}')"></div>` : ''}
+                        <div class="flight-card-content">
+                            <div class="flight-number-main">${flightNumber}</div>
+                            <div class="flight-time-badge">${time}</div>
+                            <div class="flight-destination-main">${destination}</div>
+                            <div class="flight-status-badge${statusColorClass === 'status-orange' ? ' status-orange' : ''}">${statusRu}</div>
+                        </div>
+                    `;
+                    activeRegistrationsList.appendChild(listItem);
+
+                    // Удаляем класс new-arrival через некоторое время после анимации
+                    if (listItem.classList.contains('new-arrival')) {
+                        setTimeout(() => {
+                            listItem.classList.remove('new-arrival');
+                        }, 2000); // Соответствует длительности анимации
+                    }
+
+                    // *** НОВОЕ: Удаляем класс 'blink' после завершения анимации мигания ***
+                    // Длительность 0.7s * 10 итераций = 7 секунд
+                    if (listItem.classList.contains('blink')) {
+                        listItem.addEventListener('animationend', function handler(event) {
+                            // Проверяем, что это наша анимация мигания (а не new-arrival)
+                            if (event.animationName === 'blink-green' || event.animationName === 'blink-orange') {
+                                this.classList.remove('blink', 'status-check-in', 'status-boarding');
+                                // Цвет текста статуса восстановится автоматически через CSS
+                                this.removeEventListener('animationend', handler); 
+                            }
+                        });
+                    }
+                });
+            } else {
+                const noFlightsItem = document.createElement('li');
+                noFlightsItem.classList.add('flight-item');
+                noFlightsItem.innerHTML = `<div class="flight-info">Нет актуальных рейсов для отображения.</div>`;
+                activeRegistrationsList.appendChild(noFlightsItem);
+            }
+
+            // Обновляем набор предыдущих ID для следующего цикла
+            previousFlightIDs = currentFlightIDs;
+            previousFlightsMap = {};
+            if (flights && flights.length > 0) {
+                flights.forEach(f => {
+                    previousFlightsMap[f.id] = {
+                        status: {
+                            name_en: f.status ? f.status.name_en : '',
+                            name_ru: f.status ? (f.status.name_ru || f.status.name_en) : ''
+                        }
+                    };
+                });
+            }
+
+            // Если обнаружен новый рейс, проигрываем звук
+            if (newFlightDetected) {
+                playNotificationSound();
+            }
+        }
+
+        // WebSocket подключение
+        // const ws = new WebSocket('ws://' + window.location.host + '/ws/dispatcher');
+        function connectWebSocket() {
+            ws = new WebSocket('ws://' + window.location.host + '/go/ws/dispatcher');
+
+            ws.onopen = () => {
+                console.log('Connected to WebSocket server');
+                if (reconnectTimeout) {
+                    clearTimeout(reconnectTimeout);
+                    reconnectTimeout = null;
+                }
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log('Received data:', data);
+
+                // Если это массив — обычные рейсы
+                if (Array.isArray(data)) {
+                    updateDisplay(data);
+                } else if (data && typeof data === 'object' && data.type) {
+                    // Это уведомление о статусе
+                    playNotificationSound();
+                }
+            };
+
+            ws.onclose = () => {
+                console.log('Disconnected from WebSocket server. Reconnecting...');
+                if (!reconnectTimeout) {
+                    reconnectTimeout = setTimeout(connectWebSocket, 3000);
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket Error:', error);
+                ws.close();
+            };
+        }
+
+        function initMainApp() {
+            connectWebSocket();
+            // ... здесь можно добавить другие инициализации ...
+        }
+        // --- Модальное окно для включения/отключения звука ---
+        const overlay = document.getElementById('soundPromptOverlay');
+        const enableBtn = document.getElementById('enableSoundBtn');
+        const disableBtn = document.getElementById('disableSoundBtn');
+        // Модалка всегда показывается при каждом заходе/обновлении
+        overlay.style.display = 'flex';
+        // Не запускаем основной функционал до выбора
+        enableBtn.addEventListener('click', () => {
+            isSoundEnabled = true;
+            toggleSoundButton.checked = true;
+            overlay.style.display = 'none';
+            localStorage.setItem('soundEnabled', 'true');
+            notificationSound.play().catch(()=>{});
+            initMainApp();
+        });
+        disableBtn.addEventListener('click', () => {
+            isSoundEnabled = false;
+            toggleSoundButton.checked = false;
+            overlay.style.display = 'none';
+            localStorage.setItem('soundEnabled', 'false');
+            initMainApp();
+        });
+    </script>
+</body>
+</html>

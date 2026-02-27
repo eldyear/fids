@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}OSS Суточный план{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles copy.css' %}">
+</head>
+<body>
+    <header>
+        <a href="{% url 'user_menu' %}"><img src="{% static 'images/logomanas.svg' %}" alt="Логотип" class="logoosh"></a>
+        <h2>{% block page_header %}Default Page Header{% endblock %}</h2>
+                {% if user.is_authenticated %}
+                <div class="navigation">
+                            <a href="{% url 'logout' %}" class="button">
+                                
+                                <img src="{% static 'images/user.svg' %}" alt="user" class="user-icon">
+                                <div class="logout "><img src="{% static 'images/logout.svg' %}" alt="sign-out" class="sign-out-icon"></div>
+                            </a>
+                            {% else %}
+                            <a href="{% url 'login' %}" class="button">
+                                
+                                <img src="{% static 'images/user.svg' %}" alt="user" class="user-icon">
+                                <div class="logout "><img src="{% static 'images/login.svg' %}" alt="sign-in" class="sign-in-icon"></div>
+                            </a>
+                    </div>
+                </div>
+                {% endif %}
+        
+    </header>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <main class="content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Eldyear</p>
+    </footer>
+</body>
+</html>

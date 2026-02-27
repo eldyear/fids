@@ -1,0 +1,30 @@
+{% extends 'app/dashboard/base_dashboard.html' %}
+
+{% block page_title %}Generate Daily Schedule{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 0 auto;">
+    <p style="color: var(--text-secondary); margin-bottom: 20px;">Select a date to generate the daily flight schedule based on active templates.</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label for="id_date" style="display: block; margin-bottom: 8px; color: var(--text-secondary);">Date</label>
+            {{ form.date }}
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Generate Schedule</button>
+    </form>
+</div>
+
+<style>
+    input[type="date"] {
+        width: 100%;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        background-color: var(--bg-body);
+        color: var(--text-primary);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'app/dashboard/base_dashboard.html' %}
+
+{% block page_title %}Flight Templates{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Templates</h2>
+        <a href="{% url 'flight_template_add' %}" class="btn btn-primary">+ Add Template</a>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Flight</th>
+                    <th>Direction</th>
+                    <th>Time</th>
+                    <th>Season Start</th>
+                    <th>Season End</th>
+                    <th>Weekdays</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for template in flight_templates %}
+                <tr>
+                    <td style="font-weight: 600;">{{ template.flight.flight.flights }}</td>
+                    <td>
+                        {% if template.direction == 'dep' %}
+                            <span style="color: var(--accent-color);">Departure</span>
+                        {% else %}
+                            <span style="color: var(--success-color);">Arrival</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ template.time|time:"H:i" }}</td>
+                    <td>{{ template.season_start|date:"d.m.Y" }}</td>
+                    <td>{{ template.season_end|date:"d.m.Y" }}</td>
+                    <td>{{ template.weekdays }}</td>
+                    <td>
+                        <div style="display: flex; gap: 10px;">
+                            <a href="{% url 'flight_template_edit' template.pk %}" style="color: var(--accent-color); text-decoration: none;">Edit</a>
+                            <a href="{% url 'flight_template_delete' template.pk %}" style="color: var(--danger-color); text-decoration: none;">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 20px;">No templates found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px;">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary btn-sm">Previous</a>
+        {% endif %}
+        <span style="align-self: center; color: var(--text-secondary);">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary btn-sm">Next</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

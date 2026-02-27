@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Техническая карта рейса {{ flight.flight_num }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Загружаем обычную версию шрифта */
+        @font-face {
+            font-family: 'DejaVu Sans';
+            src: url("/static/fonts/DejaVuSans.ttf");
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        /* Загружаем жирную версию шрифта */
+        @font-face {
+            font-family: 'DejaVu Sans';
+            src: url("/static/fonts/DejaVuSans-Bold.ttf");
+            font-weight: bold;
+            font-style: normal;
+        }
+
+        body { font-family: 'DejaVu Sans', sans-serif; font-size: 14px; width: 90vw; margin-left: 40px; background-color:rgb(34, 35, 35);}
+        .header { text-align: center; margin-bottom: 15px; }
+        .header h1 { font-size: 18px; margin-bottom: 5px; }
+        .header h3 { font-size: 14px; margin-bottom: 0; }
+
+        /* Стиль для таблицы деталей рейса в формате "сетки" */
+        .details-grid-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        .details-grid-table th, .details-grid-table td {
+            padding: 2px 8px;
+            text-align: left;
+            vertical-align: top;
+            border: none;
+        }
+        /* Стиль для названий */
+        .details-grid-table th { font-weight: normal; }
+        /* Стиль для значений */
+        .details-grid-table td { font-weight: bold; }
+
+        /* Стиль для таблицы услуг */
+        .service-table { width: 100%; border-collapse: collapse; margin-bottom: 2px; }
+        .service-table th, .service-table td {
+            border: 1px solid #000000;
+            padding: 2px;
+            text-align: left;
+        }
+        .service-table-secondary {
+            text-align: center;
+        }
+        .service-table th { background-color: #f2f2f2; }
+
+        .total-cost { text-align: right; font-size: 14px; font-weight: bold; margin-top: 10px; }
+        .container { width: 70vw; min-height: 90vh; margin-left: 13vw; margin-top: 5vh; background-color:rgb(255, 255, 255); }
+    </style>
+</head>
+<body>
+    <div class="container card p-3">
+        <div class="card-title text-dark text-center">
+            <h1>Техническая карта</h1>
+            <h3>{{ flight.airline.name|default:"-" }} ({{ flight.airline.code|default:"-" }}) от {{ flight.date|date:"d.m.Y" }}</h3>
+        </div>
+    
+        <table class="details-grid-table">
+            <tbody>
+                <tr>
+                    <th style="width: 25%;">Номер рейса:</th>
+                    <th style="width: 25%;">Аэропорт:</th>
+                    <th style="width: 25%;">Тип ВС:</th>
+                    <th style="width: 25%;">Бортовой номер:</th>
+                </tr>
+                <tr>
+                    <td>{{ flight.flight_num }} ⇆ {{ flight.linked_flight.flight_num|default:"-" }}</td>
+                    <td>{{ flight.dep_airport.code }} → {{ flight.arr_airport.code }}</td>
+                    <td>{{ flight.aircraft_type|default:"-" }}</td>
+                    <td>{{ flight.board_num|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <th>Макс. взлетная масса:</th>
+                    <th>Стоянка:</th>
+                    <th>Дата рейса:</th>
+                    <th>Дата ⇆ рейса:</th>
+                </tr>
+                <tr>
+                    <td>{{ tech_card.max_takeoff_weight|default:"-" }}</td>
+                    <td>{{ flight.stand|default:"-" }}</td>
+                    <td>{{ flight.date|date:"d.m.Y" }}</td>
+                    <td>{{ flight.linked_flight.date|date:"d.m.Y" }}</td>
+                </tr>
+                <tr>
+                    <th>Время П/П:</th>
+                    <th>Время П/Ф:</th>
+                    <th>Время В/П:</th>
+                    <th>Время В/Ф:</th>
+                </tr>
+                <tr>
+                    <td>{{ flight.time|default:"-" }}</td>
+                    <td>{{ flight.actual_time|default:"-" }}</td>
+                    <td>{{ flight.linked_flight.time|default:"-" }}</td>
+                    <td>{{ flight.linked_flight.actual_time|default:"-" }}</td>
+                </tr>
+            </tbody>
+        </table>
+    
+        <table class="service-table">
+            <thead>
+                <tr>
+                    <th style="text-align: center; width: 30vw;">Тип услуги</th>
+                    <th style="text-align: center; width: 5vw;">Время нач.</th>
+                    <th style="text-align: center; width: 5vw;">Время кон.</th>
+                    <th style="text-align: center; width: 5vw;">Кол-во</th>
+                    <th style="text-align: center; width: 4vw;">Ед. изм.</th>
+                    <th style="text-align: center; width: 15vw;">Описание</th>
+                    {% if is_finance %}
+                    <th style="text-align: center; width: 7vw;">Цена за ед.</th>
+                    <th style="text-align: center; width: 7vw;">Итого</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in services_with_costs %}
+                <tr>
+                    <td>{{ item.service.service_type.name }}</td>
+                    <td style="text-align: center;">{{ item.service.start_time|date:"H:i"|default:"-" }}</td>
+                    <td style="text-align: center;">{{ item.service.end_time|date:"H:i"|default:"-" }}</td>
+                    <td style="text-align: center;">{{ item.service.quantity }}</td>
+                    <td style="text-align: center;">{{ item.service.unit_of_measure|default:"-" }}</td>
+                    <td style="text-align: center;">{{ item.service.description|default:"-" }}</td>
+                    {% if is_finance %}
+                    <td style="text-align: center;">{{ item.price_per_unit|floatformat:2 }} USD.</td>
+                    <td style="text-align: center;">{{ item.service_total_cost|floatformat:2 }} USD.</td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center">Услуги не найдены.</td>
+                </tr>
+                {% endfor %}
+                {% if is_finance %}
+                <tr>
+                    <td colspan="8" class="text-end total-cost">Общая стоимость: {{ total_cost|floatformat:2 }} USD.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        
+        
+
+        <table style="width: 90%; margin-top: 10px; border-collapse: collapse;">
+            <tr>
+                <td style="width: 50%; vertical-align: top;">
+                    <div style="font-weight: normal; margin-bottom: 5px;">Ответственный:</div>
+                    <div style="font-weight: bold;">{{ tech_card.author.get_full_name }}</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

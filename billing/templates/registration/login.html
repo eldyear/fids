@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Светлый фон */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        
+        .login-card {
+            background-color: #ffffff; /* Белая карточка */
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 400px;
+            padding: 2.5rem;
+            color: #1f2937; /* Темный текст */
+        }
+        
+        .input-field {
+            background-color: #f9fafb; /* Поля ввода немного светлее */
+            border: 1px solid #e5e7eb;
+            color: #1f2937;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #ff6b4a; /* Оранжевая рамка при фокусе */
+            box-shadow: 0 0 0 3px rgba(255, 107, 74, 0.5);
+        }
+        
+        .btn-primary {
+            background-color: #0d6efd; /* Основная оранжевая кнопка */
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            width: 100%;
+            transition: background-color 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color:rgb(9, 97, 230); /* Чуть темнее при наведении */
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="text-center mb-6">
+            <i class="fas fa-file-invoice-dollar text-4xl text-blue-500 mb-2"></i>
+            {% comment %} <h3 class="text-2xl font-bold">Авторизация</h3> {% endcomment %}
+        </div>
+        
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+                <div class="bg-red-100 text-red-800 text-sm p-3 rounded-md mb-4 border border-red-400" role="alert">
+                    Неверное имя пользователя или пароль. Пожалуйста, попробуйте снова.
+                </div>
+            {% endif %}
+
+            <div class="mb-4">
+                <input type="text" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" 
+                       class="input-field" placeholder="Имя пользователя"
+                       value="{{ form.username.value|default_if_none:'' }}">
+            </div>
+            <div class="mb-6">
+                <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" 
+                       class="input-field" placeholder="Пароль">
+            </div>
+            <div class="d-grid">
+                <button type="submit" class="btn-primary">Войти</button>
+            </div>
+            <input type="hidden" name="next" value="{{ next }}" />
+        </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

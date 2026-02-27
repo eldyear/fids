@@ -1,0 +1,127 @@
+{% load flights_extras %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Финансовый контроль рейса {{ flight.flight_num }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding-top: 20px; }
+        .container { max-width: 960px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">
+            Финансовый контроль техкарты
+            <span class="text-muted">№ {{ tech_card.id }}</span>
+        </h1>
+
+        <div class="d-flex justify-content-between mb-4">
+            <a href="{% url 'finance_dashboard' %}" class="btn btn-secondary">← Вернуться к списку</a>
+            <div class="btn-group" role="group" aria-label="Export options">
+                <a href="{% url 'finance_export_to_pdf' flight.id %}" class="btn btn-primary" target="_blank">PDF</a>
+                <a href="{% url 'export_to_excel' flight.id %}" class="btn btn-success">Excel</a>
+                <a href="{% url 'export_to_1c' flight.id %}" class="btn btn-warning">1С (CSV)</a>
+            </div>
+        </div>
+        <div class="card mb-4 p-4 bg-light shadow-sm">
+            <h3 class="card-title text-primary">Детали рейса</h3>
+            <div class="row align-items-center mb-5">
+                        <div class="col-md-8">
+                            <h3 class="card-title text-primary m-0">
+                                {% if read_only %}
+                                    {{ tech_card.author.get_full_name }}
+                                {% else %}
+                                    {{ current_user_name }}
+                                {% endif %}
+                            </h3>
+                            <p class="text-secondary m-0" style="font-size: 1rem;">
+                                Ответственный: <strong>{{ tech_card.author.get_full_name }}</strong>
+                            </p>
+                        </div>
+                    </div>
+    
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p class="mb-1"><strong class="text-secondary">Номер рейса:</strong>  <br><div class="card mb-1 text-center fw-semibold py-1">{{ flight.flight_num }} ⇆ {{ flight.linked_flight.flight_num|default:"-" }}</div></p>
+                            <p class="mb-1">
+                                <strong class="text-secondary">Мак.взлетная масса:</strong>
+                                <div class="card mb-1 text-center fw-semibold py-1">{{ tech_card.max_takeoff_weight|default:'' }}</div>
+                            </p>
+                        </div>
+                        <div class="col-md-3">
+                            <p class="mb-1"><strong class="text-secondary">Аэропорт:</strong> <br><div class="card mb-1 text-center fw-semibold py-1">{{ flight.dep_airport.code|default:"-" }} → {{ flight.arr_airport.code|default:"-" }} → {{ flight.dep_airport.code|default:"-" }}</div></p>
+                            <p class="mb-1"><strong class="text-secondary">Стоянка:</strong> <br><div class="card mb-1 text-center fw-semibold py-1">{{ flight.stand|default:"-" }}</div></p>
+                        </div>
+                        <div class="col-md-2">
+                            <p class="mb-1"><strong class="text-secondary">Тип ВС:</strong> <br><div class="card mb-1 text-center fw-semibold py-1">{{ flight.aircraft_type|default:"-" }}</div></p>
+                            <p class="mb-1"><strong class="text-secondary">Борт. номер:</strong> <br><div class="card mb-1 text-center fw-semibold py-1">{{ flight.board_num|default:"-" }}</div></p>
+                        </div>
+                        <div class="col-md-2">
+                            <p class="mb-1"><strong class="text-secondary">Дата рейса:</strong>  <br><div class="card mb-1 text-center fw-semibold py-1">{{ flight.date|date:"d.m.Y" }}</div></p>
+                            <p class="mb-1"><strong class="text-secondary">Дата ⇆ рейса:</strong>  <br><div class="card mb-1 text-center fw-semibold py-1">{{ flight.linked_flight.date|date:"d.m.Y" }}</div></p>
+                        </div>
+                        <div class="col-md-2">
+                            <p class="mb-1"><strong class="text-secondary">АК:</strong>  <br><div class="card mb-1 text-center fw-semibold py-1">{{ flight.airline.name }}</div></p>
+                            <p class="mb-1"><strong class="text-secondary">Код АК:</strong> <br><div class="card mb-1 text-center fw-semibold py-1">{{ flight.airline.code|default:"-" }}</div></p>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <p class="mb-1"><strong class="text-secondary">Время П/П:</strong> <br><div class="card mb-1 text-center fw-semibold py-1">{{ flight.time|default:"-" }}</div></p>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="mb-1"><strong class="text-secondary">Время П/Ф:</strong> <br><div class="card mb-1 text-center fw-semibold py-1">{{ flight.actual_time|default:"-" }}</div></p>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="mb-1"><strong class="text-secondary">Время В/П:</strong> <br><div class="card mb-1 text-center fw-semibold py-1">{{ flight.linked_flight.time|default:"-" }}</div></p>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="mb-1"><strong class="text-secondary">Время В/Ф:</strong> <br><div class="card mb-1 text-center fw-semibold py-1">{{ flight.linked_flight.actual_time|default:"-" }}</div></p>
+                            </div>
+                        </div>
+        </div>
+    </div>
+        <h2 class="mb-3">Список услуг</h2>
+        {% if services_with_costs %}
+        <div class="table-responsive mb-4">
+            <table class="table table-bordered table-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th>Тип услуги</th>
+                        <th>Описание</th>
+                        <th>Кол-во</th>
+                        <th>Ед. изм.</th>
+                        <th>Цена за ед.</th>
+                        <th>Итого</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in services_with_costs %}
+                    <tr>
+                        <td>{{ item.service.service_type.name }}</td>
+                        <td>{{ item.service.description|default:"-" }}</td>
+                        <td>{{ item.service.quantity }}</td>
+                        <td>{{ item.service.unit_of_measure|default:"-" }}</td>
+                        <td>{{ item.price_per_unit|floatformat:2 }} USD</td>
+                        <td><strong>{{ item.service_total_cost|floatformat:2 }} USD</strong></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-end">
+            <h3>Общая стоимость: <span class="badge bg-success">{{ total_cost|floatformat:2 }} USD.</span></h3>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            Услуги для этого рейса не найдены.
+        </div>
+        {% endif %}
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

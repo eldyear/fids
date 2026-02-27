@@ -1,0 +1,99 @@
+{% load static %}
+
+<!-- Bootstrap 4 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+
+<div class="container vh-100 d-flex justify-content-center align-items-center">
+    <div class="row w-100 justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-primary">
+                <div class="card-header text-center bg-white">
+                    <img src="{% static 'images/newlogo.png' %}" alt="Логотип Ош" class="mb-2" style="height:50px;">
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-2">
+                            <a href="/users/login/" class="btn btn-block btn-outline-primary"><i
+                                    class="fas fa-sign-in-alt mr-1"></i>Авторизация</a>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <a href="/users/inftablo/" class="btn btn-block btn-outline-info"><i
+                                    class="fas fa-file-alt mr-1"></i>Суточный план</a>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-2">
+                            <a href="/go/dep" class="btn btn-block btn-success"><i
+                                    class="fas fa-plane-departure mr-1"></i>Табло ВЫЛЕТОВ</a>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <a href="/go/arr" class="btn btn-block btn-warning"><i
+                                    class="fas fa-plane-arrival mr-1"></i>Табло ПРИЛЕТОВ</a>
+                        </div>
+                    </div>
+                    <form onsubmit="redirectToUrl(); return false;" class="mb-3">
+                        <div class="input-group">
+                            <input type="text" id="pkInput" class="form-control" placeholder="Введите ID">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-tv mr-1"></i>Табло
+                                    регистрации</button>
+                            </div>
+                        </div>
+                    </form>
+                    <form onsubmit="redirectToGateUrl(); return false;" class="mb-3">
+                        <div class="input-group">
+                            <input type="text" id="pkInputGate" class="form-control" placeholder="Введите ID">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-info"><i class="fas fa-door-open mr-1"></i>Табло
+                                    выхода (гейт)</button>
+                            </div>
+                        </div>
+                    </form>
+                    <form onsubmit="redirectToBaggageUrl(); return false;">
+                        <div class="input-group">
+                            <input type="text" id="pkInputBaggage" class="form-control" placeholder="Введите ID">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-secondary"><i
+                                        class="fas fa-suitcase-rolling mr-1"></i>Табло выдачи багажа</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS: jQuery, Bootstrap -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function redirectToUrl() {
+        const pk = document.getElementById('pkInput').value;
+        if (pk) {
+            const url = `/go/st/${pk}`;
+            window.open(url);
+        } else {
+            alert("Пожалуйста, введите ID.");
+        }
+    }
+    function redirectToGateUrl() {
+        const pk = document.getElementById('pkInputGate').value;
+        if (pk) {
+            const url = `/go/gt/${pk}`;
+            window.open(url);
+        } else {
+            alert("Пожалуйста, введите ID.");
+        }
+    }
+    function redirectToBaggageUrl() {
+        const pk = document.getElementById('pkInputBaggage').value;
+        if (pk) {
+            const url = `/go/bg/${pk}`;
+            window.open(url);
+        } else {
+            alert("Пожалуйста, введите ID.");
+        }
+    }
+</script>

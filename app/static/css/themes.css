@@ -1,0 +1,151 @@
+/* Light Theme Variables */
+:root[data-theme="light"] {
+    /* Backgrounds */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-body: #f0f2f5;
+    --bg-card: #ffffff;
+
+    /* Text */
+    --text-primary: #1a1a1a;
+    --text-secondary: #6c757d;
+    --text-muted: #adb5bd;
+
+    /* Borders */
+    --border-color: #dee2e6;
+    --border-light: #e9ecef;
+
+    /* Accents */
+    --accent-color: #3b82f6;
+    --accent-hover: #2563eb;
+
+    /* Status colors */
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --info-color: #3b82f6;
+
+    /* Sidebar */
+    --sidebar-bg: #ffffff;
+    --sidebar-text: #4b5563;
+    --sidebar-active-bg: #eff6ff;
+    --sidebar-active-text: #3b82f6;
+    --sidebar-hover-bg: #f3f4f6;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Theme Variables (default from base_dashboard.html) */
+:root,
+:root[data-theme="dark"] {
+    /* Default dark theme uses variables from base_dashboard.html inline styles */
+    --bg-body: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-sidebar: #1e293b;
+    --bg-card: #1e293b;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    /* Lighter for better contrast */
+    --accent-color: #3b82f6;
+    --accent-hover: #2563eb;
+    --border-color: #334155;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --info-color: #3b82f6;
+}
+
+/* Theme-aware transitions */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Remove visited link color change */
+a:visited {
+    color: inherit;
+}
+
+a {
+    color: inherit;
+}
+
+/* Override specific elements for light theme */
+:root[data-theme="light"] .card {
+    background: var(--bg-card);
+    box-shadow: var(--shadow);
+}
+
+:root[data-theme="light"] .sidebar {
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border-color);
+}
+
+:root[data-theme="light"] .sidebar a {
+    color: var(--sidebar-text);
+}
+
+:root[data-theme="light"] .sidebar a:hover {
+    background: var(--sidebar-hover-bg);
+}
+
+:root[data-theme="light"] .sidebar a.active {
+    background: var(--sidebar-active-bg);
+    color: var(--sidebar-active-text);
+}
+
+:root[data-theme="light"] table {
+    border-color: var(--border-color);
+}
+
+:root[data-theme="light"] table thead {
+    background: var(--bg-secondary);
+    border-bottom: 2px solid var(--border-color);
+}
+
+:root[data-theme="light"] table tbody tr:hover {
+    background: var(--bg-secondary);
+}
+
+:root[data-theme="light"] table tbody tr {
+    border-bottom: 1px solid var(--border-light);
+}
+
+:root[data-theme="light"] .badge-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+:root[data-theme="light"] .badge-success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+:root[data-theme="light"] .badge-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Theme Toggle Button Styles */
+.theme-toggle {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.theme-toggle:hover {
+    background: var(--border-color);
+}
+
+.theme-toggle i {
+    font-size: 1.1rem;
+}

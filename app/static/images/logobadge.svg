@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_Слой_2" data-name="Слой_2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 83.38 28.91">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        fill: #00adee;
+      }
+
+      .cls-3, .cls-4 {
+        fill: #034ea1;
+      }
+
+      .cls-2 {
+        font-family: Montserrat-Bold, Montserrat;
+        font-size: 4.5px;
+      }
+
+      .cls-2, .cls-4 {
+        font-weight: 700;
+      }
+
+      .cls-4 {
+        font-family: Montserrat-ExtraBold, Montserrat;
+        font-size: 24.59px;
+      }
+
+      .cls-5 {
+        letter-spacing: .06em;
+      }
+
+      .cls-6 {
+        letter-spacing: .06em;
+      }
+
+      .cls-7 {
+        letter-spacing: .06em;
+      }
+
+      .cls-8 {
+        letter-spacing: .05em;
+      }
+
+      .cls-9 {
+        letter-spacing: .04em;
+      }
+
+      .cls-10 {
+        letter-spacing: .04em;
+      }
+
+      .cls-11 {
+        letter-spacing: .03em;
+      }
+
+      .cls-12 {
+        letter-spacing: .03em;
+      }
+    </style>
+  </defs>
+  <g id="_Слой_1-2" data-name="Слой_1">
+    <g>
+      <g>
+        <polygon class="cls-3" points="7.28 3.56 7.28 6.97 16.42 10.68 25.56 6.97 25.56 3.56 7.28 3.56"/>
+        <polygon class="cls-3" points="9.52 13.49 9.54 13.49 7.28 11.61 7.28 21.84 12.84 21.84 13.79 17.03 9.52 13.49"/>
+        <polygon class="cls-3" points="13.29 21.84 25.56 21.84 25.56 11.61 24.57 12.44 13.29 21.84"/>
+      </g>
+      <g>
+        <polygon class="cls-1" points="17.62 10.89 19.59 11.67 24.15 11.94 32.83 4.7 17.62 10.89"/>
+        <polygon class="cls-1" points="0 4.7 14.48 16.78 13.73 20.65 24.15 11.94 19.11 12.47 0 4.7"/>
+      </g>
+    </g>
+    <text class="cls-4" transform="translate(31.74 20.9)"><tspan x="0" y="0">ОШ</tspan></text>
+    <text class="cls-2" transform="translate(.31 27.71)"><tspan class="cls-7" x="0" y="0">М</tspan><tspan class="cls-12" x="4.59" y="0">Э</tspan><tspan class="cls-8" x="7.94" y="0">Ж</tspan><tspan class="cls-6" x="13.03" y="0">Д</tspan><tspan class="cls-10" x="17.02" y="0">У</tspan><tspan class="cls-5" x="20.47" y="0">НАР</tspan><tspan class="cls-9" x="31.76" y="0">О</tspan><tspan class="cls-5" x="35.72" y="0">ДНЫЙ АЭРОПО</tspan><tspan class="cls-11" x="76.82" y="0">Р</tspan><tspan class="cls-6" x="80.21" y="0">Т</tspan></text>
+  </g>
+</svg>

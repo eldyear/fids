@@ -1,0 +1,84 @@
+{% extends 'app/dashboard/base_dashboard.html' %}
+
+{% block page_title %}Flights Management{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div style="display: flex; gap: 10px;">
+            <a href="?direction=all" class="btn {% if current_direction == 'all' %}btn-primary{% else %}btn-secondary{% endif %}" style="background-color: {% if current_direction != 'all' %}var(--bg-body){% endif %};">All</a>
+            <a href="?direction=dep" class="btn {% if current_direction == 'dep' %}btn-primary{% else %}btn-secondary{% endif %}" style="background-color: {% if current_direction != 'dep' %}var(--bg-body){% endif %};">Departures</a>
+            <a href="?direction=arr" class="btn {% if current_direction == 'arr' %}btn-primary{% else %}btn-secondary{% endif %}" style="background-color: {% if current_direction != 'arr' %}var(--bg-body){% endif %};">Arrivals</a>
+        </div>
+        <!-- <a href="#" class="btn btn-primary">+ Add Flight</a> -->
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Flight</th>
+                    <th>Airline</th>
+                    <th>Direction</th>
+                    <th>Route</th>
+                    <th>Sched. Time</th>
+                    <th>Est. Time</th>
+                    <th>Status</th>
+                    <th>Gate</th>
+                    <th>Desk</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for flight in flights %}
+                <tr>
+                    <td>{{ flight.date1|date:"d.m.Y" }}</td>
+                    <td style="font-weight: 600;">{{ flight.flight.flights }}</td>
+                    <td>{{ flight.airline|default:"-" }}</td>
+                    <td>
+                        {% if flight.direction == 'dep' %}
+                            <span style="color: var(--accent-color);">DEP</span>
+                        {% else %}
+                            <span style="color: var(--success-color);">ARR</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ flight.destination.city_name_en }}</td>
+                    <td>{{ flight.time1|time:"H:i" }}</td>
+                    <td>{{ flight.last_time|time:"H:i"|default:"-" }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if flight.status.name_en == 'DELAYED' %}badge-danger
+                            {% elif flight.status.name_en == 'ARRIVED' or flight.status.name_en == 'DEPARTED' %}badge-success
+                            {% else %}badge-warning{% endif %}">
+                            {{ flight.status.name_en|default:"Scheduled" }}
+                        </span>
+                    </td>
+                    <td>
+                        {% for gate in flight.gate.all %}
+                            {{ gate.gate }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            -
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for desk in flight.stoika.all %}
+                            {{ desk.stoiki }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            -
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <a href="#" style="color: var(--accent-color); text-decoration: none; font-weight: 500;">Edit</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="11" style="text-align: center; color: var(--text-secondary); padding: 40px;">No flights found matching your criteria.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

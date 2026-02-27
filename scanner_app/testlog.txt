@@ -1,0 +1,67 @@
+Django API Response: 
+Object
+flight_found
+: 
+false
+flight_number_searched
+: 
+"N/AN/A"
+message
+: 
+"Рейс N/AN/A на текущую дату не найден в системе FIDS. Сканирование не сохранено."
+status
+: 
+"error"
+
+
+---------------------------------------
+
+Оригинал: HDCBCRI#6M1SAKMATOV/MARISH EOANENY OSSBSZMN 0006 339Y018C0001 100
+-----------
+Пассажир: SAKMATOV /
+Тип Пассажира: M1
+PNR: MARISH
+Откуда: EOA
+Куда: NEN
+Перевозчик: N/A
+Рейс: N/A
+Дата/Класс: N/A
+Класс Обслуживания: Y OSSBSZMN 0006 339Y018C0001
+Место: N/A
+SEQ: 100
+Префикс Сканера: HDCBCRI#6
+Доп. Инфо: N/A
+
+------------------------------------------------------------------------------------
+
+Django API Response: 
+Object
+flight_found
+: 
+false
+flight_number_searched
+: 
+"N/A8"
+message
+: 
+"Рейс N/A8 на текущую дату не найден в системе FIDS. Сканирование не сохранено."
+status
+: 
+"error"
+
+-----------------------------------------------
+Оригинал: HDCBCRI#6M1KADYRKULOV/KANATBEK EOQRHJ8 OSSBSZMN 0006 339Y016B0001 100
+-----------
+Пассажир: KADYRKULOV / K
+Тип Пассажира: M1
+PNR: ANATBEK
+Откуда: EOQ
+Куда: RHJ
+Перевозчик: N/A
+Рейс: 8
+Дата/Класс: N/A
+Класс Обслуживания: OSSBSZMN 0006 339Y016B0001
+Место: N/A
+SEQ: 100
+Префикс Сканера: HDCBCRI#6
+Доп. Инфо: N/A

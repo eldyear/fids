@@ -1,0 +1,367 @@
+{% load flights_extras %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель супервайзера</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { padding-top: 20px; background-color: #f0f2f5; }
+        .container { max-width: 1400px; }
+        .card { margin-bottom: 20px; border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .flight-card { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+        .flight-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .flight-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px 20px;
+        }
+        .flight-info-grid p {
+            margin-bottom: 0;
+            font-size: 0.95em;
+        }
+        .flight-info-grid strong {
+            display: block;
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-bottom: 2px;
+        }
+        .tech-card-view-item {
+            border: 1px solid #dee2e6;
+            border-radius: .25rem;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .tech-card-view-item:hover {
+            background-color: #e9ecef;
+        }
+
+        .tech-card-view-item {
+            transition: transform 0.2s ease-in-out;
+        }
+        
+        .tech-card-view-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* Стиль для блока пользователя */
+        .user-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .flight-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .flight-card-body p {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .flight-card-body p strong {
+            font-weight: 600;
+            color: #495057;
+            margin-right: 5px;
+        }
+
+        .flight-card-actions {
+            margin-top: 1rem;
+            border-top: 1px solid #e9ecef;
+            padding-top: 1rem;
+        }
+        
+        /* Убираем отображение таблицы на маленьких экранах */
+        @media (max-width: 991px) {
+            .table-responsive { display: none; }
+        }
+        /* Убираем отображение карточек на больших экранах */
+        @media (min-width: 992px) {
+            .flight-cards-mobile { display: none; }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <div class="user-info">
+            {% if user.is_authenticated %}
+            <h2 class="mb-0">{{ user.first_name }} {{ user.last_name }}</h2>
+                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">Выход</button>
+                </form>
+            {% endif %}
+        </div>
+
+        {% include 'includes/messages.html' %}
+
+        <div class="card p-4">
+            <div class="row g-2">
+                <div class="col-md-9">
+                    <form method="get" class="mb-4" id="filter-form">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="{{ form.date.id_for_label }}" class="form-label">{{ form.date.label }}</label>
+                                {{ form.date|add_class:"form-control" }}
+                            </div>
+                            <input type="hidden" name="view" id="view-mode-input" value="{{ view_mode }}">
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">Показать</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-3 d-flex align-items-end mb-4">
+                    <form method="post" action="{% url 'supervisor_dashboard' %}" class="w-100">
+                        {% csrf_token %}
+                        <input type="hidden" name="date" value="{{ request.GET.date }}">
+                        <button type="submit" class="btn btn-secondary w-100">Обновить из API</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="mb-0">
+                {% if view_mode == 'flights' %}Список рейсов{% else %}Мои техкарты{% endif %}
+            </h2>
+            <div class="btn-group" role="group">
+                <a href="{% url 'supervisor_dashboard' %}?date={{ request.GET.date }}&view=flights" class="btn btn-outline-primary {% if view_mode == 'flights' %}active{% endif %}">
+                    Рейсы
+                </a>
+                <a href="{% url 'supervisor_dashboard' %}?date={{ request.GET.date }}&view=techcards" class="btn btn-outline-primary {% if view_mode == 'techcards' %}active{% endif %}">
+                    Мои техкарты
+                </a>
+            </div>
+        </div>
+
+        {% if view_mode == 'flights' %}
+            
+            <div class="table-responsive d-none d-lg-block">
+                <table class="table table-bordered table-hover table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Дата</th>
+                            <th>Время план.</th>
+                            <th>Время ожид.</th>
+                            <th>Время факт.</th>
+                            <th>Номер рейса</th>
+                            <th>Авиакомпания</th>
+                            <th>Вылет</th>
+                            <th>Прилет</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for flight_info in flights_with_info %}
+                        <tr>
+                            <td>{{ flight_info.flight.date|date:"d.m.Y" }}</td>
+                            <td>{{ flight_info.flight.time|default:"-" }}</td>
+                            <td>{{ flight_info.flight.estimated_time|default:"-" }}</td>
+                            <td>{{ flight_info.flight.actual_time|default:"-" }}</td>
+                            <td>{{ flight_info.flight.flight_num }}</td>
+                            <td>{{ flight_info.flight.airline|default:"-" }}</td>
+                            <td>{{ flight_info.flight.dep_airport.code|default:"-" }}</td>
+                            <td>{{ flight_info.flight.arr_airport.code|default:"-" }}</td>
+                            <td class="text-end">
+                                {% if flight_info.user_tech_card_exists %}
+                                    <a href="#" onclick="openServicesPage('{% url 'manage_services' flight_info.flight.id %}', '{{ flight_info.flight.id }}')"
+                                       class="btn btn-success btn-sm">
+                                        Редактировать
+                                    </a>
+                                {% endif %}
+                            
+                                {% for tech_card in flight_info.other_tech_cards %}
+                                    <a href="#" onclick="openServicesPage('{% url 'view_services' flight_info.flight.id tech_card.id %}', '{{ flight_info.flight.id }}')"
+                                    class="btn {% if tech_card.is_closed %}btn-info{% else %}btn-warning{% endif %} btn-sm"
+                                    title="Просмотр техкарты: {{ tech_card.author.get_full_name }}">
+                                        {% if tech_card.is_closed %}
+                                        <i class="fa fa-lock" title="Техкарта закрыта"></i> Просмотр
+                                        {% else %}
+                                            Редактировать
+                                        {% endif %}
+                                    </a>
+                                {% endfor %}
+                            
+                                {% if not flight_info.user_tech_card_exists %}
+                                    {% if flight_info.can_create_tech_card %}
+                                        <a href="#" onclick="openServicesPage('{% url 'manage_services' flight_info.flight.id %}', '{{ flight_info.flight.id }}')"
+                                           class="btn btn-primary btn-sm">
+                                            Создать
+                                        </a>
+                                    {% else %}
+                                        <button class="btn btn-primary btn-sm" disabled title="Создание техкарты для старых рейсов недоступно.">
+                                            Создать
+                                        </button>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="11" class="text-center">Рейсы по заданному фильтру не найдены.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flight-cards-mobile d-block d-lg-none">
+                {% for flight_info in flights_with_info %}
+                    <div class="card flight-card">
+                        <div class="card-body">
+                            <div class="flight-card-header">
+                                <h5 class="mb-0">
+                                    <strong>Рейс {{ flight_info.flight.flight_num }}</strong>
+                                </h5>
+                                <span class="badge bg-secondary">{{ flight_info.flight.date|date:"d.m.Y" }}</span>
+                            </div>
+                            <p><strong>Авиакомпания:</strong> {{ flight_info.flight.airline|default:"-" }}</p>
+                            <p><strong>Маршрут:</strong> {{ flight_info.flight.dep_airport.code|default:"-" }} &rarr; {{ flight_info.flight.arr_airport.code|default:"-" }}</p>
+                            <p><strong>Время план:</strong> {{ flight_info.flight.time|default:"-" }}</p>
+                            <p><strong>Время ожид:</strong> {{ flight_info.flight.estimated_time|default:"-" }}</p>
+                            <p><strong>Время факт:</strong> {{ flight_info.flight.actual_time|default:"-" }}</p>
+
+                            <div class="flight-card-actions text-end">
+                                {% if flight_info.user_tech_card_exists %}
+                                    <a href="#" onclick="openServicesPage('{% url 'manage_services' flight_info.flight.id %}', '{{ flight_info.flight.id }}')"
+                                       class="btn btn-success btn-sm w-100 mb-2">
+                                        Редактировать мою техкарту
+                                    </a>
+                                {% endif %}
+                            
+                                {% for tech_card in flight_info.other_tech_cards %}
+                                    <a href="#" onclick="openServicesPage('{% url 'view_services' flight_info.flight.id tech_card.id %}', '{{ flight_info.flight.id }}')"
+                                    class="btn {% if tech_card.is_closed %}btn-info{% else %}btn-warning{% endif %} btn-sm w-100 mb-2"
+                                    title="Просмотр техкарты: {{ tech_card.author.get_full_name }}">
+                                        {% if tech_card.is_closed %}
+                                        <i class="fa fa-lock" title="Техкарта закрыта"></i> Просмотр
+                                        {% else %}
+                                            Редактировать
+                                        {% endif %}
+                                    </a>
+                                {% endfor %}
+                            
+                                {% if not flight_info.user_tech_card_exists %}
+                                    {% if flight_info.can_create_tech_card %}
+                                        <a href="#" onclick="openServicesPage('{% url 'manage_services' flight_info.flight.id %}', '{{ flight_info.flight.id }}')"
+                                           class="btn btn-primary btn-sm w-100">
+                                            Создать техкарту
+                                        </a>
+                                    {% else %}
+                                        <button class="btn btn-primary btn-sm w-100" disabled title="Создание техкарты для старых рейсов недоступно.">
+                                            Создать
+                                        </button>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="alert alert-info text-center">
+                        Рейсы по заданному фильтру не найдены.
+                    </div>
+                {% endfor %}
+            </div>
+
+            
+        {% elif view_mode == 'techcards' %}
+            <div class="tech-card-view">
+                {% for tech_card in tech_cards %}
+                <a href="#" onclick="openServicesPage('{% url 'view_services' tech_card.flight.id tech_card.id %}', '{{ tech_card.flight.id }}')" class="text-decoration-none text-dark">
+                    <div class="tech-card-view-item card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="m-0">
+                                    Рейс {{ tech_card.flight.flight_num }}
+                                    {% if tech_card.flight.dep_airport.code and tech_card.flight.arr_airport.code %}
+                                        ({{ tech_card.flight.dep_airport.code }} &rarr; {{ tech_card.flight.arr_airport.code }})
+                                    {% endif %}
+                                </h5>
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-secondary me-2">{{ tech_card.flight.date|date:"d.m.Y" }}</span>
+                                    {% if tech_card.is_closed %}
+                                        <i class="fa fa-lock text-danger" title="Техкарта закрыта"></i>
+                                    {% else %}
+                                        <i class="fa fa-pencil-alt text-primary" title="Техкарта открыта для редактирования"></i>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <p class="card-text mb-1">
+                                <small class="text-muted">Автор: {{ tech_card.author.get_full_name|default:"-" }}</small>
+                            </p>
+                            
+                            {% if tech_card.is_closed %}
+                                <p class="card-text mb-1">
+                                    <small class="text-muted">Создана: {{ tech_card.created_at|date:"d.m.Y H:i"|default:"-" }}</small>
+                                </p>
+                                <p class="card-text mb-1">
+                                    <small class="text-muted">Закрыл: {{ tech_card.closed_by.get_full_name|default:"-" }}</small>
+                                </p>
+                            {% endif %}
+                            {% with service_count=tech_card.services.count %}
+                                <div class="mt-2">
+                                    {% if service_count > 0 %}
+                                        <span class="badge bg-primary me-1">
+                                            {{ service_count }} {{ service_count|pluralize:"услуга,услуги,услуг" }}
+                                        </span>
+                                        {% for service in tech_card.services.all|slice:":3" %}
+                                            <span class="badge bg-info text-dark">{{ service.service_type.name }}</span>
+                                        {% endfor %}
+                                        {% if service_count > 3 %}
+                                            <span class="badge bg-info text-dark">...</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Услуг нет</span>
+                                    {% endif %}
+                                </div>
+                            {% endwith %}
+                        </div>
+                    </div>
+                </a>
+                {% empty %}
+                    <div class="alert alert-info text-center">
+                        Техкарты по заданному фильтру не найдены.
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if not flights_with_info and view_mode == 'flights' %}
+            <p class="alert alert-info">Для отображения данных выберите дату, затем нажмите "Показать".</p>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ИМЕНУЕМ ГЛАВНУЮ СТРАНИЦУ
+        window.name = 'supervisor_dashboard_tab';
+
+        function openServicesPage(url, flightId) {
+            const windowName = `manage_services_${flightId}`;
+            window.open(url, windowName);
+        }
+
+        document.getElementById('filter-form').addEventListener('submit', function(event) {
+            const viewMode = document.querySelector('.btn-group .active').getAttribute('href').split('view=')[1];
+            document.getElementById('view-mode-input').value = viewMode;
+        });
+    </script>
+</body>
+</html>

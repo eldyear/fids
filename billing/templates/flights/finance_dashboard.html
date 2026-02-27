@@ -1,0 +1,98 @@
+{% load flights_extras %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Финансовый контроль</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding-top: 20px; }
+        .container { max-width: 1400px; }
+        .card { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">Финансовый контроль</h1>
+        <p class="mb-4">
+            Здесь отображаются только те рейсы, по которым супервайзер уже сформировал техническую карту.
+        </p>
+
+        {% include 'includes/messages.html' %}
+
+        <div class="card p-4">
+            <h2 class="mb-3">Фильтр рейсов</h2>
+            <form method="get" class="mb-4">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="{{ form.date.id_for_label }}" class="form-label">{{ form.date.label }}</label>
+                        {{ form.date|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-3">
+                        <label for="{{ form.direction.id_for_label }}" class="form-label">{{ form.direction.label }}</label>
+                        {{ form.direction|add_class:"form-select" }}
+                    </div>
+                    <div class="col-md-3">
+                        <label for="{{ form.region.id_for_label }}" class="form-label">{{ form.region.label }}</label>
+                        {{ form.region|add_class:"form-select" }}
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Показать</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="mb-0">Список техкарт</h2>
+            <a href="{% url 'price_management' %}" class="btn btn-info">Управление ценами</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th>Автор</th>
+                        <th>Дата</th>
+                        <th>Время</th>
+                        <th>Номер рейса</th>
+                        <th>Направление</th>
+                        <th>Авиакомпания</th>
+                        <th>Тип ВС</th>
+                        <th>Борт. номер</th>
+                        <th>Вылет</th>
+                        <th>Прилет</th>
+                        <th>Макс. взлетная масса</th>
+                        <th>Общая стоимость</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in tech_cards_with_costs %}
+                    <tr onclick="window.location.href='{% url 'finance_manage_services' item.tech_card.flight.id item.tech_card.id %}'" style="cursor:pointer;">
+                        <td>{{ item.tech_card.author.get_full_name }}</td>
+                        <td>{{ item.tech_card.flight.date|date:"d.m.Y" }}</td>
+                        <td>{{ item.tech_card.flight.time|default:"-" }}</td>
+                        <td>{{ item.tech_card.flight.flight_num }}</td>
+                        <td>{{ item.tech_card.flight.get_direction_display }}</td>
+                        <td>{{ item.tech_card.flight.airline|default:"-" }}</td>
+                        <td>{{ item.tech_card.flight.aircraft_type|default:"-" }}</td>
+                        <td>{{ item.tech_card.flight.board_num|default:"-" }}</td>
+                        <td>{{ item.tech_card.flight.dep_airport.code|default:"-" }}</td>
+                        <td>{{ item.tech_card.flight.arr_airport.code|default:"-" }}</td>
+                        <td>{{ item.tech_card.max_takeoff_weight|default:"-" }}</td>
+                        <td>{{ item.total_cost|floatformat:2 }} руб.</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="12" class="text-center">Техкарты по заданному фильтру не найдены.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

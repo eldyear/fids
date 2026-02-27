@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация - Сканер штрих-кодов</title>
+    <style>
+        /* Общие стили для темы "Безопасность-Аэропорт" */
+        :root {
+            --dark-blue-bg-start: #1A293A; /* Начальный цвет фона */
+            --dark-blue-bg-end: #0F1720;   /* Конечный цвет фона */
+            --card-bg: rgba(30, 40, 50, 0.95); /* Фон основных карточек/контейнеров */
+            --border-color-light: rgba(70, 80, 90, 0.5); /* Цвет светлой рамки */
+            --text-light: #E0E0E0; /* Светлый основной текст */
+            --text-muted: #889BAF; /* Приглушенный текст */
+            --heading-color: #ADD8E6; /* Цвет заголовков */
+            --input-bg: #34495E; /* Фон полей ввода */
+            --input-border: #4A6075; /* Рамка полей ввода */
+            --input-focus-bg: #3D536B; /* Фон полей ввода при фокусе */
+            --accent-blue-light: #007BFF; /* Светлый акцентный синий (для кнопок, фокуса) */
+            --accent-blue-dark: #0056b3; /* Темный акцентный синий (для кнопок) */
+            --button-hover-start: #004085; /* Начальный цвет кнопки при наведении */
+            --button-hover-end: #0056b3;   /* Конечный цвет кнопки при наведении */
+
+            /* Цвета для сообщений */
+            --status-info-bg: #1a5e86;
+            --status-info-text: #bde0ff;
+            --status-success-bg: #198754;
+            --status-success-text: #d4edda;
+            --status-warning-bg: #ffc107;
+            --status-warning-text: #343a40;
+            --status-error-bg: #dc3545;
+            --status-error-text: #f8d7da;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark-blue-bg-start) 0%, var(--dark-blue-bg-end) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            border-radius: 5px; /* Острые углы */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid var(--border-color-light);
+            box-sizing: border-box; /* Важно для padding/width */
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .login-header h1 {
+            color: var(--heading-color);
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .login-header h1::before {
+            content: '🛂'; /* Иконка для сканера / контроля */
+            font-size: 1em;
+            color: var(--accent-blue-light);
+        }
+        .login-header p {
+            color: var(--text-muted);
+            font-size: 1.1em;
+            margin-top: 0;
+        }
+
+        /* Стили для сообщений (замена Bootstrap alert) */
+        .message {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-size: 0.95em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        .message.info {
+            background-color: var(--status-info-bg);
+            color: var(--status-info-text);
+            border: 1px solid rgba(0, 123, 255, 0.5);
+        }
+        .message.success {
+            background-color: var(--status-success-bg);
+            color: var(--status-success-text);
+            border: 1px solid rgba(25, 135, 84, 0.5);
+        }
+        .message.warning {
+            background-color: var(--status-warning-bg);
+            color: var(--status-warning-text);
+            border: 1px solid rgba(255, 193, 7, 0.5);
+        }
+        .message.error { /* Bootstrap uses 'danger', we'll map 'error' to it */
+            background-color: var(--status-error-bg);
+            color: var(--status-error-text);
+            border: 1px solid rgba(220, 53, 69, 0.5);
+        }
+
+        .message-close-btn { /* Замена btn-close */
+            background: none;
+            border: none;
+            color: inherit; /* Цвет наследуется от сообщения */
+            font-size: 1.5em;
+            line-height: 1;
+            padding: 0;
+            cursor: pointer;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+        .message-close-btn:hover {
+            opacity: 1;
+        }
+
+
+        /* Стили для формы */
+        .form-group { /* Замена mb-3, mb-4 */
+            margin-bottom: 20px;
+        }
+
+        .form-label { /* Замена form-label */
+            display: block;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .form-control { /* Замена form-control */
+            background-color: var(--input-bg);
+            color: var(--text-light);
+            border-radius: 5px; /* Острые углы */
+            border: 1px solid var(--input-border);
+            padding: 10px 15px;
+            font-size: 1em;
+            width: 100%;
+            box-sizing: border-box; /* Важно для padding */
+            transition: all 0.3s ease;
+        }
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+        .form-control:focus {
+            background-color: var(--input-focus-bg);
+            border-color: var(--accent-blue-light);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+            color: #FFFFFF; /* Убедимся, что текст белый при фокусе */
+        }
+
+        .btn-login { /* Замена btn btn-login */
+            background: linear-gradient(135deg, var(--accent-blue-dark) 0%, var(--accent-blue-light) 100%);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 5px; /* Острые углы */
+            font-size: 1.1em;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .btn-login:hover {
+            background: linear-gradient(135deg, var(--button-hover-start) 0%, var(--button-hover-end) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+        .btn-login::before {
+            content: '➡️'; /* Иконка входа */
+            font-size: 1.1em;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+        .mt-4 { /* Замена mt-4 */
+            margin-top: 25px;
+        }
+        .text-muted-custom { /* Замена text-muted */
+            color: var(--text-muted) !important;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-header">
+            <h1>Сканер штрих-кодов</h1>
+            <p>Войдите в систему для продолжения</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {{ message.tags|default:'info' }}">
+                    {{ message }}
+                    <button type="button" class="message-close-btn" onclick="this.parentNode.style.display='none';">
+                        &times;
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username" class="form-label">Имя пользователя:</label>
+                <input type="text" class="form-control" id="username" name="username" 
+                       required autofocus>
+            </div>
+            <div class="form-group">
+                <label for="password" class="form-label">Пароль:</label>
+                <input type="password" class="form-control" id="password" name="password" 
+                       required>
+            </div>
+            <button type="submit" class="btn-login">
+                Войти
+            </button>
+        </form>
+
+        <div class="text-center mt-4">
+            <small class="text-muted-custom">
+                Система сканирования штрих-кодов авиабилетов
+            </small>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Табло рейсов</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #1e2a38;
+            margin-bottom: 20px;
+        }
+        .date-picker {
+            text-align: center;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        .date-picker label, .date-picker select, .date-picker input, .date-picker button {
+            font-size: 1rem;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .date-picker select {
+            background-color: #fff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #eef2f5;
+            color: #555;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        .flight-status {
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .status-on-time { background-color: #d4edda; color: #155724; }
+        .status-delayed { background-color: #fff3cd; color: #856404; }
+        .status-cancelled { background-color: #f8d7da; color: #721c24; }
+        
+        /* New styles for specific statuses */
+        .status-check-in { background-color: #d4edda; color: #155724; }
+        .status-boarding { background-color: #d1ecf1; color: #0c5460; }
+        .status-departed { background-color: #cce5ff; color: #004085; }
+        .status-arrived { background-color: #cce5ff; color: #004085; }
+        .status-cancelled { background-color: #f8d7da; color: #721c24; }
+        .status-delayed { background-color: #fff3cd; color: #856404; }
+        .status-expected { background-color: #e2e3e5; color: #383d41; }
+
+        /* Style for the airline logo */
+        .airline-logo {
+            width: 100px;
+            height: auto;
+            vertical-align: middle;
+        }
+
+        /* --- Mobile Styles --- */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+            }
+            .date-picker {
+                flex-direction: column;
+                gap: 10px;
+            }
+            table {
+                border: none;
+            }
+            thead {
+                display: none;
+            }
+            tr {
+                display: block;
+                border: 1px solid #ccc;
+                margin-bottom: 15px;
+                border-radius: 8px;
+            }
+            td {
+                display: block;
+                text-align: left;
+                border-bottom: none;
+                padding: 0;
+            }
+            td:last-child {
+                border-bottom: none;
+            }
+
+            .row-flex {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 10px;
+            }
+            
+            .hide-on-mobile, .hide-on-mobile th, .hide-on-mobile td {
+                display: none;
+            }
+
+            .desktop-row {
+                display: none;
+            }
+        }
+
+        /* --- Desktop Styles --- */
+        @media (min-width: 601px) {
+            .mobile-row {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Табло {{ direction_text }}: {{ selected_date|date:"d M Y" }}</h1>
+
+        <div class="date-picker">
+            <form method="get">
+                <label for="direction_input">Направление:</label>
+                <select id="direction_input" name="direction">
+                    <option value="вылет" {% if selected_direction == 'вылет' %}selected{% endif %}>Вылет</option>
+                    <option value="прилет" {% if selected_direction == 'прилет' %}selected{% endif %}>Прилет</option>
+                </select>
+
+                <label for="date_input">Выберите дату:</label>
+                <input type="date" id="date_input" name="date" value="{{ selected_date|date:"Y-m-d" }}">
+                
+                <button type="submit">Показать</button>
+            </form>
+        </div>
+
+        <table>
+            <thead class="desktop-row">
+                <tr>
+                    <th>АК</th>
+                    <th>Время</th>
+                    <th>Рейс</th>
+                    <th>Пункт назначения</th>
+                    <th>Статус</th>
+                    <th class="hide-on-mobile">Стойка</th>
+                    <th class="hide-on-mobile">Выход</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for flight in flights %}
+                <!-- Desktop row -->
+                <tr class="desktop-row">
+                    <td>
+                        <img src="/static/images/airlines/{{ flight.airline }}.svg" 
+                             alt="{{ flight.flight.airline.name }}" 
+                             class="airline-logo"
+                             onerror="this.onerror=null; this.src='https://placehold.co/100x40/f0f0f0/808080?text=Logo'">
+                    </td>
+                    <td>{{ flight.time1|time:"H:i" }}</td>
+                    <td>{{ flight.flight.flights }}</td>
+                    <td>{{ flight.destination.city_name_ru }}</td>
+                    <td>
+                        <span class="flight-status status-{{ flight.status.name_en|lower|slugify }}">
+                            {{ flight.status.name_ru }}
+                        </span>
+                    </td>
+                    <td class="hide-on-mobile">
+                        {% for stoika in flight.stoika.all %}
+                            {{ stoika.stoiki }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td class="hide-on-mobile">
+                        {% for gate in flight.gate.all %}
+                            {{ gate.gate }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+                <!-- Mobile row -->
+                <tr class="mobile-row">
+                    <td class="mobile-cell">
+                        <div class="row-flex">
+                            <span>{{ flight.flight.flights }}</span>
+                            <img src="/static/images/airlines/{{ flight.airline }}.svg" 
+                                 alt="{{ flight.flight.airline.name }}" 
+                                 class="airline-logo"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/100x40/f0f0f0/808080?text=Logo'">
+                        </div>
+                        <div class="row-flex">
+                            <span>{{ flight.destination.city_name_ru }}</span>
+                            <span>{{ flight.time1|time:"H:i" }}</span>
+                        </div>
+                        <div class="row-flex">
+                            <span class="flight-status status-{{ flight.status.name_en|lower|slugify }}">
+                                {{ flight.status.name_ru }}
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align: center;">На эту дату рейсов не найдено.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

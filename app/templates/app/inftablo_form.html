@@ -1,0 +1,22 @@
+<!-- templates/inftablo_form.html -->
+{% extends "base.html" %}
+
+{% block page_header %}{% if form.instance.pk %}Редактировать рейс{% else %}Добавить рейс{% endif %}{% endblock %}
+
+{% block content %}
+<!-- {% if form.instance.pk %}Редактировать{% else %}Добавить{% endif %} рейс</h2> -->
+
+<form method="post" class="form-list">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="form-btns">
+        <button type="submit" class="btn btn-primary">
+            {% if form.instance.pk %}Сохранить изменения{% else %}Добавить рейс{% endif %}
+        </button>
+        {% if form.instance.pk %}
+        <button type="submit" name="save_as_new" value="true" class="btn btn-secondary">Сохранить как новый</button>
+        {% endif %}
+        <a href="{% url 'inftablo_list' %}" class="btn-link-back">Назад к списку</a>
+    </div>
+</form>
+{% endblock %}

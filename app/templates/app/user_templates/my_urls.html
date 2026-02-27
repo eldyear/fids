@@ -1,0 +1,61 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
+
+<div class="links">
+    <!-- <h3>Аэропорт Ош</h3> -->
+    <img src="{% static 'images/logobadge.svg' %}" alt="Логотип Ош" class="logo"/>
+    <div>
+        <div class="dep">
+            <div><a href="/users/login/" class="button-link" target="_blank">Авторизация</a></div>
+            <div><a href="/users/flight-templates/" class="button-link" target="_blank">Формирование Шаблона</a></div>
+        </div>
+        <div class="dep">
+            <div><a href="/dep/" class="button-link" target="_blank">Табло ВЫЛЕТОВ</a></div>
+            <div><a href="/arr/" class="button-link" target="_blank">Табло ПРИЛЕТОВ</a></div>
+        </div>
+        <div>
+            <input type="text" id="pkInput" placeholder="Введите ID">
+            <a href="#" onclick="redirectToUrl()" class="button-link" target="_blank">Табло регистрации</a>
+        </div>
+        <div>
+            <input type="text" id="pkInputGate" placeholder="Введите ID">
+            <a href="#" onclick="redirectToGateUrl()" class="button-link" target="_blank">Табло выхода (гейт)</a>
+        </div>
+        <div>
+            <input type="text" id="pkInputBaggage" placeholder="Введите ID">
+            <a href="#" onclick="redirectToBaggageUrl()" class="button-link" target="_blank">Табло выдачи багажа</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function redirectToUrl() {
+        const pk = document.getElementById('pkInput').value;  // Получаем значение из input
+        if (pk) {
+            const url = `/ch/${pk}`;  // URL для табло регистрации с ID
+            window.open(url, '_blank');  // Открывает ссылку в новой вкладке
+        } else {
+            alert("Пожалуйста, введите ID.");  // Сообщение об ошибке, если поле пустое
+        }
+    }
+
+    function redirectToGateUrl() {
+        const pk = document.getElementById('pkInputGate').value;  // Получаем значение из input для выдачи багажа
+        if (pk) {
+            const url = `/gate/${pk}`;  // URL для табло выдачи багажа с ID
+            window.open(url, '_blank');  // Открывает ссылку в новой вкладке
+        } else {
+            alert("Пожалуйста, введите ID.");  // Сообщение об ошибке, если поле пустое
+        }
+    }
+    function redirectToBaggageUrl() {
+        const pk = document.getElementById('pkInputBaggage').value;  // Получаем значение из input для выдачи багажа
+        if (pk) {
+            const url = `/bag/${pk}`;  // URL для табло выдачи багажа с ID
+            window.open(url, '_blank');  // Открывает ссылку в новой вкладке
+        } else {
+            alert("Пожалуйста, введите ID.");  // Сообщение об ошибке, если поле пустое
+        }
+    }
+</script>

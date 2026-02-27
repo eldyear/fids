@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flight Status</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .status { font-weight: bold; }
+        .dep { color: blue; }
+        .arr { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Flight Status <span id="lastUpdate"></span></h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Airline</th>
+                <th>Flight</th>
+                <th>Destination</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Stoika</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="flightsBody"></tbody>
+    </table>
+
+    <script>
+        const socket = new WebSocket('ws://localhost:8080/ws');
+        const flightsBody = document.getElementById('flightsBody');
+        const lastUpdate = document.getElementById('lastUpdate');
+        
+        socket.onopen = () => {
+            console.log('Connected to WebSocket server');
+            lastUpdate.textContent = '(Connected)';
+        };
+        
+        socket.onmessage = (event) => {
+            const flights = JSON.parse(event.data);
+            updateFlightsTable(flights);
+            lastUpdate.textContent = `(Last update: ${new Date().toLocaleTimeString('ru-RU', { year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })})`;
+        };
+        
+        socket.onclose = () => {
+            console.log('Disconnected from WebSocket server');
+            lastUpdate.textContent = '(Disconnected)';
+        };
+        
+        function updateFlightsTable(data) {
+            const tbody = document.getElementById('flightsBody');
+            tbody.innerHTML = '';
+            
+            data.forEach(flight => {
+                const row = document.createElement('tr');
+                
+                // Безопасное получение данных
+                const stoikas = Array.isArray(flight.stoika) ? flight.stoika : [];
+                const gates = Array.isArray(flight.gate) ? flight.gate : [];
+                
+                row.innerHTML = `
+                    <td>${flight.airline}</td>
+                    <td>${flight.flight}</td>
+                    <td>${flight.destination.name_ru}</td>
+                    <td>${new Date(flight.date1).toLocaleDateString('ru-RU', { year: '2-digit', month: '2-digit', day: '2-digit' })}</td>
+                    <td>${flight.time1.split(':')[0]}:${flight.time1.split(':')[1]}</td>
+                    <td>${stoikas.join(', ') || '-'}</td>
+                    <td>${flight.status?.name_ru || 'Scheduled'}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}{{ view.object|default:"Новый шаблон" }}{% endblock %}
+{% block page_header %}{{ view.object|default:"Новый шаблон" }}{% endblock %}
+
+{% block content %}
+
+<form method="post" class="tablo-form">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="form-btns">
+        <button type="submit" class="btn btn-primary hover-scale">Сохранить</button>
+        <a href="{% url 'add_flights' %}" class="btn btn-secondary">Добавить рейс</a>
+        <a href="{% url 'flight_template_list' %}" class="btn btn-secondary">Отмена</a>
+    </div>
+</form>
+{% endblock %}

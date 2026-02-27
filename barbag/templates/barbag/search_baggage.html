@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Поиск багажа</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Определение CSS-переменных для обеих тем --- */
+        :root {
+            /* СВЕТЛАЯ ТЕМА (По умолчанию) */
+            --bg-main: #f0f2f5;
+            --bg-card: #ffffff;
+            --bg-form: #f8f9fa;
+            --primary-text: #212529;
+            --secondary-text: #6c757d;
+            --accent-color: #007bff; /* Синий */
+            --danger: #dc3545;
+            --success: #28a745;
+            --border-color: #e9ecef;
+            --input-bg: white;
+            --header-border: #007bff;
+            --hover-bg: #dee2e6;
+            --highlight-bg: #e6f0ff;
+            --mono-font: 'Roboto Mono', monospace;
+            --box-shadow-main: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --search-button-bg: #343a40; /* Темно-серый для кнопки поиска */
+            --action-button-bg: #e9ecef; /* Нейтральный фон для кнопки "Вернуться" */
+
+            /* Сообщения */
+            --msg-error-bg: #ffe0e0;
+            --msg-error-text: #cc0000;
+        }
+
+        /* ТЕМНАЯ ТЕМА (Переопределение) */
+        body.dark-mode {
+            --bg-main: #14141d; 
+            --bg-card: #1c1c28; 
+            --bg-form: #252538;
+            --primary-text: #e0e0e0;
+            --secondary-text: #a0a0b0;
+            --accent-color: #00bcd4; /* Неоновый бирюзовый */
+            --danger: #ff4d4d;
+            --success: #4eff9e; 
+            --border-color: #3f3f4e;
+            --input-bg: #14141d; 
+            --header-border: #00bcd4;
+            --hover-bg: #2e3048;
+            --highlight-bg: #223c45;
+            --box-shadow-main: 0 4px 20px rgba(0, 0, 0, 0.5);
+            --search-button-bg: #495057; /* Темно-серый для кнопки поиска */
+            --action-button-bg: #343a40; /* Темный фон для кнопки "Вернуться" */
+
+            /* Сообщения */
+            --msg-error-bg: #4a2121;
+            --msg-error-text: #ff4d4d;
+        }
+
+        /* --- Общие Стили --- */
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--primary-text);
+            margin: 0;
+            padding: 0;
+            font-size: 14px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* --- Шапка и Контролы --- */
+        .header {
+            width: 100%;
+            background-color: var(--bg-card);
+            color: var(--primary-text);
+            padding: 15px 30px;
+            font-size: 1.6em;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-bottom: 2px solid var(--header-border);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .header-title { color: var(--accent-color); font-weight: 700; font-size: 0.9em; }
+        .header-controls { display: flex; align-items: center; gap: 15px; }
+        #theme-toggle {
+            padding: 8px 12px;
+            background-color: var(--secondary-text);
+            color: var(--bg-card);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.6em;
+            font-weight: 600;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .logout-button {
+            padding: 8px 16px;
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.6em;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- Основной Контейнер --- */
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--box-shadow-main);
+            border-radius: 8px;
+            overflow: hidden;
+            padding: 25px;
+            transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+        h1 {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin: 0 0 20px 0;
+            text-align: center;
+        }
+        h2 {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: var(--primary-text);
+            text-align: left;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 5px;
+            transition: color 0.3s, border-color 0.3s;
+        }
+
+        /* --- Форма Поиска --- */
+        .search-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-form);
+            border-radius: 4px;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .search-form label {
+            font-size: 1em;
+            font-weight: 700;
+            color: var(--primary-text);
+            white-space: nowrap;
+        }
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1em;
+            flex-grow: 1;
+            max-width: 350px;
+            background-color: var(--input-bg);
+            color: var(--primary-text);
+            font-family: var(--mono-font);
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+        }
+        input[type="text"]:focus {
+             border-color: var(--accent-color);
+             outline: none;
+             box-shadow: 0 0 0 2px var(--highlight-bg);
+        }
+        
+        /* --- Общий стиль для кнопок --- */
+        button {
+            padding: 10px 20px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        /* Стиль для кнопки "Найти" (темнее, как просили) */
+        .search-button {
+            background-color: var(--search-button-bg) !important;
+        }
+        .search-button:hover {
+            background-color: var(--secondary-text) !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Стиль иконки */
+        .icon {
+            font-size: 1.1em;
+            line-height: 1;
+        }
+
+        /* --- Кнопка "Вернуться" (Action Button) --- */
+        .action-button {
+            /* Нейтральный стиль */
+            padding: 10px 20px; 
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            text-decoration: none;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1em;
+            font-weight: 600;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+            background-color: var(--action-button-bg); 
+            color: var(--primary-text); 
+        }
+        .action-button:hover {
+            background-color: var(--hover-bg);
+            border-color: var(--secondary-text);
+        }
+        
+        /* --- Стили Списка Результатов --- */
+        ul {
+            list-style-type: none;
+            padding: 0;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-card);
+            margin: 0 0 20px 0;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); 
+            transition: background-color 0.3s;
+        }
+        li {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 1em;
+            display: flex;
+            align-items: flex-start;
+        }
+        li:hover {
+            background-color: var(--hover-bg);
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        .baggage-icon {
+            margin-right: 15px;
+            font-size: 2em;
+            color: var(--accent-color);
+            transition: color 0.3s;
+        }
+        .baggage-details {
+            flex-grow: 1;
+            line-height: 1.6;
+        }
+        .baggage-details strong {
+            font-weight: 700;
+        }
+        .container-info {
+            color: var(--accent-color); 
+            font-weight: 700; 
+            background-color: var(--highlight-bg); 
+            padding: 2px 6px;
+            border-radius: 3px;
+            white-space: nowrap;
+            font-family: var(--mono-font);
+        }
+        .flight-info {
+            color: var(--secondary-text);
+            font-weight: 400;
+        }
+        p.error {
+            background-color: var(--msg-error-bg);
+            color: var(--msg-error-text);
+            border: 1px solid var(--msg-error-text);
+            padding: 12px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1em;
+            margin: 0 0 20px 0;
+            border-radius: 4px;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+        .back-button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <span class="header-title">Аэропорт: Операционный Центр</span>
+        <div class="header-controls">
+            <button id="theme-toggle">Светлая тема 💡</button>
+            <a href="{% url 'logout' %}" class="logout-button">
+                <span class="icon">➡️</span> Выход
+            </a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h1>Поиск багажа по части штрихкода</h1>
+
+        <form method="get" action="{% url 'search_baggage' %}" class="search-form">
+            <label for="barcode">Введите часть штрихкода багажа:</label>
+            <input type="text" id="barcode" name="barcode" value="{{ search_query }}" placeholder="Например: 12345 или 67890">
+            <button type="submit" class="search-button">
+                <span class="icon">🔍</span> Найти
+            </button>
+        </form>
+
+        {% if search_query and not baggage_list %}
+            <p class="error">❌ Багаж с частью штрихкода **"{{ search_query }}"** не найден.</p>
+        {% endif %}
+
+        {% if baggage_list %}
+            <h2>Результаты поиска ({{ baggage_list|length }} ед.):</h2>
+            <ul>
+            {% for bag in baggage_list %}
+                <li>
+                    <span class="baggage-icon">🧳</span>
+                    <div class="baggage-details">
+                        <strong>Штрихкод:</strong> <span style="font-family: var(--mono-font);">{{ bag.barcode }}</span><br>
+                        <strong>Контейнер:</strong> 
+                        <span class="container-info">📦 {{ bag.container.barcode }}</span>
+                        <br>
+                        <span class="flight-info">
+                            <strong>Рейс:</strong> ✈️ {{ bag.container.flight.flight_num }}
+                            &nbsp;|&nbsp; 
+                            <strong>Пункт назначения:</strong> 📍 {{ bag.container.flight.destination }}
+                        </span>
+                    </div>
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+
+        <div class="back-button-container">
+            <a href="{% url 'flight_list' %}" class="action-button">
+                <span class="icon">🔙</span> Вернуться к списку рейсов
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Логика Переключения Тем ---
+            const themeToggle = document.getElementById('theme-toggle');
+            const body = document.body;
+            const storageKey = 'flightAppTheme';
+
+            function updateTheme(theme) {
+                if (theme === 'dark') {
+                    body.classList.add('dark-mode');
+                    themeToggle.textContent = 'Светлая тема 💡';
+                } else {
+                    body.classList.remove('dark-mode');
+                    themeToggle.textContent = 'Темная тема 🌙';
+                }
+            }
+
+            // 1. Установка темы при загрузке (по умолчанию 'dark')
+            const savedTheme = localStorage.getItem(storageKey) || 'dark';
+            updateTheme(savedTheme);
+
+            // 2. Обработчик клика
+            themeToggle.addEventListener('click', function () {
+                const currentTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
+                updateTheme(currentTheme);
+                localStorage.setItem(storageKey, currentTheme);
+            });
+        });
+    </script>
+</body>
+</html>

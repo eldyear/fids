@@ -1,0 +1,121 @@
+{% load flights_extras %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление ценами</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding-top: 20px; }
+        .container { max-width: 960px; }
+        .save-btn {
+            white-space: nowrap;
+        }
+        .price-input {
+            width: 120px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">Управление ценами на услуги</h1>
+        <p class="text-muted">
+            Здесь вы можете установить или обновить цену за единицу для каждого типа услуги. 
+            Изменения сохраняются автоматически.
+        </p>
+
+        <a href="{% url 'finance_dashboard' %}" class="btn btn-secondary mb-4">← Вернуться на главную</a>
+
+        <div id="alert-container"></div>
+        
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Название услуги</th>
+                        <th>Код</th>
+                        <th>Цена за единицу (руб.)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for service_type in service_types %}
+                    <tr>
+                        <td>{{ service_type.name }}</td>
+                        <td>{{ service_type.code }}</td>
+                        <td>
+                            <div class="input-group">
+                                <input type="number" step="0.01" class="form-control price-input" 
+                                       value="{{ prices|get_item:service_type.id|default:'0' }}" 
+                                       data-service-type-id="{{ service_type.id }}">
+                                <button class="btn btn-success save-btn" type="button" 
+                                        data-service-type-id="{{ service_type.id }}">
+                                    Сохранить
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const saveButtons = document.querySelectorAll('.save-btn');
+            const alertContainer = document.getElementById('alert-container');
+
+            saveButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const serviceTypeId = this.dataset.serviceTypeId;
+                    const priceInput = document.querySelector(`input[data-service-type-id='${serviceTypeId}']`);
+                    const pricePerUnit = priceInput.value;
+
+                    // Валидация
+                    if (pricePerUnit === '' || isNaN(pricePerUnit) || pricePerUnit < 0) {
+                        showAlert('Пожалуйста, введите корректное числовое значение.', 'danger');
+                        return;
+                    }
+
+                    // Отправка AJAX-запроса
+                    fetch('{% url "save_price" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        },
+                        body: JSON.stringify({
+                            service_type_id: serviceTypeId,
+                            price_per_unit: pricePerUnit
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            showAlert('Цена успешно сохранена!', 'success');
+                        } else {
+                            showAlert(`Ошибка сохранения: ${data.message}`, 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Ошибка:', error);
+                        showAlert('Произошла ошибка сети.', 'danger');
+                    });
+                });
+            });
+
+            function showAlert(message, type) {
+                const alertHtml = `
+                    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+                alertContainer.innerHTML = alertHtml;
+            }
+        });
+    </script>
+</body>
+</html>

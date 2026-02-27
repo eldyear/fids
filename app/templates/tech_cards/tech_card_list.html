@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Технологические карты</title>
+</head>
+<body>
+    <h1>Технологические карты</h1>
+    <a href="{% url 'tech_card_create' %}">Создать новую карту</a>
+    <ul>
+        {% for tech_card in tech_cards %}
+        <li><a href="{% url 'tech_card_detail' tech_card.pk %}">{{ tech_card.flight_number }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

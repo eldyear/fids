@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Дашборд{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-orange: #FF6B4A;
+            --light-orange: #FFA168;
+            --background-white: #ffffff;
+            --light-gray-shadow: #f3f4f6;
+            --gray-border: #e5e7eb;
+            --text-dark: #111827;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-white);
+            color: var(--text-dark);
+        }
+        
+        .neomorphic-card {
+            background-color: var(--background-white);
+            border-radius: 16px;
+            box-shadow: 8px 8px 16px var(--light-gray-shadow), -8px -8px 16px var(--background-white);
+            transition: all 0.3s ease;
+        }
+
+        .neomorphic-card:hover {
+            box-shadow: 10px 10px 20px var(--light-gray-shadow), -10px -10px 20px var(--background-white);
+            transform: translateY(-2px);
+        }
+
+        .neomorphic-button {
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            box-shadow: inset 4px 4px 8px var(--light-gray-shadow), inset -4px -4px 8px var(--background-white);
+        }
+
+        .neomorphic-button:hover {
+            box-shadow: inset 2px 2px 4px var(--light-gray-shadow), inset -2px -2px 4px var(--background-white);
+        }
+
+        .active-link {
+            border-left: 4px solid var(--primary-orange);
+        }
+        
+        .progress-circle-outer {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: conic-gradient(var(--primary-orange) 180deg, var(--gray-border) 180deg);
+        }
+        .progress-circle-inner {
+            background: var(--background-white);
+            width: 80px;
+            height: 80px;
+        }
+
+        /* Дополнительные стили для мобильной адаптации */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                box-shadow: none;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex text-gray-800">
+    <!-- Sidebar -->
+    <aside class="w-72 bg-white p-6 shadow-md flex flex-col justify-between sidebar">
+        <!-- Logo and Menu -->
+        <div>
+            <div class="flex items-center space-x-2 pb-6 mb-6 border-b border-gray-200">
+                <i class="fas fa-cubes text-2xl text-orange-500"></i>
+                <h1 class="font-bold text-2xl tracking-wide text-gray-800">Дашборд</h1>
+            </div>
+            
+            <!-- Main Menu -->
+            <nav>
+                <div class="font-bold text-gray-400 mb-2 text-sm">Главное меню</div>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="{% url 'dashboard_v2' %}?view=home" class="{% if view_mode == 'home' %}active-link{% endif %} flex items-center space-x-3 p-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200 {% if view_mode == 'home' %}text-orange-500 font-semibold{% endif %}">
+                            <i class="fas fa-home w-5"></i>
+                            <span>Главная</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'dashboard_v2' %}?view=flights" class="{% if view_mode == 'flights' %}active-link{% endif %} flex items-center space-x-3 p-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200 {% if view_mode == 'flights' %}text-orange-500 font-semibold{% endif %}">
+                            <i class="fas fa-plane w-5"></i>
+                            <span>Рейсы</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'dashboard_v2' %}?view=techcards" class="{% if view_mode == 'techcards' %}active-link{% endif %} flex items-center space-x-3 p-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200 {% if view_mode == 'techcards' %}text-orange-500 font-semibold{% endif %}">
+                            <i class="fas fa-file-alt w-5"></i>
+                            <span>Мои ТК</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                            <i class="fas fa-cog w-5"></i>
+                            <span>Настройки</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- User Profile -->
+        <div class="flex items-center space-x-3 mt-6 p-3">
+            <img src="https://placehold.co/40x40/FF6B4A/ffffff?text=U" class="rounded-full" alt="Аватар пользователя">
+            <div>
+                <p class="font-semibold text-gray-900">Иван Иванов</p>
+                <p class="text-sm text-gray-500">Супервайзер</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-8 main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сканер штрих-кодов</title>
+    <style>
+        /* Общие стили для темы "Безопасность-Аэропорт" */
+        :root {
+            --dark-blue-bg-start: #1A293A;
+            /* Начальный цвет фона */
+            --dark-blue-bg-end: #0F1720;
+            /* Конечный цвет фона */
+            --card-bg: rgba(30, 40, 50, 0.95);
+            /* Фон основных карточек/контейнеров */
+            --border-color-light: rgba(70, 80, 90, 0.5);
+            /* Цвет светлой рамки */
+            --text-light: #E0E0E0;
+            /* Светлый основной текст */
+            --text-muted: #889BAF;
+            /* Приглушенный текст */
+            --heading-color: #ADD8E6;
+            /* Цвет заголовков */
+            --input-bg: #34495E;
+            /* Фон полей ввода */
+            --input-border: #4A6075;
+            /* Рамка полей ввода */
+            --input-focus-bg: #3D536B;
+            /* Фон полей ввода при фокусе */
+            --accent-blue-light: #007BFF;
+            /* Светлый акцентный синий (для кнопок, фокуса) */
+            --accent-blue-dark: #0056b3;
+            /* Темный акцентный синий (для кнопок) */
+            --button-hover-start: #004085;
+            /* Начальный цвет кнопки при наведении */
+            --button-hover-end: #0056b3;
+            /* Конечный цвет кнопки при наведении */
+
+            /* Цвета для сообщений */
+            --status-info-bg: #1a5e86;
+            --status-info-text: #bde0ff;
+            --status-success-bg: #198754;
+            --status-success-text: #d4edda;
+            --status-warning-bg: #ffc107;
+            --status-warning-text: #343a40;
+            /* Темный текст на желтом фоне */
+            --status-error-bg: #dc3545;
+            --status-error-text: #f8d7da;
+
+            /* Цвета для логов/списков */
+            --log-bg: #2C3E50;
+            /* Фон контейнера логов/списков */
+            --log-item-bg: #34495E;
+            /* Фон элементов списка логов */
+            --log-item-border: #4A6075;
+            /* Разделитель элементов списка */
+            --log-item-text: #E0E0E0;
+            /* Текст элементов списка */
+            --log-strong-text: #ADD8E6;
+            /* Выделенный текст в логах */
+            --log-raw-bg: #1A293A;
+            /* Фон для сырых данных */
+            --log-raw-text: #B0C4DE;
+            /* Текст для сырых данных */
+            --log-timestamp-text: #889BAF;
+            /* Цвет временной метки */
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark-blue-bg-start) 0%, var(--dark-blue-bg-end) 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            /* Изменено на column для лучшего расположения */
+            align-items: center;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            /* padding будет на .main-content */
+            box-sizing: border-box;
+        }
+
+        /* Обновленный Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            /* Темный фон из переменных */
+            color: var(--text-light);
+            padding: 15px 20px;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            /* Более выразительная тень */
+            border-bottom: 1px solid var(--border-color-light);
+            /* Легкая рамка снизу */
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            /* Внутренний отступ */
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.8em;
+            /* Немного крупнее */
+            color: var(--heading-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Заменяем иконку Font Awesome на текстовый символ */
+        .header h1::before {
+            content: '✈️';
+            /* Пример: самолет, или '👁️‍🗨️' для безопасности, или '📟' для сканера */
+            font-size: 1em;
+            color: var(--accent-blue-light);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            /* Увеличил промежуток */
+        }
+
+        .user-info span {
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            /* Отступ между иконкой и текстом */
+        }
+
+        /* Заменяем иконку Font Awesome для пользователя */
+        .user-info span::before {
+            content: '👤';
+            /* Иконка пользователя */
+            font-size: 1.1em;
+            color: var(--text-muted);
+        }
+
+        .action-button {
+            /* Переименован logout-btn в action-button */
+            background: linear-gradient(135deg, var(--accent-blue-dark) 0%, var(--accent-blue-light) 100%);
+            border: none;
+            /* Убираем рамку */
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            /* Острые углы с небольшим скруглением */
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            /* Для выравнивания иконки и текста */
+            align-items: center;
+            gap: 8px;
+            /* Промежуток между иконкой и текстом */
+        }
+
+        .action-button:hover {
+            background: linear-gradient(135deg, var(--button-hover-start) 0%, var(--button-hover-end) 100%);
+            color: white;
+            text-decoration: none;
+            transform: translateY(-1px);
+            /* Небольшой эффект при наведении */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Иконки для кнопок (Журнал, Выйти) */
+        .action-button.journal-btn::before {
+            content: '📄';
+            /* Иконка для журнала */
+        }
+
+        .action-button.logout-btn::before {
+            content: '➡️';
+            /* Иконка для выхода */
+        }
+
+
+        .main-content {
+            margin-top: 100px;
+            /* Увеличил отступ для фиксированного заголовка */
+            padding: 20px;
+            width: 100%;
+            max-width: 1200px;
+            /* Максимальная ширина для всего контента */
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            /* Темный фон из переменных */
+            padding: 40px;
+            border-radius: 5px;
+            /* Острые углы с небольшим скруглением */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            /* Более выразительная тень */
+            width: 100%;
+            display: flex;
+            gap: 30px;
+            /* Увеличил промежуток между колонками */
+            flex-wrap: wrap;
+            border: 1px solid var(--border-color-light);
+            /* Легкая рамка */
+        }
+
+        .column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 320px;
+            /* Немного увеличил минимальную ширину колонки */
+            background-color: var(--input-bg);
+            /* Фон для колонок */
+            padding: 25px;
+            /* Внутренний отступ колонки */
+            border-radius: 5px;
+            /* Острые углы */
+            border: 1px solid var(--input-border);
+            /* Рамка для колонки */
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+            /* Внутренняя тень */
+        }
+
+        h1,
+        h2 {
+            color: var(--heading-color);
+            margin-bottom: 20px;
+            text-align: center;
+            /* Центрируем заголовки в колонках */
+        }
+
+        .status-message {
+            margin-top: 20px;
+            padding: 15px;
+            /* Увеличил padding */
+            border-radius: 5px;
+            /* Острые углы */
+            font-weight: bold;
+            text-align: center;
+            /* Центрируем текст статуса */
+            font-size: 1.1em;
+            /* Немного крупнее */
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+            /* Внутренняя тень */
+            border: 1px solid;
+            /* Рамка соответствующего цвета */
+        }
+
+        /* Цвета для статусов */
+        .status-message.info {
+            background-color: var(--status-info-bg);
+            color: var(--status-info-text);
+            border-color: var(--status-info-text);
+        }
+
+        .status-message.success {
+            background-color: var(--status-success-bg);
+            color: var(--status-success-text);
+            border-color: var(--status-success-text);
+        }
+
+        .status-message.warning {
+            background-color: var(--status-warning-bg);
+            color: var(--status-warning-text);
+            border-color: var(--status-warning-text);
+        }
+
+        .status-message.error {
+            background-color: var(--status-error-bg);
+            color: var(--status-error-text);
+            border-color: var(--status-error-text);
+        }
+
+        .log-container,
+        .passenger-list-container {
+            flex-grow: 1;
+            /* Чтобы контейнеры занимали доступное пространство */
+            max-height: 550px;
+            /* Немного увеличил высоту */
+            overflow-y: auto;
+            border: 1px solid var(--input-border);
+            /* Рамка */
+            border-radius: 5px;
+            /* Острые углы */
+            padding: 10px;
+            background-color: var(--log-bg);
+            /* Темный фон */
+            text-align: left;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3);
+            /* Внутренняя тень */
+        }
+
+        .log-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .log-list li {
+            background-color: var(--log-item-bg);
+            /* Темнее фон элементов списка */
+            border-bottom: 1px solid var(--log-item-border);
+            /* Темный разделитель */
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            /* Острые углы */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            /* Выразительная тень */
+            color: var(--log-item-text);
+            border-left: 5px solid transparent;
+            /* Для цветной полоски слева */
+        }
+
+        .log-list li.success {
+            background-color: rgba(25, 135, 84, 0.1);
+            border-left-color: var(--status-success-bg);
+        }
+
+        .log-list li.warning {
+            background-color: rgba(255, 193, 7, 0.1);
+            border-left-color: var(--status-warning-bg);
+        }
+
+        .log-list li.error {
+            background-color: rgba(220, 53, 69, 0.1);
+            border-left-color: var(--status-error-bg);
+        }
+
+        .log-list li:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .parsed-field {
+            margin-bottom: 5px;
+            font-size: 0.95em;
+            /* Чуть крупнее */
+            color: var(--log-item-text);
+        }
+
+        .parsed-field strong {
+            display: inline-block;
+            width: 140px;
+            /* Немного увеличил для выравнивания */
+            color: var(--log-strong-text);
+            /* Светлее для выделения */
+            font-weight: 600;
+        }
+
+        .barcode-raw {
+            font-family: 'Courier New', monospace;
+            background-color: var(--log-raw-bg);
+            /* Очень темный фон */
+            color: var(--log-raw-text);
+            /* Более светлый текст для контраста */
+            padding: 8px;
+            border-radius: 5px;
+            /* Острые углы */
+            margin-top: 10px;
+            word-break: break-all;
+            font-size: 0.85em;
+            border: 1px dashed var(--log-item-border);
+            /* Пунктирная рамка */
+        }
+
+        .timestamp {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.75em;
+            /* Чуть крупнее */
+            color: var(--log-timestamp-text);
+            text-align: right;
+        }
+
+        .passenger-list {
+            list-style: none;
+            /* Убираем стандартную нумерацию, так как она приходит с сервера */
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .passenger-list li {
+            padding: 8px 0;
+            /* Увеличил padding */
+            border-bottom: 1px dashed var(--log-item-border);
+            /* Темный пунктир */
+            font-size: 1em;
+            /* Чуть крупнее */
+            color: var(--log-item-text);
+        }
+
+        .passenger-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* Медиа-запросы для адаптивности */
+        @media (max-width: 900px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .user-info {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .container {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .column {
+                min-width: unset;
+                /* Сброс минимальной ширины */
+                width: 100%;
+                /* На маленьких экранах колонки занимают всю ширину */
+            }
+        }
+
+        @media (max-width: 500px) {
+
+            .login-card,
+            .container {
+                padding: 20px;
+                /* Уменьшаем padding на очень маленьких экранах */
+            }
+
+            .column {
+                padding: 15px;
+            }
+
+            .header {
+                padding: 10px;
+            }
+
+            .header-content {
+                padding: 0 10px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .action-button {
+                padding: 6px 12px;
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>Сканер штрих-кодов</h1>
+            <div class="user-info">
+                <span>{{ current_user.username }}</span>
+                <a href="{% url 'all_scans_view' %}" class="action-button journal-btn">Журнал</a>
+                <a href="{% url 'logout_view' %}" class="action-button logout-btn">Выйти</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="column">
+                <h1>Статус Считывателя</h1>
+                <div id="statusMessage" class="status-message info">
+                    Подключение к сканеру...
+                </div>
+                <h2>Лог Сканирований</h2>
+                <div class="log-container">
+                    <ul id="logList" class="log-list">
+                    </ul>
+                </div>
+            </div>
+            <div class="column">
+                <h2>Список Пассажиров</h2>
+                <div class="passenger-list-container">
+                    <ol id="passengerList" class="passenger-list">
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const statusMessageDiv = document.getElementById('statusMessage');
+            const logList = document.getElementById('logList');
+            const passengerList = document.getElementById('passengerList');
+
+            // URL вашего Django API для сохранения данных
+            const DJANGO_API_URL = 'http://199.1.1.3/scanner/save_scan/'; // ИЗМЕНИТЕ, если ваш Django-сервер на другом адресе/порту
+
+            // Функция для получения CSRF токена (если Django требует)
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            function connectWebSocket() {
+                const ws = new WebSocket('ws://127.0.0.1:8765'); // Адрес WebSocket сервера из scanner_websocket_bridge.py
+
+                ws.onopen = () => {
+                    console.log('Connected to WebSocket server');
+                    statusMessageDiv.className = 'status-message success';
+                    statusMessageDiv.textContent = 'Подключено к серверу сканера.';
+                };
+
+                ws.onmessage = async (event) => {
+                    const message = JSON.parse(event.data);
+                    console.log('Received message from WebSocket:', message);
+
+                    // Обновляем статус сообщения
+                    statusMessageDiv.className = `status-message ${message.status_type || 'info'}`;
+                    statusMessageDiv.textContent = message.status_message || '';
+
+                    // Обновляем список пассажиров
+                    if (message.passenger_list) {
+                        passengerList.innerHTML = ''; // Очищаем список перед обновлением
+                        message.passenger_list.forEach(pax => {
+                            const li = document.createElement('li');
+                            li.textContent = pax;
+                            passengerList.appendChild(li);
+                        });
+                    }
+
+                    // Если есть распарсенные данные (то есть это не просто сообщение о готовности сканера)
+                    if (message.parsed_data) {
+                        const parsedData = message.parsed_data;
+                        const timestamp = new Date().toLocaleString();
+
+                        // --- 1. СНАЧАЛА ОБНОВЛЯЕМ ИНТЕРФЕЙС (для мгновенного отклика) ---
+                        const listItem = document.createElement('li');
+
+                        // Используем статус от WebSocket для начального отображения
+                        let itemStatus = message.status_type || 'info';
+                        listItem.className = itemStatus;
+
+                        listItem.innerHTML = `
+                            <div class="parsed-field"><strong>Пассажир:</strong> ${parsedData.passenger_name || 'N/A'}</div>
+                            <div class="parsed-field"><strong>Тип Пассажира:</strong> ${parsedData.pax_type || 'N/A'}</div>
+                            <div class="parsed-field"><strong>PNR:</strong> ${parsedData.PNR || 'N/A'}</div>
+                            <div class="parsed-field"><strong>Откуда:</strong> ${parsedData.origin_airport || 'N/A'}</div>
+                            <div class="parsed-field"><strong>Куда:</strong> ${parsedData.destination_airport || 'N/A'}</div>
+                            <div class="parsed-field"><strong>Перевозчик:</strong> ${parsedData.carrier_code || 'N/A'}</div>
+                            <div class="parsed-field"><strong>Рейс:</strong> ${parsedData.flight_number || 'N/A'}</div>
+                            <div class="parsed-field"><strong>Дата/Класс:</strong> ${parsedData.flight_date_info || 'N/A'}</div>
+                            <div class="parsed-field"><strong>Дата (ISO):</strong> ${parsedData.flight_date || 'N/A'}</div>
+                            <div class="parsed-field"><strong>Класс Обслуживания:</strong> ${parsedData.compartment_code || 'N/A'}</div>
+                            <div class="parsed-field"><strong>Место:</strong> ${parsedData.seat_number || 'N/A'}</div>
+                            <div class="parsed-field"><strong>SEQ:</strong> ${parsedData.sequence_number || 'N/A'}</div>
+                            <div class="parsed-field"><strong>Префикс Сканера:</strong> ${parsedData.scanner_prefix || 'N/A'}</div>
+                            <div class="parsed-field"><strong>Доп. Инфо:</strong> ${parsedData.additional_info_tail || 'N/A'}</div>
+                            <div class="barcode-raw">Оригинал: ${parsedData.raw_barcode || 'N/A'}</div>
+                            <span class="timestamp">${timestamp}</span>
+                        `;
+
+                        // Очищаем список и добавляем элемент
+                        logList.innerHTML = '';
+                        logList.appendChild(listItem);
+
+                        // --- 2. ОТПРАВКА ДАННЫХ В DJANGO (фоном) ---
+                        try {
+                            const response = await fetch(DJANGO_API_URL, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': getCookie('csrftoken'), // Включите, если Django требует CSRF
+                                },
+                                body: JSON.stringify({
+                                    raw_barcode: parsedData.raw_barcode,
+                                    parsed_data: parsedData,
+                                    is_duplicate: message.is_duplicate // Передаем флаг дубликата
+                                })
+                            });
+
+                            const djangoResponse = await response.json();
+                            console.log('Django API Response:', djangoResponse);
+
+                            let djangoStatusMessage = `Django: ${djangoResponse.message}`;
+                            let djangoStatusType = djangoResponse.status === 'success' ? 'success' : 'error';
+
+                            if (djangoResponse.flight_found === false) {
+                                djangoStatusMessage += " (Рейс FIDS не найден)";
+                                djangoStatusType = 'warning'; // Или 'error', в зависимости от серьезности
+                            }
+
+                            // Обновляем статус, чтобы показать ответ от Django
+                            statusMessageDiv.className = `status-message ${djangoStatusType}`;
+                            statusMessageDiv.textContent = djangoStatusMessage;
+
+                            // Обновляем цвет элемента списка, если статус изменился (например, рейс не найден)
+                            listItem.className = djangoStatusType;
+
+
+                        } catch (error) {
+                            console.error('Error sending data to Django:', error);
+                            statusMessageDiv.className = 'status-message error';
+                            statusMessageDiv.textContent = `Ошибка отправки данных в Django: ${error.message}`;
+
+                            // Помечаем элемент списка как ошибочный, если не удалось отправить
+                            listItem.className = 'error';
+                        }
+                    }
+                };
+
+                ws.onclose = () => {
+                    console.log('Disconnected from WebSocket server. Reconnecting...');
+                    statusMessageDiv.className = 'status-message error';
+                    statusMessageDiv.textContent = 'Соединение со сканером потеряно. Попытка переподключения...';
+                    setTimeout(connectWebSocket, 3000); // Попытка переподключения через 3 секунды
+                };
+
+                ws.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    statusMessageDiv.className = 'status-message error';
+                    statusMessageDiv.textContent = 'Ошибка WebSocket. Проверьте сервер сканера.';
+                    ws.close(); // Закрываем соединение, чтобы сработал onclose и переподключение
+                };
+            }
+
+            connectWebSocket();
+        });
+    </script>
+</body>
+
+</html>

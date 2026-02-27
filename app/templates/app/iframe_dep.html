@@ -1,0 +1,17 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Departure OSS</title>
+    <link rel="stylesheet" href="{% static 'css/deparrdep.css' %}">
+</head>
+<body>
+    <div id="table-container"></div> <!-- Контейнер для таблиц -->
+    <div id="static-data" data-depart-plane="{% static 'images/departplane.png' %}"></div>
+    <div id="static-data-logo" data-logo-manas="{% static 'images/manas.png' %}"></div>
+    
+    <script src="{% static 'js/iframe_dep.js' %}"></script> <!-- Скрипт с логикой -->
+</body>
+</html>

@@ -1,0 +1,53 @@
+{% extends 'app/dashboard/base_dashboard.html' %}
+
+{% block page_title %}Результаты поиска{% endblock %}
+
+{% block content %}
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <!-- <h1>Результаты поиска</h1> -->
+    </div>
+    <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">Главная</a></li>
+            <li class="breadcrumb-item active">Результаты поиска</li>
+        </ol>
+    </div>
+</div>
+<div class="container-fluid">
+    <h2>Результаты поиска для: "{{ query }}"</h2>
+    {% if results %}
+    <table class="table table-hover text-nowrap">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Направление</th>
+                <th>Авиакомпания</th>
+                <th>Рейс №</th>
+                <th>Пункт назначения</th>
+                <th>Дата</th>
+                <th>Время</th>
+                <th>Время факт</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for flight in results %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{% if flight.direction == 'arr' %}Прилет{% elif flight.direction == 'dep' %}Вылет{% endif %}</td>
+                <td>{{ flight.airline }}</td>
+                <td>{{ flight.flight }}</td>
+                <td>{{ flight.destination }}</td>
+                <td>{{ flight.date1|date:"d.m.Y" }}</td>
+                <td>{{ flight.time1 }}</td>
+                <td>{{ flight.last_time }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Нет результатов, соответствующих вашему запросу.</p>
+    {% endif %}
+    <a href="{% url 'inftablo_list' %}" class="btn btn-secondary">Вернуться к суточному плану</a>
+</div>
+{% endblock %}

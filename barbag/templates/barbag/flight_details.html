@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Детали рейса</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Определение CSS-переменных для обеих тем --- */
+        :root {
+            /* СВЕТЛАЯ ТЕМА (По умолчанию) */
+            --bg-main: #f4f6f9;
+            --bg-card: #ffffff;
+            --bg-form: #f8f9fa;
+            --primary-text: #212529;
+            --secondary-text: #6c757d;
+            --accent-color: #007bff;
+            --border-color: #e9ecef;
+            --input-bg: white;
+            --header-border: #007bff;
+            --hover-bg: #dee2e6;
+            
+            --success: #28a745;
+            --warning: #856404;
+            --danger: #dc3545;
+            --status-closed-bg: #d4edda;
+            --status-open-bg: #fff3cd;
+            --box-shadow-main: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ТЕМНАЯ ТЕМА (Переопределение) */
+        body.dark-mode {
+            --bg-main: #1e1e2d;
+            --bg-card: #27293d;
+            --bg-form: #27293d;
+            --primary-text: #ffffff;
+            --secondary-text: #a0a0b0;
+            --accent-color: #00bcd4; 
+            --border-color: #3f3f4e;
+            --input-bg: #1a1a25;
+            --header-border: #00bcd4;
+            --hover-bg: #2e3048;
+
+            --success: #4caf50;
+            --warning: #ffc107;
+            --danger: #f44336;
+            --status-closed-bg: #1a561a;
+            --status-open-bg: #5a4000;
+            --box-shadow-main: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+
+        /* --- Общие Стили --- */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--primary-text);
+            margin: 0;
+            padding: 0;
+            font-size: 14px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* --- Шапка --- */
+        .header {
+            width: 100%;
+            background-color: var(--bg-card);
+            color: var(--primary-text);
+            padding: 15px 30px;
+            font-size: 1.6em;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-bottom: 2px solid var(--header-border);
+            transition: background-color 0.3s;
+        }
+        
+        .header-title {
+            font-size: 0.9em;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        #theme-toggle {
+            padding: 8px 12px;
+            background-color: var(--secondary-text);
+            color: var(--bg-card);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.6em; /* Увеличенный размер для читаемости */
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        #theme-toggle:hover {
+            background-color: #495057;
+        }
+        
+        .logout-button {
+            padding: 8px 16px;
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.6em; /* Увеличенный размер для читаемости */
+            font-weight: 600;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .logout-button:hover {
+            background-color: #c82333;
+        }
+
+        /* --- Основной Контейнер --- */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            background-color: var(--bg-card);
+            box-shadow: var(--box-shadow-main);
+            padding: 25px;
+            border-radius: 8px;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        h1 {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--primary-text);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+        h3 {
+            color: var(--secondary-text);
+            margin-top: 20px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 5px;
+            font-size: 1em;
+            font-weight: 600;
+        }
+        h4 {
+            font-size: 0.9em;
+            color: var(--secondary-text);
+            margin-bottom: 10px;
+            font-weight: 400;
+        }
+        p {
+            color: var(--secondary-text);
+        }
+
+        /* --- Форма ввода веса (Обновлено) --- */
+        form {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            border-radius: 6px;
+            background-color: var(--bg-form);
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s;
+        }
+        form label {
+            font-size: 1em; /* Увеличен размер */
+            font-weight: 600;
+            color: var(--primary-text); /* Цвет первичного текста */
+            white-space: nowrap;
+        }
+        input[type="number"] {
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1em;
+            width: 180px;
+            background-color: var(--input-bg);
+            color: var(--primary-text);
+            transition: background-color 0.3s, border-color 0.3s;
+            outline: none;
+        }
+        input[type="number"]:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 1px var(--accent-color);
+        }
+        button[type="submit"] {
+            padding: 8px 20px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        button[type="submit"]:hover {
+            background-color: #0056b3; 
+        }
+        body.dark-mode button[type="submit"]:hover {
+            background-color: #0097a7;
+        }
+
+        /* --- Группа Кнопок Действий --- */
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 10px;
+            background-color: var(--bg-form);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+        .action-button {
+            padding: 8px 15px; 
+            border: 1px solid var(--accent-color);
+            border-radius: 4px;
+            text-decoration: none;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.2s;
+            background-color: var(--bg-card);
+            color: var(--accent-color);
+        }
+        .action-button:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        .download-button {
+            background-color: var(--danger);
+            color: white;
+            border: 1px solid var(--danger);
+        }
+        .download-button:hover {
+            background-color: #c82333;
+        }
+
+        /* --- Сводка --- */
+        .list-section ul {
+            list-style-type: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 0 0 30px 0;
+        }
+        .list-section li {
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-form);
+            border-radius: 6px;
+            font-size: 0.9em;
+            border-left: 4px solid var(--accent-color);
+            color: var(--primary-text);
+            transition: background-color 0.3s;
+        }
+        /* Дополнительные цвета для сводки */
+        .list-section li:nth-child(1) { border-left-color: var(--accent-color); }
+        .list-section li:nth-child(2) { border-left-color: var(--success); }
+        .list-section li:nth-child(3) { border-left-color: var(--warning); }
+        .list-section li:nth-child(4) { border-left-color: var(--danger); } 
+
+        .list-section li strong {
+            color: var(--accent-color);
+            font-weight: 700;
+            display: block;
+            margin-top: 5px;
+            font-size: 1.1em;
+        }
+        .list-section li:nth-child(2) strong { color: var(--success); }
+        .list-section li:nth-child(3) strong { color: var(--warning); }
+
+        /* --- Аккордеон (Контейнеры) --- */
+        .container-info {
+            margin-bottom: 8px; 
+            background-color: var(--bg-card);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: border-color 0.3s;
+        }
+        .accordion-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            cursor: pointer;
+            background-color: var(--bg-form);
+            transition: background-color 0.3s;
+        }
+        .accordion-header:hover {
+            background-color: var(--hover-bg);
+        }
+        .accordion-header.active {
+             background-color: var(--hover-bg);
+             /* Сделаем активный контейнер чуть заметнее */
+             border-bottom: 1px solid var(--accent-color);
+        }
+        
+        .accordion-content {
+            padding: 15px;
+            background-color: var(--bg-card);
+            border-top: 1px solid var(--border-color);
+            display: none; 
+            transition: background-color 0.3s;
+        }
+        
+        /* Статусы */
+        .status-badge {
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-left: 10px;
+            text-transform: uppercase;
+        }
+        .closed {
+            background-color: var(--status-closed-bg);
+            color: var(--success);
+        }
+        .open {
+            background-color: var(--status-open-bg);
+            color: var(--warning);
+        }
+        
+        .accordion-icon {
+            margin-left: 15px;
+            transition: transform 0.3s;
+            font-size: 1.2em;
+            color: var(--accent-color);
+        }
+        .accordion-header.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Список багажа */
+        .accordion-content ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            border: none;
+        }
+        .accordion-content li {
+            background-color: var(--bg-form);
+            padding: 6px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            color: var(--primary-text); /* Изменил на primary для лучшей читаемости */
+            border: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <span class="header-title">Аэропорт: Багажный Операционный Центр</span>
+        <div class="header-controls">
+            <button id="theme-toggle">Сменить тему</button>
+            
+            <a href="{% url 'logout' %}" class="logout-button">
+                <span class="icon">➡️</span> Выход ({{ request.user.username }})
+            </a>
+        </div>
+    </div>
+    <div class="container">
+        <h1>Детализация рейса</h1>
+        <h2>Рейс №{{ flight.flight_num }} — {{ flight.destination }}</h2>
+        
+        <div class="button-group">
+            <a href="{% url 'flight_list' %}" class="action-button">
+                <span class="icon">🔙</span>Вернуться к списку рейсов
+            </a>
+            <a href="{% url 'generate_pdf_report' flight_id=flight.flight_id %}" target="_blank" class="action-button download-button">
+                <span style="font-size: 1.1em;">📄</span> Скачать отчет в PDF
+            </a>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <label for="total_weight">Общий вес рейса (кг):</label>
+            <input type="number" id="total_weight" name="total_weight" step="0.01" placeholder="Введите вес..." value="{{ flight.total_weight|default:'' }}">
+            <button type="submit">
+                <span style="font-size: 1.1em;">💾</span> Сохранить
+            </button>
+        </form>
+        
+        <div class="list-section">
+            <h3>Сводка по багажу</h3>
+            <ul>
+                <li>
+                    <h4>Отсканировано багажа</h4>
+                    <strong>{{ total_baggage_count }}</strong>
+                </li>
+                <li>
+                    <h4>Общий вес рейса</h4>
+                    <strong>{{ flight.total_weight|default:'Не указан' }}</strong> кг
+                </li>
+                <li>
+                    <h4>Средний вес места</h4>
+                    {% if average_weight %}<strong>{{ average_weight|floatformat:2 }}</strong> кг{% else %}Не рассчитан{% endif %}
+                </li>
+                <li>
+                    <h4>Контейнеров в рейсе</h4>
+                    <strong>{{ containers|length }}</strong>
+                </li>
+            </ul>
+        </div>
+        
+        <h3>Контейнеры рейса</h3>
+        {% for container in containers %}
+            <div class="container-info">
+                <div class="accordion-header" id="header-{{ forloop.counter }}">
+                    <h2 style="flex-grow: 1;">
+                        Контейнер: <strong>{{ container.barcode }}</strong>
+                        <span style="font-weight: 400; font-size: 0.9em; margin-left: 15px; color: var(--secondary-text);">
+                            (Багажа: <strong>{{ container.baggage_count }}</strong>)
+                        </span>
+                    </h2>
+                    <div style="display: flex; align-items: center;">
+                        {% if container.is_closed %}
+                            <span class="status-badge closed">Закрыт</span>
+                        {% else %}
+                            <span class="status-badge open">Открыт</span>
+                        {% endif %}
+                        <span class="accordion-icon">▼</span>
+                    </div>
+                </div>
+
+                <div class="accordion-content" id="content-{{ forloop.counter }}">
+                    {% if container.estimated_weight %}
+                        <p style="color: var(--secondary-text);">Примерный вес контейнера: <strong style="color: var(--primary-text);">{{ container.estimated_weight|floatformat:2 }}</strong> кг</p>
+                    {% endif %}
+                    
+                    {% if container.baggage_list %}
+                        <h4>Штрихкоды багажа:</h4>
+                        <ul>
+                        {% for bag in container.baggage_list %}
+                            <li>{{ bag.barcode }}</li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p style="color: var(--secondary-text); font-style: italic;">В этом контейнере нет багажа.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <p style="text-align: center; font-style: italic; color: var(--secondary-text);">Для этого рейса контейнеры не зарегистрированы.</p>
+        {% endfor %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Логика Аккордеона ---
+            const headers = document.querySelectorAll('.accordion-header');
+            
+            headers.forEach(header => {
+                header.addEventListener('click', function () {
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('.accordion-icon');
+                    
+                    this.classList.toggle('active');
+
+                    if (content.style.display === 'block') {
+                        content.style.display = 'none';
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        // Закрываем все другие открытые
+                        document.querySelectorAll('.accordion-header.active').forEach(openHeader => {
+                            if (openHeader !== this) {
+                                openHeader.classList.remove('active');
+                                openHeader.nextElementSibling.style.display = 'none';
+                                openHeader.querySelector('.accordion-icon').style.transform = 'rotate(0deg)';
+                            }
+                        });
+
+                        // Открываем текущий
+                        content.style.display = 'block';
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+
+            // --- Логика Переключения Тем ---
+            const themeToggle = document.getElementById('theme-toggle');
+            const body = document.body;
+            const storageKey = 'flightAppTheme';
+
+            function updateTheme(theme) {
+                if (theme === 'dark') {
+                    body.classList.add('dark-mode');
+                    themeToggle.textContent = 'Светлая тема 💡';
+                } else {
+                    body.classList.remove('dark-mode');
+                    themeToggle.textContent = 'Темная тема 🌙';
+                }
+            }
+
+            // 1. Установка темы при загрузке (по умолчанию 'light', как в стилях)
+            const savedTheme = localStorage.getItem(storageKey) || 'light';
+            updateTheme(savedTheme);
+
+            // 2. Обработчик клика
+            themeToggle.addEventListener('click', function () {
+                const currentTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
+                updateTheme(currentTheme);
+                
+                // 3. Сохранение выбора пользователя
+                localStorage.setItem(storageKey, currentTheme);
+            });
+        });
+    </script>
+</body>
+</html>

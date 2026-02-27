@@ -1,0 +1,81 @@
+{% extends 'app/dashboard/base_dashboard.html' %}
+
+{% block page_title %}Overview{% endblock %}
+
+{% block content %}
+<div class="grid">
+    <div class="card">
+        <h3 style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 10px;">Total Flights Today</h3>
+        <div style="font-size: 2.5rem; font-weight: 700;">{{ total_flights_today }}</div>
+    </div>
+    <div class="card">
+        <h3 style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 10px;">Departures</h3>
+        <div style="font-size: 2.5rem; font-weight: 700; color: var(--accent-color);">{{ departures_count }}</div>
+    </div>
+    <div class="card">
+        <h3 style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 10px;">Arrivals</h3>
+        <div style="font-size: 2.5rem; font-weight: 700; color: var(--success-color);">{{ arrivals_count }}</div>
+    </div>
+    <div class="card">
+        <h3 style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 10px;">Delayed</h3>
+        <div style="font-size: 2.5rem; font-weight: 700; color: var(--danger-color);">{{ delayed_count }}</div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Recent Activity</h2>
+        <a href="{% url 'dashboard_flights' %}" class="btn btn-primary">View All Flights</a>
+    </div>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Flight</th>
+                    <th>Direction</th>
+                    <th>Destination/Origin</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                    <th>Gate</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for flight in recent_flights %}
+                <tr>
+                    <td style="font-weight: 600;">{{ flight.flight.flights }}</td>
+                    <td>
+                        {% if flight.direction == 'dep' %}
+                            <span style="color: var(--accent-color);">Departure</span>
+                        {% else %}
+                            <span style="color: var(--success-color);">Arrival</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ flight.destination.city_name_en }}</td>
+                    <td>{{ flight.time1|time:"H:i" }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if flight.status.name_en == 'DELAYED' %}badge-danger
+                            {% elif flight.status.name_en == 'ARRIVED' or flight.status.name_en == 'DEPARTED' %}badge-success
+                            {% else %}badge-warning{% endif %}">
+                            {{ flight.status.name_en }}
+                        </span>
+                    </td>
+                    <td>
+                        {% for gate in flight.gate.all %}
+                            {{ gate.gate }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            -
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-secondary);">No flights found for today.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Список рейсов</title>
+    
+    <style>
+        body {
+            font-family: 'Verdana', 'Tahoma', sans-serif;
+            background-color: #e6e6e6; /* Светло-серый фон */
+            color: #333;
+            margin: 0;
+            padding: 0;
+            /* Убедимся, что тело не имеет лишних отступов */
+        }
+        
+        /* СТИЛЬ ЗАГОЛОВКА, РАСТЯНУТОГО НА ВСЮ ШИРИНУ */
+        .header {
+            width: 100%;
+            background-color: #004d99; /* Тёмно-синий заголовок */
+            color: #fff;
+            padding: 12px 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+            box-sizing: border-box; 
+            margin-bottom: 20px; 
+            
+            /* !!! СТИЛИ ДЛЯ ВЫРАВНИВАНИЯ ЭЛЕМЕНТОВ (Flexbox) !!! */
+            display: flex;
+            justify-content: space-between; /* Растягиваем элементы по краям */
+            align-items: center; /* Выравниваем по вертикали */
+        }
+        
+        .header-title {
+            /* Заголовок теперь занимает левую часть */
+            font-size: 1em; /* Размер шрифта уже определен в .header */
+        }
+        
+        .logout-button {
+            /* Стиль для кнопки выхода */
+            padding: 6px 12px;
+            background-color: #ff3333; /* Ярко-красный для кнопки выхода */
+            color: white;
+            border: none;
+            cursor: pointer;
+            border: 1px solid #8f1313;
+            font-size: 0.6em; /* Чуть меньше основного заголовка */
+            font-weight: bold;
+            text-decoration: none; /* Убираем подчеркивание у ссылки */
+            transition: background-color 0.2s;
+            white-space: nowrap; /* Гарантируем, что текст не перенесется */
+        }
+        
+        .logout-button:hover {
+            background-color: #cc0000;
+        }
+        
+        .container {
+            max-width: 1100px;
+            width: 90%; /* Добавим адаптивность */
+            margin: 0 auto; /* Центрируем контейнер */
+            background-color: #fff;
+            border: 1px solid #c0c0c0;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .content {
+            padding: 20px;
+        }
+        h1 {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #004d99;
+            margin: 0 0 15px 0;
+        }
+        h2 {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #555;
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: right;
+            margin-bottom: 0px;
+            padding: 1px;
+            border: 1px solid #ccc;
+            background-color: #f0f0f0;
+        }
+        label {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #333;
+        }
+        input[type="date"], input[type="text"] {
+            padding: 6px;
+            border: 1px solid #999;
+            border-radius: 0;
+            font-size: 0.9em;
+        }
+        button {
+            padding: 6px 15px;
+            background-color: #007bff;
+            color: white;
+            border: 1px solid #0056b3;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1em;
+        }
+        th, td {
+            text-align: center;
+            padding: 1px 12px;
+            border: 1px solid #ccc;
+        }
+        th {
+            background-color: #e0e0e0;
+            color: #333;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        /* Улучшена читабельность таблицы */
+        tr:nth-child(even) {
+            background-color: #f7f7f7; 
+        }
+        tr:hover {
+            background-color: #f0f0f0;
+        }
+        .flight-info-cell {
+            font-weight: normal;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px; /* Уменьшено расстояние */
+            white-space: nowrap;
+            justify-content: center;
+        }
+        /* Общий стиль для всех кнопок действий */
+        .action-button {
+            padding: 6px 8px; 
+            border: 1px solid #999;
+            border-radius: 0;
+            text-decoration: none;
+            text-align: center;
+            display: inline-flex; /* Использовать flex для выравнивания иконки и текста */
+            align-items: center;
+            font-size: 0.8em;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        /* Стиль для кнопки "Выбрать" - главное действие, выделяем цветом успеха */
+        .select-button {
+            background-color: #4CAF50 !important; /* Зеленый */
+            color: white !important;
+            border-color: #388E3C !important;
+        }
+        .select-button:hover {
+            background-color: #388E3C !important;
+        }
+        /* Стиль для кнопки "Детали" */
+        .details-button {
+            background-color: #f0f0f0;
+            color: #333;
+            border-color: #999;
+        }
+        .details-button:hover {
+            background-color: #ddd;
+        }
+        .airline-logo {
+            width: 80px;
+            height: auto;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+        .no-flights {
+            text-align: center;
+            color: #777;
+            padding: 20px;
+            font-style: italic;
+        }
+        /* Стиль для иконок (используем Unicode) */
+        .icon {
+            margin-right: 5px;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <span class="header-title">Аэропорт: Операционный Центр</span>
+        <a href="{% url 'logout' %}" class="logout-button">
+            <span class="icon">➡️</span> Выход ({{ request.user.username }})
+        </a>
+    </div>
+    
+    <div class="container">
+        <div class="content">
+            <h1>Модуль: Управление рейсами</h1> 
+            
+            <form method="get" action="" class="form-container">
+                <label for="date">Выберите дату:</label>
+                <input type="date" id="date" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+                
+                <label for="query">Поиск рейса:</label>
+                <input type="text" id="query" name="query" value="{{ search_query|default:'' }}" placeholder="Номер или пункт">
+                
+                <button type="submit">
+                    <span class="icon">🔍</span> Показать
+                </button>
+            </form>
+
+            <h2>Рейсы на {{ selected_date|date:"d M Y" }}</h2>
+            
+            {% if flights %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>АК</th>
+                        <th>Рейс</th>
+                        <th>Направление</th>
+                        <th>Время</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for flight in flights %}
+                    <tr>
+                        <td>
+                            <img src="/static/images/airlines/{{ flight.airline }}.svg" 
+                                 alt="{{ flight.airline }}" 
+                                 class="airline-logo"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/60x20/e0e0e0/808080?text=Logo'">
+                        </td>
+                        <td class="flight-info-cell">{{ flight.flight }}</td>
+                        <td class="flight-info-cell">{{ flight.destination }}</td>
+                        <td class="flight-info-cell">{{ flight.time1 }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <form method="post" action="{% url 'select_flight' %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="flight_id" value="{{ flight.id }}">
+                                    <button type="submit" class="action-button select-button">
+                                        <span class="icon">✅</span> Выбрать
+                                    </button>
+                                </form>
+                                
+                                {% if flight.is_ready_for_details %}
+                                <form method="get" action="{% url 'flight_details' flight_id=flight.id %}" style="display:inline;">
+                                    <button type="submit" class="action-button details-button">
+                                        <span class="icon">ℹ</span> Детали
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="no-flights">На выбранную дату рейсов нет.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p class="no-flights">На выбранную дату рейсов нет.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

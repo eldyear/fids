@@ -1,0 +1,71 @@
+{% load flights_extras %}
+
+{% if services %}
+<div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Тип услуги
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Время
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Количество
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Примечания
+                </th>
+                {% if not read_only %}
+                <th class="relative px-6 py-3">
+                    <span class="sr-only">Действия</span>
+                </th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for service in services %}
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {{ service.service_type.name }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{ service.start_time|time:'H:i'|default:"-" }} - {{ service.end_time|time:'H:i'|default:"-" }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{ service.quantity }} {{ service.unit_of_measure|default:"-" }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{ service.description|default:"-" }}
+                </td>
+                {% if not read_only %}
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <a href="#" class="text-orange-500 hover:text-orange-600 transition-colors duration-200 edit-btn"
+                       data-id="{{ service.id }}"
+                       data-service_type="{{ service.service_type_id }}"
+                       data-description="{{ service.description }}"
+                       data-quantity="{{ service.quantity }}"
+                       data-unit_of_measure="{{ service.unit_of_measure }}"
+                       data-start_time="{{ service.start_time|time:'H:i'|default:'' }}"
+                       data-end_time="{{ service.end_time|time:'H:i'|default:'' }}">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <form action="{% url 'delete_service' service.id %}" method="post" class="d-inline-block ml-4">
+                        {% csrf_token %}
+                        <button type="submit" class="text-red-500 hover:text-red-600 transition-colors duration-200" onclick="return confirm('Вы уверены?');">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="text-center text-gray-500 py-4">
+    <p>К этому рейсу пока не добавлены услуги.</p>
+</div>
+{% endif %}

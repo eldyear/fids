@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Departures OSS</title>
+    <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+    <link rel="stylesheet" href="static/css/dep_arr.css">
+    <!-- NEW YEAR SURPRISE START -->
+    <link rel="stylesheet" href="static/css/newyear.css">
+    <script src="static/js/newyear.js" defer></script>
+    <!-- NEW YEAR SURPRISE END -->
+</head>
+<body>
+    
+    <table class="table text-center roboto-light">
+        <thead id="tableHeader">
+            <tr class="table-bar">
+                <th class="text-left info-box" colspan="3">
+                    <p class="roboto-light second-text">OSS/UCFO</p>
+                    <p id="AirportName" class="roboto-bold first-text">Ош Аэропорту</p>
+                    <p id="Manas" class="roboto-light second-text">МАНАС</p>
+                </th>
+                <th class="roboto-bold" colspan="2">
+                    <div class="depart">
+                        <img src="static/images/departplane.png" alt="Airport Logo" class="depart-logo">
+                        <div id="mainHeader" class="depart-text">ВЫЛЕТЫ</div>
+                    </div>
+                </th>
+                <th class="roboto-light text-right" colspan="2">
+                    <p class="roboto-light second-text" id="current-date"></p>
+                    <p class="roboto-bold first-text" id="current-time"></p>
+                    <p id="TimeTitle" class="roboto-light second-text">время:</p>
+                </th>
+            </tr>
+            <tr class="roboto-light table-header">
+                <th id="colAirline">Авиакомпания</th>
+                <th id="colFlight">Рейс</th>
+                <th id="colDestination">Направление</th>
+                <th id="colDate">Дата</th>
+                <th id="colTime">Время</th>
+                <th id="colCounters">Стойки</th>
+                <th id="colStatus">Статус</th>
+            </tr>
+        </thead>
+        <tbody id="flightsTableBody"></tbody>
+    </table>
+    <div id="connectionStatus">Подключение...</div>
+
+    <script src="static/js/dep.js"></script>
+</body>
+</html>

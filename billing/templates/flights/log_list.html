@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Журнал действий</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            background-color: #f4f7f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-form {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #ecf0f1;
+            border-radius: 6px;
+        }
+        .filter-form label {
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 5px;
+        }
+        .filter-form input, .filter-form select {
+            padding: 8px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+        }
+        .filter-form button {
+            padding: 10px 15px;
+            border: none;
+            background-color: #3498db;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .filter-form button:hover {
+            background-color: #2980b9;
+        }
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            /* Исправлено: фиксированный макет, чтобы избежать растягивания */
+            table-layout: fixed;
+        }
+        .log-table th, .log-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+            /* Разрешаем перенос текста по словам */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+        /* Устанавливаем ширину для колонок, чтобы таблица не растягивалась */
+        .log-table th:nth-child(1) { width: 15%; } /* Время */
+        .log-table th:nth-child(2) { width: 10%; } /* Пользователь */
+        .log-table th:nth-child(3) { width: 10%; } /* Действие */
+        .log-table th:nth-child(4) { width: 25%; } /* Объект */
+        .log-table th:nth-child(5) { width: 40%; } /* Изменения */
+        
+        .log-table th {
+            background-color: #34495e;
+            color: white;
+            font-weight: bold;
+        }
+        .log-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .log-table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+        .action-created { color: #27ae60; font-weight: bold; }
+        .action-updated { color: #f39c12; font-weight: bold; }
+        .action-deleted { color: #e74c3c; font-weight: bold; }
+        .log-changes {
+            font-family: sans-serif;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .change-item {
+            margin: 5px 0;
+        }
+        .old-value {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        .new-value {
+            font-weight: bold;
+            color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Журнал действий</h1>
+
+        <form method="get" class="filter-form">
+            <div>
+                {{ form.start_date.label_tag }}
+                {{ form.start_date }}
+            </div>
+            <div>
+                {{ form.end_date.label_tag }}
+                {{ form.end_date }}
+            </div>
+            <div>
+                {{ form.user.label_tag }}
+                {{ form.user }}
+            </div>
+            <button type="submit">Фильтровать</button>
+        </form>
+
+        <table class="log-table">
+            <thead>
+                <tr>
+                    <th>Время</th>
+                    <th>Пользователь</th>
+                    <th>Действие</th>
+                    <th>Объект</th>
+                    <th>Изменения</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log.action_time|date:"d.m.Y H:i:s" }}</td>
+                    <td>{{ log.user.username }}</td>
+                    <td>
+                        <span class="{% if log.action == 'CREATED' %}action-created{% elif log.action == 'UPDATED' %}action-updated{% else %}action-deleted{% endif %}">
+                            {{ log.get_action_display }}
+                        </span>
+                    </td>
+                    <td>{{ log.content_object }} (ID: {{ log.object_id }})</td>
+                    <td>
+                        <div class="log-changes">
+                            {% if log.changes.message %}
+                                <p><strong>{{ log.changes.message }}</strong></p>
+                                {% for field, change in log.changes.details.items %}
+                                    <div class="change-item">
+                                        <strong>
+                                            {% if field == 'service_type' %}Тип услуги
+                                            {% elif field == 'quantity' %}Количество
+                                            {% elif field == 'description' %}Примечание
+                                            {% elif field == 'unit_of_measure' %}Ед. изм.
+                                            {% elif field == 'start_time' %}Время начала
+                                            {% elif field == 'end_time' %}Время окончания
+                                            {% else %}{{ field|title }}
+                                            {% endif %}:
+                                        </strong>
+                                        было <span class="old-value">"{{ change.old }}"</span>, стало <span class="new-value">"{{ change.new }}"</span>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <pre>{{ log.changes }}</pre>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center;">Записей в журнале не найдено.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

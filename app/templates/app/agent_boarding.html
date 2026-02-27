@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+    <style>
+        :root {
+            --main-bg: #f7fafc;
+            --card-bg: #fff;
+            --accent: #2ecc40;
+            --accent-dark: #218838;
+            --accent-light: #e6ffe6;
+            --text-main: #222;
+            --text-muted: #888;
+            --shadow: 0 4px 24px rgba(46,204,64,0.10), 0 1.5px 6px rgba(46,204,64,0.08);
+            --radius: 18px;
+            --transition: 0.25s cubic-bezier(.4,0,.2,1);
+        }
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            min-height: 100vh;
+            background: var(--main-bg);
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .main-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 38px 32px 32px 32px;
+            max-width: 480px;
+            width: 100%;
+            margin: 32px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            animation: fadeInMainCard 0.7s;
+        }
+        @keyframes fadeInMainCard {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1 {
+            font-size: 2.1em;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+        .gate-info {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 1.13em;
+            letter-spacing: 0.2px;
+        }
+        select {
+            width: 100%;
+            padding: 14px 12px;
+            border-radius: 8px;
+            border: 1.5px solid #d1e7dd;
+            font-size: 1.15em;
+            background: #f8fff8;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            transition: border-color var(--transition), box-shadow var(--transition);
+            box-shadow: 0 1px 2px rgba(46,204,64,0.04);
+        }
+        select:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 2px #b2f7cc;
+        }
+        .button-row {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 6px;
+        }
+        button {
+            flex: 1 1 0;
+            padding: 15px 0;
+            border-radius: 8px;
+            border: none;
+            font-size: 1.15em;
+            font-weight: 600;
+            background: var(--accent);
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(46,204,64,0.08);
+            transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
+        }
+        button:hover, button:focus {
+            background: #1e7e34;
+            box-shadow: 0 4px 16px rgba(46,204,64,0.13);
+            transform: translateY(-2px) scale(1.03);
+        }
+        button#endBoardingButton {
+            background: #dc3545;
+        }
+        button#endBoardingButton:hover, button#endBoardingButton:focus {
+            background: #c82333;
+        }
+        .success-message {
+            color: #218838;
+            background: #e6ffe6;
+            border: 1.5px solid #2ecc40;
+            text-align: center;
+            margin-top: 18px;
+            font-weight: 600;
+            font-size: 1.1em;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(46,204,64,0.08);
+            animation: fadeInMsg 0.5s;
+        }
+        .error-message {
+            color: #c82333;
+            background: #ffe6e6;
+            border: 1.5px solid #dc3545;
+            text-align: center;
+            margin-top: 18px;
+            font-weight: 600;
+            font-size: 1.1em;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(220,53,69,0.08);
+            animation: fadeInMsg 0.5s;
+        }
+        @keyframes fadeInMsg {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hidden {
+            display: none;
+        }
+        @media (max-width: 600px) {
+            .main-card {
+                padding: 18px 4vw 18px 4vw;
+                max-width: 98vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-card">
+        <h2>{{ page_title }}</h2>
+        <div class="gate-info">Вы работаете на гейте: <strong>{{ gate_number }}</strong></div>
+
+        {% if current_flight_obj %}
+            <div class="active-flight-block">
+                <span class="plane-ico">✈️</span>
+                <div>
+                    <div style="font-size: 1.25em; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 2px;">
+                        Открыт рейс на этом гейте
+                    </div>
+                    <div class="flight-num">
+                        {{ current_flight_obj.flight.flights }}
+                    </div>
+                    <div style="margin-bottom: 2px; color: #218838; font-size: 1.1em;">
+                        Дата: <span style="font-weight: 600;">{{ current_flight_obj.date1|date:'d.m.Y' }}</span>
+                        &nbsp;|&nbsp;
+                        Время: <span style="font-weight: 600;">{{ current_flight_obj.time1|time:'H:i' }}</span>
+                    </div>
+                    <span class="badge">
+                        {{ current_flight_obj.status.name_ru }}
+                    </span>
+                </div>
+            </div>
+        {% endif %}
+
+        <label for="flightSelect">Выберите рейс:</label>
+        <select id="flightSelect">
+            {% for flight in flights %}
+                <option value="{{ flight.flight.flights }}_{{ flight.date1|date:"Y-m-d" }}">
+                    {{ flight.flight.flights }} -
+                    {% if flight.direction == 'P' %}
+                        {{ flight.flight.arrival_city.name_ru }}
+                    {% else %}
+                        {{ flight.flight.departure_city.name_ru }}
+                    {% endif %}
+                    ({{ flight.time1|time:"H:i" }} {{ flight.date1|date:"d.m" }})
+                </option>
+            {% endfor %}
+        </select>
+
+        <div class="button-row">
+            <button id="startBoardingButton">Начать посадку</button>
+            <button id="endBoardingButton">Посадка окончена</button>
+        </div>
+
+        <div id="message" class="hidden"></div>
+    </div>
+
+    <script>
+        const gateNumber = "{{ gate_number }}";
+        const flightSelect = document.getElementById('flightSelect');
+        const startBoardingButton = document.getElementById('startBoardingButton');
+        const endBoardingButton = document.getElementById('endBoardingButton');
+        const messageDiv = document.getElementById('message');
+
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = type + '-message';
+            messageDiv.style.display = 'block';
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function getFlightDataFromSelect() {
+            const selectedValue = flightSelect.value;
+            const parts = selectedValue.split('_');
+            if (parts.length === 2) {
+                return {
+                    flight_number: parts[0],
+                    flight_date: parts[1]
+                };
+            }
+            return null;
+        }
+
+        startBoardingButton.addEventListener('click', function() {
+            const flightData = getFlightDataFromSelect();
+            if (!flightData) {
+                showMessage('Пожалуйста, выберите рейс.', 'error');
+                return;
+            }
+
+            // Сохраняем выбранный рейс
+            localStorage.setItem('selectedFlightBoarding', flightSelect.value);
+
+            // Отключаем кнопку для предотвращения повторных нажатий
+            this.disabled = true;
+            this.textContent = 'Обработка...';
+
+            fetch('/api/start_boarding/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    flight_number: flightData.flight_number,
+                    flight_date: flightData.flight_date,
+                    gate_number: gateNumber
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.message || 'Ошибка сервера'); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    showMessage(data.message, 'success');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                showMessage('Произошла ошибка: ' + error.message, 'error');
+            })
+            .finally(() => {
+                this.disabled = false;
+                this.textContent = 'Начать посадку';
+            });
+        });
+
+        endBoardingButton.addEventListener('click', function() {
+            const flightData = getFlightDataFromSelect();
+            if (!flightData) {
+                showMessage('Пожалуйста, выберите рейс.', 'error');
+                return;
+            }
+
+            // Сохраняем выбранный рейс
+            localStorage.setItem('selectedFlightBoarding', flightSelect.value);
+
+            this.disabled = true;
+            this.textContent = 'Обработка...';
+
+            fetch('/api/end_boarding/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    flight_number: flightData.flight_number,
+                    flight_date: flightData.flight_date
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.message || 'Ошибка сервера'); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    showMessage(data.message, 'success');
+                    localStorage.removeItem('selectedFlightBoarding');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                showMessage('Произошла ошибка: ' + error.message, 'error');
+            })
+            .finally(() => {
+                this.disabled = false;
+                this.textContent = 'Посадка окончена';
+            });
+        });
+
+        // Восстановить выбранный рейс из localStorage при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedFlight = localStorage.getItem('selectedFlightBoarding');
+            if (savedFlight) {
+                flightSelect.value = savedFlight;
+                localStorage.removeItem('selectedFlightBoarding');
+            } else if (typeof currentFlight !== 'undefined' && currentFlight) {
+                flightSelect.value = currentFlight;
+            } else if (flightSelect.options.length > 0) {
+                flightSelect.selectedIndex = 0;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,465 @@
+body{
+    overflow: hidden;
+    background: #fff;   
+}
+
+.montserrat-light {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+    margin: 0;
+    padding: 0;
+  }
+
+.montserrat-bold {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+    /* font-size: 50px; */
+    padding: 0;
+    margin: 0;
+}
+
+
+/* Flexbox container to hold divs */
+.flex-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+}
+
+.full-width {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.half-width-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    height: 100vh;
+}
+
+.half-width {
+    width: 50%;
+    height: 100%;
+    overflow-y: auto;
+    margin: 0%;
+    padding: 0px;
+    /* border: 2px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box; */
+    overflow-x: hidden;
+}
+
+.flight-container {
+    margin-bottom: 1em;
+}
+
+.hidden {
+    display: none;
+}
+
+.bg1 {
+    background-color: #fff;
+    background-image: url(/media/vpp.svg);
+    background-repeat: no-repeat;
+    background-size: 40%;
+    background-position: 50% 65%;
+    /* border-radius: 50px;
+    height: 90%; */
+}
+
+.bg2 {
+    background-color: #fff;
+    width: 47%;
+}
+.bg3 {
+    background-color: #fff;
+    width: 47%;
+}
+
+.bg1 .header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 3%;
+}
+
+.bg1 .flight {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+.bg2 .flight {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+.bg3 .flight {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.bg1 .flight-header {
+    font-size: 6em;
+    font-weight: 600;
+    color: #003E92;
+}
+.bg2 .flight-header {
+    font-size: 5em;
+    font-weight: 600;
+    color: #00A1ED;
+    margin-top: 5%;
+}
+.bg3 .flight-header {
+    font-size: 5em;
+    font-weight: 600;
+    color: #00A1ED;
+    margin-top: 5%;
+}
+
+.bg1 .times {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: center;
+}
+.bg2 .times {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: center;
+    height: 220px;
+}
+.bg3 .times {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: center;
+    height: 220px;
+}
+
+
+.bg1 .small-text {
+    font-size: 30px;
+    color: #00A1ED;
+    text-transform: uppercase;
+}
+.bg2 .small-text {
+    display: none;
+}
+.bg3 .small-text {
+    display: none;
+}
+
+.bg2 .small-text-half {
+    display: none;
+}
+.bg3 .small-text-half {
+    display: none;
+}
+
+.bg1 .destination{
+    font-size: 8em;
+    color: #003E92;
+    display: flex;
+    justify-content: center;
+    margin-top: -2%;
+    text-transform: uppercase;
+}
+.bg2 .destination{
+    font-size: 6em;
+    color: #003E92;
+    margin-top: -2%;
+    text-transform: uppercase;
+    text-align: center;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+}
+.bg3 .destination{
+    font-size: 6em;
+    color: #003E92;
+    margin-top: -2%;
+    text-transform: uppercase;
+    text-align: center;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.bg2 .stoika-logo {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+.bg3 .stoika-logo {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.bg1 .airline-logo{
+    margin-top: 3%;
+    margin-left: 2%;
+    width: 300px;
+    height: auto;
+}
+.bg2 .airline-logo{
+    margin-top: 3%;
+    margin-left: 2%;
+    width: auto;
+    height: 150px;
+}
+.bg3 .airline-logo{
+    margin-top: 3%;
+    margin-left: 2%;
+    width: auto;
+    height: 150px;
+}
+
+.bg1 .time {
+    font-size: 7em;
+    color: #003E92;
+}
+.bg2 .time {
+    font-size: 6em;
+    color: #003E92;
+    margin-top: 8%;
+}
+.bg3 .time {
+    font-size: 6em;
+    color: #003E92;
+    margin-top: 8%;
+}
+
+.bg1 .iata {
+    font-size: 5em;
+    color: #00A1ED;
+}
+.bg2 .iata {
+    font-size: 5em;
+    color: #00A1ED;
+}
+.bg3 .iata {
+    font-size: 5em;
+    color: #00A1ED;
+}
+
+.bg1 .weatherandbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.bg2 .weatherandbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+.bg3 .weatherandbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+
+.bg1 .weather {
+    display: flex;
+    justify-content: space-between;
+    margin-left: 46%;
+    
+    
+}
+.bg2 .weather {
+    display: flex;
+    justify-content: space-between;
+    
+}
+.bg3 .weather {
+    display: flex;
+    justify-content: space-between;
+    
+}
+
+.bg1 .weather-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10%;
+}
+.bg3 .weather-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10%;
+}
+.bg2 .weather-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10%;
+}
+
+.bg1 .weather-icon {
+    width: 50%;
+    height: auto;
+}
+.bg2 .weather-icon {
+    width: 40%;
+    height: auto;
+}
+.bg3 .weather-icon {
+    width: 40%;
+    height: auto;
+}
+
+.bg1 .weather-text {
+    font-size: 3em;
+    color: #003E92;
+}
+.bg2 .weather-text {
+    font-size: 3em;
+    color: #003E92;
+}
+.bg3 .weather-text {
+    font-size: 3em;
+    color: #003E92;
+}
+
+.bg1 .dest {
+    padding-left: 40%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.bg3 .dest {
+    display: flex;
+    justify-content: center;
+}
+
+
+.bg1 .wosh {
+    /* margin-right: 30%; */
+    padding-right: 20%;
+    margin-left: -10%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+.bg1 .footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-top: 1%;
+}
+.bg2 .footer {
+    position: absolute;
+    top: 2%;
+    left: 39.8%;
+    margin-top: 1%;
+}
+.bg3 .footer {
+    display: none;
+}
+
+.bg1 .manas-logo {
+    width: 40%;
+    height: auto;
+}
+.bg2 .manas-logo {
+    width: 40%;
+    height: auto;
+}
+.bg3 .manas-logo {
+    display: none;
+}
+
+.bg1 .st_num {
+    font-size: 8em;
+    font-weight: 900;
+    margin-top: -1%;
+    color: #003E92;
+}
+.bg2 .st_num {
+    font-size: 7em;
+    font-weight: 900;
+    margin-top: -1%;
+    color: #00A1ED;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.bg3 .st_num {
+    display: none;
+}
+
+.bg1 .circle {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 3%;
+}
+
+.bg1 .l-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 100px;
+    background-color: #000;
+    margin-left: -2.6%;
+}
+
+.bg1 .r-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 100px;
+    background-color: #000;
+    margin-right: -2.6%;
+}
+
+.bg2 .bg-half-hidden {
+    display: none;
+}
+.bg3 .bg-half-hidden {
+    display: none;
+}
+
+.bg2 .rotate {
+    display: flex;
+    flex-direction: column-reverse;
+    margin-top: 10%;
+}
+.bg3 .rotate {
+    display: flex;
+    flex-direction: column-reverse;
+    margin-top: 10%;
+}
+
+.bg2 .half-footer {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-around;
+}
+.bg3 .half-footer {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-around;
+}

@@ -1,0 +1,955 @@
+{% load flights_extras %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ flight.flight_num }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/ru.js"></script>
+
+    <style>
+        body {
+            padding-top: 15px;
+            font-size: 0.875rem;
+        }
+
+        .container {
+            max-width: 1600px;
+        }
+
+        .h3, h3 {
+            font-size: 1.5rem;
+        }
+
+        p {
+            margin-bottom: 0.5rem;
+        }
+
+        .card {
+            padding: 0.75rem;
+        }
+
+        .form-control, .form-select {
+            font-size: 0.875rem;
+            padding: 0.25rem 0.5rem;
+            height: auto;
+        }
+
+        .btn {
+            font-size: 0.875rem;
+            padding: 0.50rem 0.5rem;
+        }
+
+        .input-group-sm .btn {
+            padding: 0.25rem 0.5rem;
+        }
+
+        .table-responsive .table {
+            font-size: 0.875rem;
+            table-layout: fixed;
+            width: 100%;
+        }
+        .table-responsive .table th, .table-responsive .table td {
+            padding: 0.5rem;
+            vertical-align: top;
+        }
+
+        .table-scrollable-container {
+            max-height: 43vh;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-bottom: none;
+            border-radius: .25rem;
+        }
+
+        .table thead {
+            position: sticky;
+            top: 0;
+            background-color: #f8f9fa;
+            z-index: 10;
+        }
+        .table tbody tr:hover {
+            cursor: pointer;
+            background-color: #e2f4ff !important;
+        }
+        .table tbody tr.table-primary {
+            background-color: #cce5ff !important;
+        }
+
+        .service-type-col {
+            width: 450px;
+        }
+
+        .service-description-col {
+            width: 250px;
+        }
+
+        .service-type-cell, .service-description-cell {
+            max-height: 50px;
+            overflow-y: auto;
+            word-break: break-word;
+            display: block;
+            white-space: normal;
+        }
+
+        .max-takeoff-weight-input {
+            width: 8.5vw;
+        }
+        .footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color:rgb(121, 120, 120);
+            color: white;
+            text-align: center;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% include 'includes/messages.html' %}
+
+        <div class="row d-flex align-items-stretch">
+            <div class="col-md-6">
+                <div class="card card-block mb-4 p-4 bg-info bg-opacity-10 border border-info shadow-sm h-100">
+                    <div class="row align-items-center mb-4">
+                        <div class="col-md-8">
+                            <h3 class="card-title text-primary m-0">
+                                {{ tech_card.author.get_full_name }}
+                            </h3>
+                            <p class="text-secondary m-0" style="font-size: 1rem;">
+                                Номер техкарты: <strong>{{ tech_card.tech_card_num }}</strong>
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <p class="mb-1 fw-bold small text-secondary">Время (UTC):</p>
+                            <div class="card bg-warning text-dark text-center fw-bold h5">
+                                <span id="user-current-time"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            {% comment %} <p class="mb-1 fw-bold small text-secondary">Номер рейса:</p> {% endcomment %}
+                            {% comment %} <div class="card mb-2 text-center py-1">{{ flight.flight_num }} / {{ flight.linked_flight.flight_num|default:"-" }}</div> {% endcomment %}
+                            <p class="mb-1 fw-bold small text-secondary">Номер рейса:</p>
+                            <div class="input-group mb-2">
+                                <div class="form-control text-center py-1 fw-semibold" id="linked-flight-display" data-flight-num="{{ flight.flight_num }}">
+                                    {% if flight.linked_flight %}
+                                        {{ flight.flight_num }} / {{ flight.linked_flight.flight_num }}
+                                    {% else %}
+                                        {{ flight.flight_num }} / -
+                                    {% endif %}
+                                </div>
+                                <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#linkFlightModal">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+
+                            <p class="mb-1 fw-bold small text-secondary">Аэропорт:</p>
+                            <div class="card mb-2 text-center py-1">{{ flight.dep_airport.code|default:"-" }} → {{ flight.arr_airport.code|default:"-" }}</div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <p class="mb-1 fw-bold small text-secondary">Тип ВС / Борт. №:</p>
+                            <div class="card mb-2 text-center py-1">{{ flight.aircraft_type|default:"-" }} / {{ flight.board_num|default:"-" }}</div>
+
+                            {% comment %} <p class="mb-1 fw-bold small text-secondary">Стоянка:</p> {% endcomment %}
+                            {% comment %} <div class="card mb-2 text-center py-1">{{ flight.stand|default:"-" }}</div> {% endcomment %}
+                            <p class="mb-1 fw-bold small text-secondary">Стоянка:</p>
+                            <input type="text" 
+                                data-field-name="stand" 
+                                data-flight-id="{{ flight.id }}"
+                                data-original-value="{{ flight.stand|default:'' }}"
+                                value="{{ flight.stand|default:'' }}"
+                                class="form-control text-center fw-semibold mt-1 py-1 mb-2">
+                        </div>
+
+                        <div class="col-md-3">
+                            {% if flight.board_base == 'B' %}
+                                <p class="mb-1 fw-bold small text-secondary">Дата рейса:</p>
+                                <div class="card mb-2 text-center py-1">{{ flight.date_fact_obj|date:"d.m.Y"|default:"-" }}</div>
+                            {% else %}
+                                <p class="mb-1 fw-bold small text-secondary">Дата рейса:</p>
+                                <div class="card mb-2 text-center py-1">
+                                    {% if flight.linked_flight and flight.linked_flight.date_fact_obj %}
+                                        {{ flight.linked_flight.date_fact_obj|date:"d.m.Y" }}
+                                    {% elif flight.board_base == 'T' %}
+                                        {{ flight.date_fact_obj|date:"d.m.Y"|default:"-" }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                            <p class="mb-1 fw-bold small text-secondary">АК:</p>
+                            <div class="card mb-2 text-center py-1">{{ flight.airline.name }} ({{ flight.airline.code|default:"-" }})</div>
+                        </div>
+
+                        <div class="col-md-3">
+                            {% if flight.board_base == 'B' %}
+                                <p class="mb-1 fw-bold small text-secondary">Время П/П / П/Ф:</p>
+                                <div class="card mb-2 text-center py-1">{{ flight.linked_flight.time|default:"-" }} / {{ flight.linked_flight.actual_time|default:"-" }}</div>
+
+                                <p class="mb-1 fw-bold small text-secondary">Время В/П / В/Ф:</p>
+                                <div class="card mb-2 text-center py-1">{{ flight.time|default:"-" }} / {{ flight.actual_time|default:"-" }}</div>
+                            {% else %}
+                                <p class="mb-1 fw-bold small text-secondary">Время П/П / П/Ф:</p>
+                                <div class="card mb-2 text-center py-1">{{ flight.time|default:"-" }} / {{ flight.actual_time|default:"-" }}</div>
+
+                                <p class="mb-1 fw-bold small text-secondary">Время В/П / В/Ф:</p>
+                                <div class="card mb-2 text-center py-1">{{ flight.linked_flight.time|default:"-" }} / {{ flight.linked_flight.actual_time|default:"-" }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-4">
+                            <p class="mb-1 fw-bold small text-secondary">Макс. взлётная масса:</p>
+                            <input type="number"
+                                   data-tech-card-id="{{ tech_card.id }}"
+                                   data-field-name="max_takeoff_weight"
+                                   data-original-value="{{ tech_card.max_takeoff_weight|default:'' }}"
+                                   value="{{ tech_card.max_takeoff_weight|decimal_to_period|default:'' }}"
+                                   class="form-control text-center fw-semibold mt-1 py-1 max-takeoff-weight-input"
+                                   {% if read_only %}readonly{% endif %}>
+                        </div>
+                    
+                        <div class="col-md-4">
+                            <p class="mb-1 fw-bold small text-secondary">ТЗК:</p>
+                            <select class="form-select form-control-sm"
+                                    data-tech-card-id="{{ tech_card.id }}"
+                                    data-field-name="fueler"
+                                    data-original-value="{{ tech_card.fueler.id|default:'' }}"
+                                    {% if read_only %}disabled{% endif %}>
+                                <option value="">-</option>
+                                {% for firm in firms %}
+                                    <option value="{{ firm.id }}" {% if firm.id == tech_card.fueler.id %}selected{% endif %}>
+                                        {{ firm.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    
+                        <div class="col-md-4">
+                            <p class="mb-1 fw-bold small text-secondary">Количество:</p>
+                            <div class="input-group input-group-sm">
+                                <input type="number" class="form-control"
+                                       data-tech-card-id="{{ tech_card.id }}"
+                                       data-field-name="fuel_quantity"
+                                       data-original-value="{{ tech_card.fuel_quantity|default:'' }}"
+                                       value="{{ tech_card.fuel_quantity|decimal_to_period|default:'' }}"
+                                       {% if read_only %}disabled{% endif %}>
+                                <select class="form-select"
+                                        data-tech-card-id="{{ tech_card.id }}"
+                                        data-field-name="fuel_unit"
+                                        data-original-value="{{ tech_card.fuel_unit|default:'' }}"
+                                        {% if read_only %}disabled{% endif %}>
+                                    <option value="kg" {% if tech_card.fuel_unit == 'kg' %}selected{% endif %}>кг</option>
+                                    <option value="ton" {% if tech_card.fuel_unit == 'ton' %}selected{% endif %}>тонна</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    {% if tech_card.is_closed %}
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <p class="mb-1 fw-bold small text-secondary">Статус:</p>
+                                <div class="card text-center py-1 bg-danger text-white">
+                                    Закрыта {{ tech_card.closed_by.get_full_name }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if not read_only %}
+            <div class="col-md-6">
+                <div class="card card-block mb-4 p-4 bg-secondary bg-opacity-10 border border-info shadow-sm h-100">
+                    <h3 class="mb-3">Добавить/редактировать услугу</h3>
+                    <form method="post" id="service-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="service_id" id="service-id-input">
+                        <input type="hidden" name="tech_card" id="tech_card-id-input" value="{{ tech_card.id }}">
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.service_type.id_for_label }}" class="form-label">Тип услуги</label>
+                                <select class="form-select form-select-sm" id="{{ form.service_type.id_for_label }}" name="{{ form.service_type.name }}">
+                                    <option value="" data-category="">Выберите тип услуги...</option>
+                                    {% for obj in form.service_type.field.queryset %}
+                                        <option value="{{ obj.id }}" data-category="{{ obj.category }}" {% if form.service_type.value == obj.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ obj }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+            
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.start_time.id_for_label }}" class="form-label">Время начала</label>
+                                <div class="input-group input-group-sm">
+                                    {{ form.start_time|add_class:"form-control form-control-sm" }}
+                                    <button type="button" class="btn btn-outline-secondary" id="set-start-time-btn">
+                                        <i class="fas fa-clock"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.end_time.id_for_label }}" class="form-label">Время окончания</label>
+                                <div class="input-group input-group-sm">
+                                    {{ form.end_time|add_class:"form-control" }}
+                                    <button type="button" class="btn btn-outline-secondary" id="set-end-time-btn">
+                                        <i class="fas fa-clock"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+            
+                        <div id="passenger-fields" class="dynamic-fields" style="display: none;">
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="id_adults_count" class="form-label">Взр.</label>
+                                    <input type="number" class="form-control form-control-sm" id="id_adults_count" name="adults_count" min="0">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="id_children_count" class="form-label">Рб.</label>
+                                    <input type="number" class="form-control form-control-sm" id="id_children_count" name="children_count" min="0">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="id_infants_count" class="form-label">Рм.</label>
+                                    <input type="number" class="form-control form-control-sm" id="id_infants_count" name="infants_count" min="0">
+                                </div>
+                            </div>
+                        </div>
+            
+                        <div id="duration-fields" class="dynamic-fields" style="display: none;">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="id_duration_hours" class="form-label">Часы</label>
+                                    <input type="number" class="form-control form-control-sm" id="id_duration_hours" name="duration_hours" min="0" value="0" placeholder="00">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_duration_minutes" class="form-label">Минуты</label>
+                                    <input type="number" class="form-control form-control-sm" id="id_duration_minutes" name="duration_minutes" min="0" max="59" value="0" placeholder="30">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="default-fields" class="dynamic-fields" style="display: none;">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="id_quantity" class="form-label">Кол-во</label>
+                                    <input type="number" class="form-control form-control-sm" id="id_quantity" name="quantity" min="0">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_unit_of_measure" class="form-label">Ед. изм.</label>
+                                    <input type="text" class="form-control form-control-sm" id="id_unit_of_measure" name="unit_of_measure">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.description.id_for_label }}" class="form-label">Примечание</label>
+                                {{ form.description|add_class:"form-control" }}
+                            </div>
+                        </div>
+            
+                        <button type="submit" class="btn btn-primary mb-2">Сохранить</button>
+                        <button type="button" class="btn btn-secondary" id="cancel-edit-btn" style="display:none;">Отмена</button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="row">
+            <div class="col-12 d-flex justify-content-between mb-3">
+                <button  disabled id="back-to-dashboard-btn" class="btn btn-secondary mt-3">
+                    ← Вернуться к списку рейсов
+                </button>
+                <div class="btn-group mt-3" role="group" aria-label="Action options">
+                    {% if not read_only %}
+                        <button class="btn btn-warning" id="edit-service-btn" disabled>Редактировать</button>
+                        <button type="button" class="btn btn-danger" id="delete-service-btn" disabled>Удалить</button>
+                    {% endif %}
+                
+                    {% if tech_card and tech_card.id %}
+                        {% if is_supervisor and not tech_card.is_closed %}
+                            <button type="button" class="btn btn-dark" id="close-techcard-btn"
+                                    data-tech-card-id="{{ tech_card.id }}">Закрыть техкарту</button>
+                        {% endif %}
+                        
+                        <a href="{% url 'export_to_pdf' flight.id tech_card.id %}" class="btn btn-primary">
+                            Экспорт в PDF
+                        </a>
+                        <a href="{% url 'preview_pdf_template' flight.id tech_card.id %}" target="_blank" class="btn btn-success">
+                            Печать
+                        </a>
+                    {% else %}
+                    <button id="close-techcard-btn" class="btn btn-danger" 
+                    data-tech-card-id="{{ tech_card.id|default:'0' }}"> 
+                Закрыть техкарту
+            </button>
+                        <button class="btn btn-secondary" disabled>Экспорт в PDF</button>
+                        <button class="btn btn-secondary" disabled>Печать</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <h5 class="card-title">Список услуг</h5>
+                <div class="table-responsive">
+                    <div class="table-scrollable-container">
+                        <table class="table table-bordered table-hover">
+                            <colgroup>
+                                <col>
+                                <col class="service-type-col">
+                                <col>
+                                <col>
+                                <col>
+                                <col>
+                                <col>
+                                <col class="service-description-col">
+                                <col>
+                            </colgroup>
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 40px;">№</th>
+                                    <th style="width: 400px;">Тип услуги</th>
+                                    <th>Начало</th>
+                                    <th>Окончание</th>
+                                    <th>Длительность</th>
+                                    <th>Кол-во</th>
+                                    <th>Ед. изм.</th>
+                                    <th>Примечание</th>
+                                    <th>Автор</th>
+                                </tr>
+                            </thead>
+                            <tbody id="services-table-body">
+                                {% if services %}
+                                    {% for service in services %}
+                                    <tr data-service-id="{{ service.id }}"
+                                        data-service_type="{{ service.service_type_id }}"
+                                        data-description="{{ service.description|default:'' }}"
+                                        data-quantity="{{ service.quantity|default:'' }}"
+                                        data-unit_of_measure="{{ service.unit_of_measure|default:'' }}"
+                                        data-start-time="{{ service.start_time|time:'H:i'|default:'' }}"
+                                        data-end-time="{{ service.end_time|time:'H:i'|default:'' }}"
+                                        data-passengers="{{ service.passengers_display }}"
+                                        data-duration-field="{{ service.duration_field|default:'' }}">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td><div class="service-type-cell">{{ service.service_type.name }}</div></td>
+                                        <td>{{ service.start_time|time:'H:i'|default:"-" }}</td>
+                                        <td>{{ service.end_time|time:'H:i'|default:"-" }}</td>
+                                        <td>{{ service.display_duration|format_duration }}</td> <td>
+                                            {% if service.service_type.category == 'int' %}
+                                                {{ service.quantity|default:"-" }}
+                                            {% elif service.service_type.category == 'pass' %}
+                                                {{ service.passengers_display }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if service.service_type.category == 'int' %}
+                                                {{ service.unit_of_measure|default:"-" }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td><div class="service-description-cell">{{ service.description|default:"-" }}</div></td>
+                                        <td>{{ service.author.get_full_name|default:"-" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="8" class="text-center">К этому рейсу пока не добавлены услуги.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- ОБЩИЕ ПЕРЕМЕННЫЕ (Объявляем один раз) ---
+        const servicesTableBody = document.getElementById('services-table-body');
+        const serviceForm = document.getElementById('service-form');
+        const serviceIdInput = document.getElementById('service-id-input');
+        const techCardIdInput = document.getElementById('tech_card-id-input');
+        const serviceTypeSelect = document.getElementById('id_service_type');
+        const startTimeInput = document.getElementById('id_start_time');
+        const endTimeInput = document.getElementById('id_end_time');
+        const descriptionInput = document.getElementById('id_description');
+        const cancelButton = document.getElementById('cancel-edit-btn');
+        const editServiceBtn = document.getElementById('edit-service-btn');
+        const deleteServiceBtn = document.getElementById('delete-service-btn');
+        const closeTechcardBtn = document.getElementById('close-techcard-btn');
+        
+        let selectedServiceRow = null;
+        
+        const passengerFields = document.getElementById('passenger-fields');
+        const durationFields = document.getElementById('duration-fields');
+        const defaultFields = document.getElementById('default-fields');
+        
+        const durationHoursInput = document.getElementById('id_duration_hours');
+        const durationMinutesInput = document.getElementById('id_duration_minutes');
+        
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        // --- НОВЫЕ ПЕРЕМЕННЫЕ ДЛЯ РЕЙСА (FLIGHT) ---
+        const linkFlightModal = document.getElementById('linkFlightModal');
+        const dateFilter = document.getElementById('dateFilter');
+        const airlineFilter = document.getElementById('airlineFilter');
+        const flightsListBody = document.getElementById('flights-list-body');
+        const linkedFlightDisplay = document.getElementById('linked-flight-display');
+        const currentFlightId = '{{ flight.id }}';
+        const currentFlightNum = linkedFlightDisplay ? linkedFlightDisplay.dataset.flightNum : '';
+
+        // --- ФУНКЦИИ ---
+        function goBackToDashboard() {
+            try {
+                if (window.opener && !window.opener.closed) {
+                    window.opener.focus();
+                    window.close();
+                } else {
+                    window.history.back();
+                }
+            } catch (error) {
+                console.error("Ошибка при выполнении goBackToDashboard:", error);
+                window.history.back();
+            }
+        }
+        
+        function updateClientTime() {
+            const now = new Date();
+            const hours = String(now.getUTCHours()).padStart(2, '0');
+            const minutes = String(now.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(now.getUTCSeconds()).padStart(2, '0');
+            const timeElement = document.getElementById('user-current-time');
+            if (timeElement) {
+                timeElement.textContent = `${hours}:${minutes}:${seconds} UTC`;
+            }
+        }
+
+        function setInputTimeToUTC(inputElement) {
+            const now = new Date();
+            const utcHours = String(now.getUTCHours()).padStart(2, '0');
+            const utcMinutes = String(now.getUTCMinutes()).padStart(2, '0');
+            const utcTime = `${utcHours}:${utcMinutes}`;
+            if (inputElement) {
+                inputElement.value = utcTime;
+            }
+        }
+
+        function toggleServiceFields() {
+            if (passengerFields) passengerFields.style.display = 'none';
+            if (durationFields) durationFields.style.display = 'none';
+            if (defaultFields) defaultFields.style.display = 'none';
+
+            const selectedOption = serviceTypeSelect.options[serviceTypeSelect.selectedIndex];
+            const category = selectedOption ? selectedOption.dataset.category : '';
+
+            switch (category) {
+                case 'pass':
+                    if (passengerFields) passengerFields.style.display = 'block';
+                    break;
+                case 'time':
+                    if (durationFields) durationFields.style.display = 'block';
+                    break;
+                case 'int':
+                    if (defaultFields) defaultFields.style.display = 'block';
+                    break;
+            }
+        }
+
+        function resetForm() {
+            serviceForm.reset();
+            if (serviceIdInput) serviceIdInput.value = '';
+            if (cancelButton) cancelButton.style.display = 'none';
+            if (editServiceBtn) editServiceBtn.disabled = true;
+            if (deleteServiceBtn) deleteServiceBtn.disabled = true;
+            if (selectedServiceRow) {
+                selectedServiceRow.classList.remove('table-primary');
+                selectedServiceRow = null;
+            }
+            const formTitle = serviceForm.closest('.card').querySelector('h3');
+            if (formTitle) formTitle.textContent = 'Добавить/редактировать услугу';
+            toggleServiceFields();
+        }
+        
+        // --- НОВЫЕ ФУНКЦИИ ДЛЯ РЕЙСА (FLIGHT) ---
+        function updateFlightField(flightId, fieldName, value) {
+            return fetch(`/billing/update-flight-field/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken
+                },
+                body: `flight_id=${flightId}&field_name=${fieldName}&value=${encodeURIComponent(value)}`
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`Server responded with status: ${response.status}. Message: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log('Flight field successfully updated:', data.message);
+                } else {
+                    console.error('Flight field update failed:', data.message);
+                }
+                return data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Произошла ошибка при сохранении: ' + error.message);
+                throw error;
+            });
+        }
+        
+        // --- НОВАЯ ЛОГИКА ДЛЯ МОДАЛЬНОГО ОКНА СВЯЗЫВАНИЯ РЕЙСОВ ---
+        // Функция для загрузки и отображения рейсов в модальном окне
+        function loadFlights() {
+            const selectedDate = dateFilter.value;
+            const selectedAirline = airlineFilter.value;
+            
+            const params = new URLSearchParams({
+                date_filter: selectedDate,
+                airline_filter: selectedAirline,
+                current_flight_id: currentFlightId,
+            });
+            
+            fetch(`/billing/get_flights_for_linking/?${params.toString()}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Проблема с ответом сервера.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                flightsListBody.innerHTML = '';
+                if (data.flights.length === 0) {
+                    flightsListBody.innerHTML = '<tr><td colspan="4" class="text-center">Рейсы не найдены.</td></tr>';
+                    return;
+                }
+
+                data.flights.forEach(flight => {
+                    const row = document.createElement('tr');
+                    row.dataset.flightId = flight.id;
+                    row.innerHTML = `
+                        <td>${flight.flight_num}</td>
+                        <td>${flight.direction}</td>
+                        <td>${flight.airline_code}</td>
+                        <td>${flight.actual_time}</td>
+                    `;
+                    flightsListBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Ошибка при загрузке рейсов:', error);
+                flightsListBody.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Ошибка загрузки.</td></tr>';
+            });
+        }
+        
+        // --- ОБРАБОТЧИКИ СОБЫТИЙ ---
+        
+        const backBtn = document.getElementById('back-to-dashboard-btn');
+        if (backBtn) {
+            backBtn.addEventListener('click', goBackToDashboard);
+        }
+
+        updateClientTime();
+        setInterval(updateClientTime, 1000);
+
+        const setStartTimeBtn = document.getElementById('set-start-time-btn');
+        const setEndTimeBtn = document.getElementById('set-end-time-btn');
+        if (setStartTimeBtn) setStartTimeBtn.addEventListener('click', () => setInputTimeToUTC(startTimeInput));
+        if (setEndTimeBtn) setEndTimeBtn.addEventListener('click', () => setInputTimeToUTC(endTimeInput));
+
+        if (serviceTypeSelect) {
+            serviceTypeSelect.addEventListener('change', toggleServiceFields);
+            toggleServiceFields();
+        }
+
+        if (cancelButton) {
+            cancelButton.addEventListener('click', resetForm);
+        }
+
+        if (servicesTableBody) {
+            servicesTableBody.addEventListener('click', function(e) {
+                let row = e.target.closest('tr');
+                if (!row || !row.dataset.serviceId) return;
+
+                if (selectedServiceRow === row) {
+                    resetForm();
+                } else {
+                    if (selectedServiceRow) selectedServiceRow.classList.remove('table-primary');
+                    row.classList.add('table-primary');
+                    selectedServiceRow = row;
+                    if (editServiceBtn) editServiceBtn.disabled = false;
+                    if (deleteServiceBtn) deleteServiceBtn.disabled = false;
+                }
+            });
+        }
+        
+        if (editServiceBtn) {
+            editServiceBtn.addEventListener('click', function() {
+                if (!selectedServiceRow) return;
+                const data = selectedServiceRow.dataset;
+                const formTitle = serviceForm.closest('.card').querySelector('h3');
+                if (serviceIdInput) serviceIdInput.value = data.serviceId || '';
+                if (serviceTypeSelect) {
+                    serviceTypeSelect.value = data.service_type || '';
+                    toggleServiceFields();
+                }
+                if (startTimeInput) startTimeInput.value = data.startTime || '';
+                if (endTimeInput) endTimeInput.value = data.endTime || '';
+                if (descriptionInput) descriptionInput.value = data.description || '';
+                const selectedCategory = serviceTypeSelect.options[serviceTypeSelect.selectedIndex].dataset.category;
+                switch (selectedCategory) {
+                    case 'pass':
+                        const [adults, children, infants] = (data.passengers || '//').split('/');
+                        document.getElementById('id_adults_count').value = adults || '';
+                        document.getElementById('id_children_count').value = children || '';
+                        document.getElementById('id_infants_count').value = infants || '';
+                        break;
+                    case 'time':
+                        const [hours, minutes] = (data.durationField || ':').split(':');
+                        if (durationHoursInput) durationHoursInput.value = hours || '';
+                        if (durationMinutesInput) durationMinutesInput.value = minutes || '';
+                        break;
+                    case 'int':
+                        document.getElementById('id_quantity').value = data.quantity || '';
+                        document.getElementById('id_unit_of_measure').value = data.unitOfMeasure || '';
+                        break;
+                }
+                if (cancelButton) cancelButton.style.display = 'inline-block';
+                if (formTitle) formTitle.textContent = 'Редактировать услугу';
+                window.scrollTo({ top: serviceForm.offsetTop, behavior: 'smooth' });
+            });
+        }
+        
+        if (deleteServiceBtn) {
+            deleteServiceBtn.addEventListener('click', function() {
+                if (!selectedServiceRow) {
+                    alert('Пожалуйста, выберите услугу для удаления.');
+                    return;
+                }
+                if (confirm('Вы уверены, что хотите удалить эту услугу?')) {
+                    const serviceId = selectedServiceRow.dataset.serviceId;
+                    fetch(`/billing/supervisor/delete_service/${serviceId}/`, {
+                        method: 'POST',
+                        headers: { 'X-CSRFToken': csrfToken }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.reload();
+                        } else {
+                            alert('Произошла ошибка при удалении услуги.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Ошибка:', error);
+                        alert('Произошла ошибка при удалении услуги.');
+                    });
+                }
+            });
+        }
+
+        if (closeTechcardBtn) {
+            closeTechcardBtn.addEventListener('click', function() {
+                if (confirm('Вы уверены, что хотите закрыть техкарту?')) {
+                    const techCardId = this.dataset.techCardId;
+                    fetch(`/billing/supervisor/techcards/${techCardId}/close/`, {
+                        method: 'POST',
+                        headers: { 'X-CSRFToken': csrfToken }
+                    })
+                    .then(response => response.ok ? response.json() : response.json().then(errorData => {
+                        throw new Error(errorData.message || 'Произошла ошибка при закрытии техкарты.');
+                    }))
+                    .then(data => {
+                        alert(data.message);
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Ошибка:', error);
+                        alert(error.message);
+                    });
+                }
+            });
+        }
+        
+        function updateTechCardField(techCardId, fieldName, value) {
+            return fetch(`/billing/supervisor/techcards/${techCardId}/update_field/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ field_name: fieldName, value: value })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`Server responded with status: ${response.status}. Message: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Произошла ошибка при сохранении: ' + error.message);
+                throw error;
+            });
+        }
+        
+        document.querySelectorAll('input[type="number"], input[type="text"], select').forEach(element => {
+            const techCardId = element.dataset.techCardId;
+            const flightId = element.dataset.flightId;
+            const fieldName = element.dataset.fieldName;
+            if (!fieldName) return;
+            const isSelect = element.tagName === 'SELECT';
+            function saveValue() {
+                const newValue = element.value;
+                const originalValue = element.dataset.originalValue;
+                if (newValue !== originalValue) {
+                    if (flightId) {
+                        updateFlightField(flightId, fieldName, newValue);
+                    } else if (techCardId) {
+                        updateTechCardField(techCardId, fieldName, newValue);
+                    }
+                    element.dataset.originalValue = newValue;
+                }
+            }
+            if (isSelect) {
+                element.addEventListener('change', saveValue);
+            } else {
+                element.addEventListener('blur', saveValue);
+                element.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        this.blur();
+                    }
+                });
+            }
+        });
+        
+        if (serviceForm) {
+            serviceForm.addEventListener('submit', function(e) {
+                document.querySelectorAll('.dynamic-fields').forEach(container => {
+                    if (container.style.display === 'none') {
+                        container.querySelectorAll('input, select, textarea').forEach(field => {
+                            field.disabled = true;
+                        });
+                        e.target.querySelectorAll('input[type="number"]').forEach(input => {
+                            input.disabled = false;
+                        });
+                    }
+                });
+            });
+        }
+        
+        if (linkFlightModal) {
+            linkFlightModal.addEventListener('show.bs.modal', loadFlights);
+        }
+        if (dateFilter) {
+            dateFilter.addEventListener('change', loadFlights);
+        }
+        if (airlineFilter) {
+            airlineFilter.addEventListener('change', loadFlights);
+        }
+
+        if (flightsListBody) {
+            flightsListBody.addEventListener('click', function(e) {
+                const row = e.target.closest('tr');
+                if (!row || !row.dataset.flightId) return;
+                const selectedFlightId = row.dataset.flightId;
+                updateFlightField(currentFlightId, 'linked_flight', selectedFlightId)
+                .then(() => {
+                    const selectedFlightNum = row.querySelector('td:nth-child(1)').textContent;
+                    linkedFlightDisplay.textContent = `${currentFlightNum} / ${selectedFlightNum}`;
+                    const modal = bootstrap.Modal.getInstance(linkFlightModal);
+                    if (modal) {
+                        modal.hide();
+                    }
+                })
+                .catch(() => {
+                    // Ошибка уже будет обработана в updateFlightField
+                });
+            });
+        }
+    });
+</script>
+    </div>
+    <footer class="footer">
+        <small>© 2025 eldyear  Мобильная версия еще в разработке!!!</small>
+    </footer>
+
+    <div class="modal fade" id="linkFlightModal" tabindex="-1" aria-labelledby="linkFlightModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="linkFlightModalLabel">Связать рейс</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="dateFilter" class="form-label">Дата:</label>
+                        <select class="form-select" id="dateFilter">
+                            <option value="today">Сегодня</option>
+                            <option value="yesterday">Вчера</option>
+                            <option value="tomorrow">Завтра</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="airlineFilter" class="form-label">Авиакомпания:</label>
+                        <select class="form-select" id="airlineFilter">
+                            <option value="">Все</option>
+                            {% for airline in airlines %}
+                                <option value="{{ airline.code }}">{{ airline.name }} ({{ airline.code }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Номер рейса</th>
+                                <th>Направление</th>
+                                <th>А/К</th>
+                                <th>Факт. время</th>
+                            </tr>
+                        </thead>
+                        <tbody id="flights-list-body">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+</body>
+</html>

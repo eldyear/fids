@@ -1,0 +1,41 @@
+{% load flights_extras %}
+{% load crispy_forms_tags %}
+
+<div class="neomorphic-card p-6 mb-6">
+    <div class="flex items-center justify-between mb-4">
+        <h5 class="text-xl font-bold">Рейс {{ flight.flight_num }}</h5>
+        <span class="text-sm font-semibold text-gray-500">
+            Стоянка: <span class="font-bold text-orange-500">{{ flight.stand|default:"-" }}</span>
+        </span>
+    </div>
+    <div class="text-sm text-gray-500">
+        <p>Макс. масса: {{ tech_card.max_takeoff_weight|default:"-" }}</p>
+        <p>Прилёт: {{ flight.actual_time|time:'H:i' }}</p>
+        <!-- Добавьте другие детали рейса, если нужно -->
+    </div>
+</div>
+
+<div class="neomorphic-card p-6">
+    <div class="flex items-center justify-between mb-4">
+        <h5 class="text-xl font-bold">Список услуг</h5>
+        {% if not read_only %}
+            <button id="add-service-btn" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-xl transition-colors duration-200 shadow-md">
+                <i class="fas fa-plus mr-2"></i>
+                Добавить
+            </button>
+        {% endif %}
+    </div>
+
+    <!-- Таблица с услугами -->
+    <div id="services-table-container">
+        {% include 'includes/services_table.html' %}
+    </div>
+
+    <!-- Форма для добавления/редактирования услуги -->
+    {% if not read_only %}
+    <div id="service-form-container" class="mt-4 neomorphic-card p-4 hidden">
+        <h5 class="text-lg font-semibold mb-2">Добавить/Редактировать услугу</h5>
+        {% include 'includes/service_form.html' %}
+    </div>
+    {% endif %}
+</div>

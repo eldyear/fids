@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<h1>Формирование суточного плана</h1>
+<p>Выберите дату для формирования рейсов:</p>
+<form method="get" action="">
+    <input type="date" name="selected_date" required>
+    <button type="submit" class="btn btn-primary">Формировать</button>
+</form>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.level_tag %} class="{{ message.level_tag }}"{% endif %}>
+        {{ message.message }}
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

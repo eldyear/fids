@@ -1,0 +1,170 @@
+body {
+    width: 960px;
+    height: 1080px;
+    background-color: #292929;
+    color: #ffffff;
+    font-family: "Montserrat", sans-serif;
+    border: #F1C14B;
+    margin: 0;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Стилизация для полосатой таблицы */
+tbody tr:nth-child(even) {
+    background-color: #494949 !important; /* Цвет для четных строк */
+    color: #f1f1f1 !important; /* Цвет текста для четных строк */
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #A2A0A1 !important; /* Цвет для нечетных строк */
+    color: #191919 !important; /* Цвет текста для нечетных строк */
+}
+
+#table-container {
+    width: 950px;
+    height: 1065px;
+    border: 5px solid #F1C14B;
+    border-color: #F1C14B;
+}
+
+.table-header th {
+    background-color: #F1C14B !important;
+    border: 3px solid #393939;
+    border-top: 6px solid #393939;
+    border-bottom: 10px solid #393939;
+    color: #000;
+}
+
+.table {
+    width: 100%;
+    color: #ffffff;
+    text-align: center;
+    border-collapse: collapse;
+    border: none;
+    margin-right: 20px;
+}
+
+.roboto-light {
+    font-weight: 600;
+    font-size: 19px;
+    margin: 0;
+    padding: 0;
+}
+
+.logo-container {
+    background-color: #ffffff;
+    height: 40px;
+    width: 110px;
+    margin-left: 40px;
+    display: flex;
+    justify-content: center;
+}
+
+.logo {
+    width: 90px;
+}
+
+.depart {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    align-items: center;
+}
+
+.depart-logo {
+    width: 70px;
+    margin-left: 20px;
+}
+
+.depart-text {
+    font-size: 40px;
+    text-align: center;
+    margin-left: 40px;
+    text-transform: uppercase;
+    color: #F1C14B;
+}
+
+.text-left {
+    text-align: left;
+    margin-left: 100px;
+}
+
+.table-header {
+    border-top: 4px solid #F1C14B;
+    height: 58px;
+}
+
+.table-bar{
+    height: 100px;
+}
+
+.head {
+    padding-left: 20px;
+}
+
+.airport-logo {
+    height: 60px;
+}
+
+.manas {
+    margin-left: 120px;
+}
+
+#ch {
+    width: 25px;
+    height: 30px;
+    background-color: rgb(51, 132, 253);
+    border-top: 1px solid #494949 !important;
+    border-bottom: 1px solid #494949 !important;
+}
+#ar {
+    width: 25px;
+    height: 30px;
+    background-color: rgb(132, 253, 51);
+    border-top: 1px solid #494949 !important;
+    border-bottom: 1px solid #494949 !important;
+}
+
+#dp {
+    width: 25px;
+    height: 30px;
+    background-color: rgb(132, 253, 51);
+    border-top: 1px solid #494949 !important;
+    border-bottom: 1px solid #494949 !important;
+}
+
+#cd {
+    width: 25px;
+    height: 30px;
+    background-color: red;
+    border-top: 1px solid #494949 !important;
+    border-bottom: 1px solid #494949 !important;
+}
+
+#bd {
+    width: 25px;
+    height: 30px;
+    background-color: rgb(44, 193, 252);
+    border-top: 1px solid #494949 !important;
+    border-bottom: 1px solid #494949 !important;
+}
+
+#cb {
+    width: 25px;
+    height: 30px;
+    background-color: rgb(44, 193, 252);
+    border-top: 1px solid #494949 !important;
+    border-bottom: 1px solid #494949 !important;
+}
+
+#rd {
+    width: 25px;
+    height: 30px;
+    background-color: rgb(255, 238, 0);
+    border-top: 1px solid #494949 !important;
+    border-bottom: 1px solid #494949 !important;
+    
+}

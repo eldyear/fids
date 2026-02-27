@@ -1,0 +1,118 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: fids_db
+    environment:
+      POSTGRES_DB: ${DB_NAME:-oss_db}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres_password_change_this}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - fids_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fids_backend
+    environment:
+      DEBUG: ${DEBUG:-False}
+      SECRET_KEY: ${SECRET_KEY:-your-secret-key-here}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,backend,nginx}
+      DB_NAME: ${DB_NAME:-oss_db}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres_password_change_this}
+      DB_HOST: db
+      DB_PORT: 5432
+      FLIGHT_API_URL: ${FLIGHT_API_URL:-https://api.example.com/flights}
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY:-}
+      MAPBOX_TOKEN: ${MAPBOX_TOKEN:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./static:/app/static
+      - ./media:/app/media
+      - ./logs:/var/log/django
+    networks:
+      - fids_network
+    command:
+      - sh
+      - -c
+      - |
+        python manage.py migrate &&
+        python manage.py collectstatic --noinput &&
+        gunicorn --bind 0.0.0.0:8000 --workers 4 --timeout 120 oss.wsgi:application
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sh", "-c", "python -c \"import requests; resp=requests.get('http://localhost:8000/', timeout=5); exit(0 if resp.status_code < 500 else 1)\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  display:
+    build:
+      context: ./fids_go_v2.1
+      dockerfile: Dockerfile
+    container_name: fids_display
+    environment:
+      DB_HOST: db
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres_password_change_this}
+      DB_NAME: ${DB_NAME:-oss_db}
+      BACKEND_URL: ${BACKEND_URL:-http://backend:8000}
+      FLIGHT_API_URL: ${FLIGHT_API_URL:-https://api.example.com/flights}
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY:-}
+    depends_on:
+      - db
+      - backend
+    volumes:
+      - ./fids_go_v2.1/static:/app/static
+    networks:
+      - fids_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sleep", "1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: fids_nginx
+    depends_on:
+      - backend
+      - display
+    volumes:
+      - ./static:/app/static:ro
+      - ./media:/app/media:ro
+    ports:
+      - "80:80"
+    networks:
+      - fids_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  fids_network:
+    driver: bridge

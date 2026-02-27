@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ввод Значения</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+        }
+        input[type="text"] {
+            width: 300px; /* Ширина поля ввода */
+            padding: 10px; /* Отступы внутри поля */
+            font-size: 16px; /* Размер шрифта */
+            margin-bottom: 20px; /* Отступ снизу */
+            border: 1px solid #ccc; /* Цвет рамки */
+            border-radius: 5px; /* Закругление углов */
+        }
+        button {
+            padding: 10px 20px; /* Отступы внутри кнопки */
+            font-size: 16px; /* Размер шрифта */
+            background-color: #007bff; /* Цвет фона кнопки */
+            color: white; /* Цвет текста */
+            border: none; /* Убираем рамку */
+            border-radius: 5px; /* Закругление углов */
+            cursor: pointer; /* Указатель при наведении */
+        }
+        button:hover {
+            background-color: #0056b3; /* Цвет фона при наведении */
+        }
+    </style>
+</head>
+<body>
+    <h2>Введите значение</h2>
+    <input type="text" id="user-input" placeholder="Введите значение">
+    <input type="text" id="user-input-2" placeholder="Введите второе значение"> <!-- Новое поле ввода -->
+    <button onclick="submitValue()">Отправить</button>
+
+    <script>
+        function submitValue() {
+            const input = document.getElementById("user-input").value;
+            const input2 = document.getElementById("user-input-2").value; // Второе значение
+    
+            if (input.trim()) {
+                // Сохраняем значения в sessionStorage
+                sessionStorage.setItem("displayValue", input);
+                sessionStorage.setItem("displayValue2", input2);
+                // Переходим на страницу вывода
+                window.location.href = "display.html";
+            }
+        }
+    </script>
+    
+</body>
+</html>

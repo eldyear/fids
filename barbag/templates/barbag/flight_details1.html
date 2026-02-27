@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Детали рейса</title>
+    <style>
+        body {
+            font-family: 'Verdana', 'Tahoma', sans-serif;
+            background-color: #e6e6e6; 
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            width: 100%;
+            background-color: #004d99; /* Тёмно-синий заголовок */
+            color: #fff;
+            padding: 12px 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+            box-sizing: border-box; 
+            margin-bottom: 20px; 
+            
+            /* !!! СТИЛИ ДЛЯ ВЫРАВНИВАНИЯ ЭЛЕМЕНТОВ (Flexbox) !!! */
+            display: flex;
+            justify-content: space-between; /* Растягиваем элементы по краям */
+            align-items: center; /* Выравниваем по вертикали */
+        }
+        
+        .header-title {
+            /* Заголовок теперь занимает левую часть */
+            font-size: 1em; /* Размер шрифта уже определен в .header */
+        }
+        
+        .logout-button {
+            /* Стиль для кнопки выхода */
+            padding: 6px 12px;
+            background-color: #ff3333; /* Ярко-красный для кнопки выхода */
+            color: white;
+            border: none;
+            cursor: pointer;
+            border: 1px solid #8f1313;
+            font-size: 0.6em; /* Чуть меньше основного заголовка */
+            font-weight: bold;
+            text-decoration: none; /* Убираем подчеркивание у ссылки */
+            transition: background-color 0.2s;
+            white-space: nowrap; /* Гарантируем, что текст не перенесется */
+        }
+        
+        .logout-button:hover {
+            background-color: #cc0000;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            background-color: #fff;
+            border: 1px solid #c0c0c0;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #004d99;
+            margin: 0 0 15px 0;
+            text-align: left;
+        }
+        h2, h3, h4 {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            text-align: left;
+        }
+        form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: left;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f0f0f0;
+        }
+        label {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #333;
+            white-space: nowrap;
+        }
+        input[type="number"] {
+            padding: 6px;
+            border: 1px solid #999;
+            border-radius: 0;
+            font-size: 0.9em;
+            width: 150px;
+        }
+        button {
+            padding: 6px 15px;
+            background-color: #007bff;
+            color: white;
+            border: 1px solid #0056b3;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f0f0f0;
+        }
+        .action-button {
+            padding: 6px 12px; 
+            border: 1px solid #999;
+            border-radius: 0;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+            font-size: 0.9em;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        .action-button:hover {
+            background-color: #ddd;
+        }
+        .download-button {
+            background-color: #e74c3c;
+            color: white;
+            border: 1px solid #c0392b;
+        }
+        .download-button:hover {
+            background-color: #c0392b;
+        }
+        .list-section ul {
+            list-style-type: none;
+            padding: 0;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            margin: 0 0 20px 0;
+        }
+        li {
+            padding: 8px 12px;
+            border-bottom: 1px solid #ccc;
+            font-size: 0.9em;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        /* --- Стили Аккордеона --- */
+        .container-info {
+            border: 1px solid #ccc;
+            margin-bottom: 10px; /* Уменьшаем отступ, чтобы аккордеон выглядел как единый блок */
+            background-color: #f7f9fa;
+        }
+        .accordion-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 15px;
+            cursor: pointer; /* Показываем, что элемент кликабельный */
+            background-color: #e0e0e0; /* Светло-серый фон для заголовка */
+            border-bottom: 1px solid #ccc;
+            transition: background-color 0.2s;
+        }
+        .accordion-header:hover {
+            background-color: #d0d0d0;
+        }
+        .accordion-header h2 {
+            margin: 0;
+            text-align: left;
+            text-transform: none;
+            font-size: 1.0em;
+            border-bottom: none; /* Убираем черту под заголовком */
+            padding-bottom: 0;
+            flex-grow: 1;
+        }
+        .accordion-content {
+            padding: 15px;
+            /* Важно: начальное состояние будет управляться JS */
+            display: none; 
+            background-color: #f7f9fa;
+        }
+        .status-badge {
+            font-weight: bold;
+            padding: 4px 8px;
+            border: 1px solid;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        .closed {
+            background-color: #e0ffe0;
+            color: #008000;
+            border-color: #008000;
+        }
+        .open {
+            background-color: #fff3e0;
+            color: #d35400;
+            border-color: #d35400;
+        }
+        .accordion-icon {
+            margin-left: 10px;
+            transition: transform 0.3s;
+            font-size: 1.2em;
+        }
+        .accordion-header.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <span class="header-title">Аэропорт: Операционный Центр</span>
+        <a href="{% url 'logout' %}" class="logout-button">
+            <span class="icon">➡️</span> Выход ({{ request.user.username }})
+        </a>
+    </div>
+    <div class="container">
+        <h1>Модуль: Детали рейса</h1>
+        <h2>Рейс: {{ flight.flight_num }} ({{ flight.destination }})</h2>
+        
+        <div class="button-group">
+            <form method="get" action="{% url 'flight_list' %}" style="display:inline;">
+                <button type="submit" class="action-button"><span class="icon" style="margin-right: 0;">🔙</span>Вернуться к списку рейсов</button>
+            </form>
+            <form method="get" action="{% url 'generate_pdf_report' flight_id=flight.flight_id %}" target="_blank" style="display:inline;">
+                <button type="submit" class="action-button download-button">
+                    <span style="font-size: 1.1em; margin-right: 5px;">📄</span> Скачать отчет в PDF
+                </button>
+            </form>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <label for="total_weight">Общий вес багажа (кг):</label>
+            <input type="number" id="total_weight" name="total_weight" step="0.01" value="{{ flight.total_weight|default:'' }}">
+            <button type="submit">Сохранить вес</button>
+        </form>
+        
+        <div class="list-section">
+            <h3>Сводка по багажу</h3>
+            <ul>
+                <li>Общее количество отсканированного багажа: <strong>{{ total_baggage_count }}</strong></li>
+                <li>Общий вес багажа: <strong>{{ flight.total_weight|default:'Не указан' }}</strong> кг</li>
+                <li>Средний вес одного места: {% if average_weight %}<strong>{{ average_weight|floatformat:2 }}</strong> кг{% else %}Не рассчитан{% endif %}</li>
+                <li>Средний вес на контейнер: {% if average_weight_per_container %}<strong>{{ average_weight_per_container|floatformat:2 }}</strong> кг{% else %}Не рассчитан{% endif %}</li>
+            </ul>
+        </div>
+        
+        <h3>Контейнеры рейса</h3>
+        {% for container in containers %}
+            <div class="container-info">
+                <div class="accordion-header">
+                    <h2 style="flex-grow: 1;">
+                        Контейнер: {{ container.barcode }} 
+                        <span style="font-weight: normal; margin-left: 15px;">
+                            (Багажа: <strong>{{ container.baggage_count }}</strong>)
+                        </span>
+                    </h2>
+                    <div style="display: flex; align-items: center;">
+                        {% if container.is_closed %}
+                            <span class="status-badge closed">Закрыт</span>
+                        {% else %}
+                            <span class="status-badge open">Открыт</span>
+                        {% endif %}
+                        <span class="accordion-icon">▼</span>
+                    </div>
+                </div>
+
+                <div class="accordion-content">
+                    {% if container.estimated_weight %}
+                        <p>Примерный вес: <strong>{{ container.estimated_weight|floatformat:2 }}</strong> кг</p>
+                    {% endif %}
+                    
+                    {% if container.baggage_list %}
+                        <h4>Список багажа:</h4>
+                        <ul>
+                        {% for bag in container.baggage_list %}
+                            <li>{{ bag.barcode }}</li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>В этом контейнере нет багажа.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <p style="text-align: center; font-style: italic;">Для этого рейса нет контейнеров.</p>
+        {% endfor %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const headers = document.querySelectorAll('.accordion-header');
+            
+            headers.forEach(header => {
+                header.addEventListener('click', function () {
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('.accordion-icon');
+
+                    // Переключение видимости контента
+                    if (content.style.display === 'block') {
+                        content.style.display = 'none';
+                        this.classList.remove('active');
+                    } else {
+                        content.style.display = 'block';
+                        this.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

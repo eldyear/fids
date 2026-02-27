@@ -1,0 +1,20 @@
+{% extends 'admin/base.html' %}
+{% load i18n admin_urls static %}
+
+{% block content %}
+<div id="content-main">
+    <h2>Импорт типов услуг из Excel</h2>
+    <p>Загрузите файл Excel (.xlsx) с колонками "Код типа услуги" и "Название типа услуги" для обновления базы данных.</p>
+    <form action="{% url 'admin:import_service_types' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset class="module aligned">
+            <div class="form-row">
+                {{ form.as_p }}
+            </div>
+        </fieldset>
+        <div class="submit-row">
+            <input type="submit" value="Импортировать" class="default">
+        </div>
+    </form>
+</div>
+{% endblock %}

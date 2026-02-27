@@ -1,0 +1,12 @@
+/* Inherit from dep_vert usually, but let's make a copy to be safe and independent */
+@import url('static/css/dep_vert.css');
+/* Assuming similar structure, but maybe different accent color override handled in class definitions */
+
+/* Specific overrides for ARRIVALS */
+.page-title.arrive-title {
+    color: #3498db;
+    /* Blue for Arrivals */
+}
+
+/* Adjustments for Arrivals columns if needed */
+/* Baggage instead of Desk? */

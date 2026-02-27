@@ -1,0 +1,49 @@
+{% extends 'app/dashboard/base_dashboard.html' %}
+
+{% block page_title %}Airlines{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Airlines List</h2>
+        <a href="{% url 'airline_add' %}" class="btn btn-primary">+ Add Airline</a>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Logo</th>
+                    <th>Name</th>
+                    <th>Code</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for airline in airlines %}
+                <tr>
+                    <td>
+                        {% if airline.logo %}
+                            <img src="{{ airline.logo.url }}" alt="{{ airline.name }}" style="height: 30px; border-radius: 4px;">
+                        {% elif airline.svg_logo %}
+                            <img src="{{ airline.svg_logo.url }}" alt="{{ airline.name }}" style="height: 30px; border-radius: 4px;">
+                        {% else %}
+                            <div style="width: 30px; height: 30px; background-color: var(--bg-body); border-radius: 4px;"></div>
+                        {% endif %}
+                    </td>
+                    <td style="font-weight: 600;">{{ airline.name }}</td>
+                    <td>{{ airline.code }}</td>
+                    <td>
+                        <a href="{% url 'airline_edit' airline.pk %}" style="color: var(--accent-color); text-decoration: none;">Edit</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 20px;">No airlines found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

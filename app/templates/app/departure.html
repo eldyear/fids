@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Departure OSS</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Табло Вылетов</h1>
+
+    <!-- Таблица для русского языка -->
+    <table id="table-ru">
+        <thead>
+            <tr>
+                <th>Рейс</th>
+                <th>Направление</th>
+                <th>Пункт назначения</th>
+                <th>Авиакомпания</th>
+                <th>Дата</th>
+                <th>Время</th>
+                <th>Последняя дата</th>
+                <th>Последнее время</th>
+                <th>Статус</th>
+                <th>Стойка</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in tablo_data %}
+            <tr>
+                <td>{{ item.flight }}</td>
+                <td>{{ item.direction }}</td>
+                <td>{{ item.destination.city_name_ru }} ({{ item.destination.iata_code }})</td>
+                <td>{{ item.airline.name }}</td>
+                <td>{{ item.date1 }}</td>
+                <td>{{ item.time1 }}</td>
+                <td>{{ item.last_date }}</td>
+                <td>{{ item.last_time }}</td>
+                <td>{{ item.status.name_ru }}</td>
+                <td>
+                    {% for stoika in item.stoika.all %}
+                        {{ stoika.stoiki }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Таблица для кыргызского языка -->
+    <table id="table-ky" class="hidden">
+        <thead>
+            <tr>
+                <th>Рейс</th>
+                <th>Багыт</th>
+                <th>Бараткан жери</th>
+                <th>Авиакомпания</th>
+                <th>Дата</th>
+                <th>Убакыт</th>
+                <th>Акыркы дата</th>
+                <th>Акыркы убакыт</th>
+                <th>Статус</th>
+                <th>Стойка</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in tablo_data %}
+            <tr>
+                <td>{{ item.flight }}</td>
+                <td>{{ item.direction }}</td>
+                <td>{{ item.destination.city_name_kg }} ({{ item.destination.iata_code }})</td>
+                <td>{{ item.airline.name }}</td>
+                <td>{{ item.date1 }}</td>
+                <td>{{ item.time1 }}</td>
+                <td>{{ item.last_date }}</td>
+                <td>{{ item.last_time }}</td>
+                <td>{{ item.status.name_kg }}</td>
+                <td>
+                    {% for stoika in item.stoika.all %}
+                        {{ stoika.stoiki }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Таблица для английского языка -->
+    <table id="table-en" class="hidden">
+        <thead>
+            <tr>
+                <th>Flight</th>
+                <th>Direction</th>
+                <th>Destination</th>
+                <th>Airline</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Last Date</th>
+                <th>Last Time</th>
+                <th>Status</th>
+                <th>Counter</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in tablo_data %}
+            <tr>
+                <td>{{ item.flight }}</td>
+                <td>{{ item.direction }}</td>
+                <td>{{ item.destination.city_name_en }} ({{ item.destination.iata_code }})</td>
+                <td>{{ item.airline.name }}</td>
+                <td>{{ item.date1 }}</td>
+                <td>{{ item.time1 }}</td>
+                <td>{{ item.last_date }}</td>
+                <td>{{ item.last_time }}</td>
+                <td>{{ item.status.name_en }}</td>
+                <td>
+                    {% for stoika in item.stoika.all %}
+                        {{ stoika.stoiki }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        const languages = ['ru', 'ky', 'en'];
+        let currentLanguageIndex = 0;
+
+        function switchLanguage() {
+            // Скрыть текущую таблицу
+            document.getElementById(`table-${languages[currentLanguageIndex]}`).classList.add('hidden');
+
+            // Обновить индекс языка
+            currentLanguageIndex = (currentLanguageIndex + 1) % languages.length;
+
+            // Показать новую таблицу
+            document.getElementById(`table-${languages[currentLanguageIndex]}`).classList.remove('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Начальный вызов switchLanguage для установки начального языка
+            switchLanguage();
+
+            // Смена языка каждые 6 секунд (6000 миллисекунд)
+            setInterval(switchLanguage, 6000);
+        });
+    </script>
+</body>
+</html>

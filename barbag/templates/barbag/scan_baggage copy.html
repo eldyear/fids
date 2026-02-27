@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Сканирование багажа</title>
+    <style>
+        body {
+            font-family: 'Verdana', 'Tahoma', sans-serif;
+            background-color: #e6e6e6; 
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .header {
+            width: 100%;
+            background-color: #004d99;
+            color: #fff;
+            padding: 12px 20px;
+            text-align: left;
+            font-size: 1.5em;
+            font-weight: bold;
+            box-sizing: border-box; 
+        }
+        .container {
+            max-width: 1100px;
+            width: 90%;
+            margin: 20px auto;
+            background-color: #fff;
+            border: 1px solid #c0c0c0;
+            overflow: hidden;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 1.5em; 
+            font-weight: bold;
+            color: #004d99;
+            margin: 0 0 15px 0;
+            text-align: left;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+        h2 {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        h3 {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            text-align: left;
+        }
+        /* Блок с формами */
+        .forms-wrapper {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            flex-grow: 1;
+            padding: 0;
+            border: none;
+            background-color: transparent;
+        }
+        .search-form {
+            border-right: 1px solid #ccc;
+            padding-right: 20px;
+            max-width: 45%;
+        }
+        .scan-wrapper {
+            max-width: 45%;
+            flex-grow: 1;
+            position: relative; /* Для позиционирования кнопки закрытия */
+            padding-bottom: 60px; /* Отступ для кнопки закрытия */
+        }
+        .scan-form { /* Сброс стилей, чтобы не конфликтовали с .scan-wrapper */
+            padding: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 0.9em;
+            color: #333;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #999;
+            border-radius: 0;
+            font-size: 0.9em;
+            box-sizing: border-box;
+        }
+        /* Общий стиль для поля сканирования */
+        .scan-input {
+            padding: 15px; 
+            font-size: 1.5em;
+            text-align: center;
+            font-weight: bold;
+            color: #333; 
+            caret-color: transparent;
+            box-sizing: border-box;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        /* --- Стили для состояний сканирования --- */
+        /* Состояние 1: Требуется контейнер (СИНИЙ, ПУЛЬСАЦИЯ) */
+        @keyframes pulse-blue-border {
+            0% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.6); } /* Синий, более интенсивный */
+            70% { box-shadow: 0 0 0 10px rgba(0, 123, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0); }
+        }
+        
+        .state-container-required {
+            border: 2px solid #007bff; /* Ярко-синий */
+            background-color: #e6f0ff; /* Светло-синий фон */
+            animation: pulse-blue-border 1.5s infinite; 
+        }
+        /* Состояние 2: Готов к багажу (ЗЕЛЕНЫЙ, БЕЗ ПУЛЬСАЦИИ) */
+        .state-baggage-ready {
+            border: 2px solid #008000; /* Зеленый */
+            background-color: #e8f5e9; /* Светло-зеленый фон */
+            animation: none;
+        }
+
+        @keyframes pulse-green-border {
+            0% { box-shadow: 0 0 0 0 rgba(0, 128, 0, 0.5); } /* Темно-зеленый */
+            60% { box-shadow: 0 0 0 15px rgba(0, 128, 0, 0); } /* Более широкий радиус (20px) */
+            100% { box-shadow: 0 0 0 0 rgba(0, 128, 0, 0); }
+        }
+
+        /* Состояние 2: Готов к багажу (ЗЕЛЕНЫЙ, МЕДЛЕННАЯ ПУЛЬСАЦИЯ) */
+        .state-baggage-ready {
+            border: 2px solid #008000; /* Зеленый */
+            background-color: #e8f5e9; /* Светло-зеленый фон */
+            animation: pulse-green-border 2.5s infinite; /* Более медленный цикл (2.5s) */
+        }
+
+        /* Кнопки */
+        button {
+            padding: 6px 15px;
+            background-color: #007bff;
+            color: white;
+            border: 1px solid #0056b3;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+            align-self: flex-end; 
+            display: inline-flex;
+            align-items: center;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .icon {
+            margin-right: 5px;
+            font-size: 1.1em;
+        }
+        /* Кнопка закрытия контейнера (специальный стиль) */
+        .close-container-form {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            margin: 0; /* Удаляем лишние маржины формы */
+            padding: 0;
+        }
+        .close-container-button {
+            padding: 8px 15px;
+            background-color: #e74c3c; /* Красный */
+            color: white;
+            border: 1px solid #c0392b;
+            font-size: 0.85em;
+            /* Сброс стилей родительской кнопки */
+            margin: 0; 
+            align-self: auto;
+        }
+        .close-container-button:hover {
+            background-color: #c0392b;
+        }
+
+        /* ... Стили сообщений и списков ... */
+        .message-box {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .error {
+            background-color: #ffe0e0;
+            color: #cc0000;
+            border-color: #cc0000;
+        }
+        .success {
+            background-color: #e0ffe0;
+            color: #008000;
+            border-color: #008000;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            border: 1px solid #ccc;
+            margin: 0 0 15px 0;
+            background-color: #fff;
+        }
+        li {
+            padding: 8px 12px;
+            border-bottom: 1px solid #ccc;
+            font-size: 0.9em;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        .container-info {
+            font-weight: bold;
+        }
+        .back-button {
+            display: inline-block;
+            padding: 6px 15px;
+            border: 1px solid #999;
+            border-radius: 0;
+            text-decoration: none;
+            color: #333;
+            background-color: #f0f0f0;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        .back-button:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    {% with current_container=open_containers|first %}
+    <div class="header">
+        Аэропорт: Операционный Центр
+    </div>
+    <div class="container">
+        <h1>Модуль: Управление багажом</h1> 
+        
+        <h2>Сканирование для рейса: {{ flight.flight_num }} ({{ flight.destination }})</h2>
+        
+        {% if error %}
+            <p class="message-box error">{{ error }}</p>
+        {% endif %}
+        {% if success_message %}
+            <p class="message-box success">{{ success_message }}</p>
+        {% endif %}
+
+        <div class="forms-wrapper">
+            <form method="get" action="{% url 'search_baggage' %}" class="search-form">
+                <h3>Поиск багажа</h3>
+                <label for="barcode_search">Штрихкод:</label>
+                <input type="text" id="barcode_search" name="barcode" placeholder="Введите штрихкод">
+                <button type="submit">
+                    <span class="icon">🔍</span> Найти
+                </button>
+            </form>
+            
+            <div class="scan-wrapper">
+                <form method="post" action="{% url 'scan_baggage' flight_id=flight.id %}" class="scan-form">
+                    {% csrf_token %}
+
+                    {% if current_container %}
+                        <h3>Контейнер активен: {{ current_container.barcode }}</h3>
+                        <label for="barcode" style="color: #008000; font-size: 1.1em;">
+                            ГОТОВ: Сканируйте багаж ({{ current_container.baggage_count }} из 30)
+                        </label>
+                        <input type="text" id="barcode" name="barcode" autofocus class="scan-input state-baggage-ready">
+                        <button type="submit">
+                            <span class="icon">➕</span> Добавить багаж
+                        </button>
+                    {% else %}
+                        <h3>Сканирование: Контейнер</h3>
+                        <label for="barcode" style="color: #007bff; font-size: 1.1em;">
+                            ТРЕБУЕТСЯ: Отсканируйте контейнер для начала работы
+                        </label>
+                        <input type="text" id="barcode" name="barcode" autofocus class="scan-input state-container-required">
+                        <button type="submit">
+                            <span class="icon">📦</span> Добавить (Контейнер)
+                        </button>
+                    {% endif %}
+                </form>
+                
+                {% if current_container %}
+                    <form method="post" action="{% url 'close_container' container_id=current_container.id %}" class="close-container-form">
+                        {% csrf_token %}
+                        <button type="submit" class="close-container-button">
+                            <span class="icon" style="margin-right: 5px;">❌</span> Закрыть контейнер
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <a href="{% url 'flight_list' %}" class="back-button">
+            <span class="icon" style="margin-right: 0;">🔙</span> Вернуться к списку рейсов
+        </a>
+    </div>
+
+    <div class="container">
+        <h3>Активные контейнеры</h3>
+        <ul>
+        {% for container in open_containers %}
+            <li>
+                <span class="container-info">Контейнер: **{{ container.barcode }}**</span>
+                (Багажа: **{{ container.baggage_count }}** из 30)
+                {% if container.baggage_count >= 30 %}
+                    <span style="color: red; font-weight: bold; margin-left: 10px;">(ЛИМИТ!)</span>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li style="font-style: italic; color: #777;">Нет активных контейнеров. Отсканируйте штрихкод контейнера, чтобы начать.</li>
+        {% endfor %}
+        </ul>
+        
+        {% if closed_containers %}
+        <h3>Последние закрытые контейнеры:</h3>
+        <ul>
+            {% for container in closed_containers %}
+                <li><span class="container-info">Контейнер: **{{ container.barcode }}**</span> (Багажа: **{{ container.baggage_count }}**)</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if scanned_baggage_list %}
+        <h3>Отсканированный багаж в текущем контейнере:</h3>
+        <ul>
+            {% for bag in scanned_baggage_list %}
+                <li>{{ bag.barcode }} - {{ bag.scanned_at|date:"H:i:s" }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+    {% endwith %}
+</body>
+</html>

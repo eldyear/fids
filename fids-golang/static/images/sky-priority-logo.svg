@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="50" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .sky-priority-text {
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      font-size: 24px;
+      fill: white;
+    }
+    .sky-priority-badge {
+      fill: #0078d2;
+      stroke: white;
+      stroke-width: 2;
+    }
+  </style>
+  <rect x="10" y="10" width="40" height="30" rx="5" class="sky-priority-badge" />
+  <text x="60" y="30" class="sky-priority-text">Sky Priority</text>
+</svg> 

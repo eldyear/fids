@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Поиск багажа</title>
+    <style>
+        body {
+            font-family: 'Verdana', 'Tahoma', sans-serif;
+            background-color: #e6e6e6; /* Светло-серый фон */
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #004d99; /* Тёмно-синий заголовок */
+            color: #fff;
+            padding: 12px 20px;
+            text-align: left;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            background-color: #fff;
+            border: 1px solid #c0c0c0;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #004d99;
+            margin: 0 0 15px 0;
+            text-align: center;
+        }
+        h2 {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #555;
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f0f0f0;
+        }
+        label {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #333;
+            white-space: nowrap;
+        }
+        input[type="text"] {
+            padding: 6px;
+            border: 1px solid #999;
+            border-radius: 0;
+            font-size: 0.9em;
+            flex-grow: 1;
+        }
+        /* Общий стиль для кнопок */
+        button {
+            padding: 6px 15px;
+            background-color: #007bff;
+            color: white;
+            border: 1px solid #0056b3;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            display: inline-flex; /* Для выравнивания иконки и текста */
+            align-items: center;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        /* Стиль иконки */
+        .icon {
+            margin-right: 5px; /* Отступ справа от иконки */
+            font-size: 1.1em;
+            line-height: 1; /* Для лучшего вертикального выравнивания */
+        }
+
+        .action-button {
+            /* Сброс стилей для кнопок-ссылок */
+            padding: 6px 15px; /* Увеличил padding для лучшего вида */
+            border: 1px solid #999;
+            border-radius: 0;
+            text-decoration: none;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            background-color: #f0f0f0; /* Светлый фон */
+            color: #333; /* Темный текст */
+        }
+        .action-button:hover {
+            background-color: #ddd;
+        }
+        
+        hr {
+            border: none;
+            border-top: 1px solid #ccc;
+            margin: 20px 0;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            margin: 0 0 20px 0;
+        }
+        li {
+            padding: 8px 12px;
+            border-bottom: 1px solid #ccc;
+            font-size: 0.9em;
+            display: flex; /* Используем flexbox для компоновки */
+            align-items: flex-start;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        .baggage-icon {
+            margin-right: 15px;
+            font-size: 1.5em;
+            color: #004d99;
+        }
+        .baggage-details {
+            flex-grow: 1;
+        }
+        p.error {
+            background-color: #ffe0e0;
+            color: #a00;
+            border: 1px solid #a00;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin: 0 0 20px 0;
+        }
+        .back-button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        Аэропорт: Операционный Центр
+    </div>
+    <div class="container">
+        <h1>Поиск багажа по части штрихкода</h1>
+
+        <form method="get" action="{% url 'search_baggage' %}">
+            <label for="barcode">Введите часть штрихкода багажа:</label>
+            <input type="text" id="barcode" name="barcode" value="{{ search_query }}">
+            <button type="submit">
+                <span class="icon">🔍</span> Найти
+            </button>
+        </form>
+
+        {% if search_query and not baggage_list %}
+            <p class="error">Багаж с таким штрихкодом не найден.</p>
+        {% endif %}
+
+        {% if baggage_list %}
+            <h2>Результаты поиска ({{ baggage_list|length }}):</h2>
+            <ul>
+            {% for bag in baggage_list %}
+                <li>
+                    <span class="baggage-icon">🧳</span>
+                    <div class="baggage-details">
+                        <strong>Штрихкод:</strong> {{ bag.barcode }}<br>
+                        <strong>Контейнер:</strong> <span style="color: #004d99; font-weight: bold;">📦 {{ bag.container.barcode }}</span><br>
+                        <strong>Рейс:</strong> ✈️ {{ bag.container.flight.flight_num }}<br>
+                        <strong>Пункт назначения:</strong> 📍 {{ bag.container.flight.destination }}<br>
+                    </div>
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+
+        <div class="back-button-container">
+            <form method="get" action="{% url 'flight_list' %}">
+                <button type="submit" class="action-button">
+                    <span class="icon">🔙</span> Вернуться к списку рейсов
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

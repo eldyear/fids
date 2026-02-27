@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Список рейсов</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Определение CSS-переменных для обеих тем --- */
+        :root {
+            /* СВЕТЛАЯ ТЕМА (По умолчанию) */
+            --bg-main: #f4f6f9;
+            --bg-card: #ffffff;
+            --bg-form: #f8f9fa;
+            --primary-text: #212529;
+            --secondary-text: #6c757d;
+            --accent-color: #007bff;
+            --border-color: #e9ecef;
+            --input-bg: white;
+            --header-border: #007bff;
+            --hover-bg: #dee2e6;
+            --table-header-bg: #e9ecef;
+            --table-row-even-bg: #f8f9fa;
+            --table-row-hover-bg: #e2e6ea;
+            
+            --success: #28a745;
+            --danger: #dc3545;
+            --box-shadow-main: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ТЕМНАЯ ТЕМА (Переопределение) */
+        body.dark-mode {
+            --bg-main: #1e1e2d;
+            --bg-card: #27293d;
+            --bg-form: #27293d;
+            --primary-text: #ffffff;
+            --secondary-text: #a0a0b0;
+            --accent-color: #00bcd4; 
+            --border-color: #3f3f4e;
+            --input-bg: #1a1a25;
+            --header-border: #00bcd4;
+            --hover-bg: #343750; /* Нейтральный фон для ховера, чтобы не сливался с row-hover */
+            --table-header-bg: #3f3f4e;
+            --table-row-even-bg: #2c2e42;
+            --table-row-hover-bg: #343750;
+
+            --success: #4caf50;
+            --danger: #f44336;
+            --box-shadow-main: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* --- Общие Стили --- */
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--primary-text);
+            margin: 0;
+            padding: 0;
+            font-size: 14px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* --- Шапка --- */
+        .header {
+            width: 100%;
+            background-color: var(--bg-card);
+            color: var(--primary-text);
+            padding: 15px 30px;
+            font-size: 1.6em;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-bottom: 2px solid var(--header-border);
+            transition: background-color 0.3s;
+        }
+        
+        .header-title {
+            font-size: 0.9em;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Кнопка переключения темы */
+        #theme-toggle {
+            padding: 8px 12px;
+            background-color: var(--secondary-text);
+            color: var(--bg-card);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em; /* Увеличил размер для читаемости */
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        #theme-toggle:hover {
+            background-color: #495057;
+        }
+        
+        .logout-button {
+            padding: 8px 16px;
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em; /* Увеличил размер для читаемости */
+            font-weight: 600;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .logout-button:hover {
+            background-color: #c82333;
+        }
+
+        /* --- Основной Контейнер --- */
+        .container {
+            max-width: 1200px;
+            width: 95%;
+            margin: 30px auto;
+            background-color: var(--bg-card);
+            box-shadow: var(--box-shadow-main);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        .content {
+            padding: 25px;
+        }
+
+        h1 {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--primary-text);
+            margin: 0 0 10px 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        h2 {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--accent-color);
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        /* --- Форма Поиска --- */
+        .form-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 25px;
+            padding: 15px;
+            border-radius: 6px;
+            background-color: var(--bg-form);
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s;
+        }
+        .form-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        label {
+            font-size: 1em; /* Увеличен размер */
+            font-weight: 600;
+            color: var(--primary-text); /* Цвет первичного текста */
+            white-space: nowrap;
+        }
+        input[type="date"], input[type="text"] {
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1em;
+            background-color: var(--input-bg);
+            color: var(--primary-text);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        input[type="text"] {
+            width: 250px; /* Увеличим ширину поля поиска */
+        }
+        button[type="submit"] {
+            padding: 8px 20px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        button[type="submit"]:hover {
+            background-color: #0056b3; 
+        }
+        body.dark-mode button[type="submit"]:hover {
+            background-color: #0097a7;
+        }
+
+        /* --- Таблица --- */
+        table {
+            width: 100%;
+            border-collapse: separate; /* Изменено на separate для border-radius */
+            border-spacing: 0;
+            font-size: 0.95em;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            overflow: hidden; 
+        }
+        th, td {
+            text-align: center;
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            color: var(--primary-text);
+            transition: color 0.3s;
+        }
+        th:last-child, td:last-child {
+            border-right: none;
+        }
+        th {
+            background-color: var(--table-header-bg);
+            color: var(--primary-text);
+            font-weight: 700;
+            text-transform: uppercase;
+            border-color: var(--border-color);
+            border-top: none;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr:nth-child(even) {
+            background-color: var(--table-row-even-bg);
+        }
+        tr:hover {
+            background-color: var(--table-row-hover-bg) !important;
+        }
+        
+        .flight-info-cell {
+            font-weight: 600;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 8px; 
+            white-space: nowrap;
+            justify-content: center;
+        }
+        
+        /* --- Кнопки в таблице --- */
+        .action-button {
+            padding: 8px 12px; /* Чуть больший размер */
+            border-radius: 4px;
+            text-decoration: none;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
+            line-height: 1; /* Улучшает выравнивание внутри */
+        }
+
+        .select-button {
+            background-color: var(--success) !important;
+            color: white !important;
+            border: 1px solid var(--success);
+        }
+        .select-button:hover {
+            background-color: #1e7e34 !important;
+        }
+        
+        .details-button {
+            background-color: var(--bg-form);
+            color: var(--secondary-text);
+            border: 1px solid var(--border-color);
+        }
+        .details-button:hover {
+            background-color: var(--hover-bg);
+            color: var(--primary-text); /* При ховере цвет текста становится основным */
+        }
+
+        .airline-logo {
+            max-width: 60px;
+            height: auto;
+            vertical-align: middle;
+            margin: 0;
+            opacity: 0.8;
+            transition: opacity 0.3s, filter 0.3s;
+        }
+        body.dark-mode .airline-logo {
+            filter: invert(1);
+            opacity: 0.9;
+        }
+
+        .no-flights {
+            text-align: center;
+            color: var(--secondary-text);
+            padding: 20px;
+            font-style: italic;
+            background-color: var(--bg-form);
+            border-radius: 0 0 8px 8px;
+        }
+        .icon {
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <span class="header-title">Аэропорт: Багажный Операционный Центр</span>
+        <div class="header-controls">
+            <button id="theme-toggle">Сменить тему</button>
+            
+            <a href="{% url 'logout' %}" class="logout-button">
+                <span class="icon">➡️</span> Выход ({{ request.user.username }})
+            </a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="content">
+            <h1>Управление рейсами</h1> 
+            
+            <form method="get" action="" class="form-container">
+                <div class="form-group">
+                    <label for="date">Дата:</label>
+                    <input type="date" id="date" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="query">Поиск:</label>
+                    <input type="text" id="query" name="query" value="{{ search_query|default:'' }}" placeholder="Номер или пункт назначения">
+                </div>
+                
+                <button type="submit">
+                    <span class="icon">🔍</span> Показать
+                </button>
+            </form>
+
+            <h2>Рейсы на {{ selected_date|date:"d M Y" }}</h2>
+            
+            {% if flights %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>АК</th>
+                        <th>Рейс</th>
+                        <th>Направление</th>
+                        <th>Время</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for flight in flights %}
+                    <tr>
+                        <td>
+                            <img src="/static/images/airlines/{{ flight.airline }}.svg" 
+                                 alt="{{ flight.airline }}" 
+                                 class="airline-logo"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/60x20/e0e0e0/808080?text=Logo'">
+                        </td>
+                        <td class="flight-info-cell">{{ flight.flight }}</td>
+                        <td class="flight-info-cell">{{ flight.destination }}</td>
+                        <td class="flight-info-cell">{{ flight.time1 }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <form method="post" action="{% url 'select_flight' %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="flight_id" value="{{ flight.id }}">
+                                    <button type="submit" class="action-button select-button">
+                                        <span class="icon">✅</span> Выбрать
+                                    </button>
+                                </form>
+                                
+                                {% if flight.is_ready_for_details %}
+                                <form method="get" action="{% url 'flight_details' flight_id=flight.id %}" style="display:inline;">
+                                    <button type="submit" class="action-button details-button">
+                                        <span class="icon">ℹ</span> Детали
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p class="no-flights">На выбранную дату рейсов нет.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const themeToggle = document.getElementById('theme-toggle');
+            const body = document.body;
+            const storageKey = 'flightAppTheme';
+
+            function updateTheme(theme) {
+                if (theme === 'dark') {
+                    body.classList.add('dark-mode');
+                    themeToggle.textContent = 'Светлая тема 💡';
+                } else {
+                    body.classList.remove('dark-mode');
+                    themeToggle.textContent = 'Темная тема 🌙';
+                }
+            }
+
+            // 1. Установка темы при загрузке
+            const savedTheme = localStorage.getItem(storageKey) || 'light';
+            updateTheme(savedTheme);
+
+            // 2. Обработчик клика
+            themeToggle.addEventListener('click', function () {
+                const currentTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
+                updateTheme(currentTheme);
+                
+                // 3. Сохранение выбора пользователя
+                localStorage.setItem(storageKey, currentTheme);
+            });
+        });
+    </script>
+</body>
+</html>

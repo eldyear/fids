@@ -1,0 +1,228 @@
+{% extends 'app/dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block page_title %}Суточный план{% endblock %}
+
+{% block content %}
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <!-- <h1>Суточный план</h1> -->
+    </div>
+    <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">Главная</a></li>
+            <li class="breadcrumb-item active">Суточный план</li>
+        </ol>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Фильтры и действия</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div id="form-container">
+                                {% include 'partials/form.html' with form=inftablo_form %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <form method="get" class="date-filter-form mr-3">
+                                    <div class="form-group">
+                                        {{ date_filter_form.as_p }}
+                                    </div>
+                                    <button type="submit" class="btn btn-outline-info btn-sm"><i
+                                            class="fas fa-filter mr-2"></i> Фильтр по дате</button>
+                                </form>
+                                <div class="btn-group" role="group" aria-label="Switch Tables">
+                                    <a href="?direction=dep"
+                                        class="btn btn-sm {% if request.GET.direction == 'dep' or not request.GET.direction %}btn-primary{% else %}btn-secondary{% endif %}">
+                                        <i class="fas fa-plane-departure mr-2"></i> Вылеты
+                                    </a>
+                                    <a href="?direction=arr"
+                                        class="btn btn-sm {% if request.GET.direction == 'arr' %}btn-primary{% else %}btn-secondary{% endif %}">
+                                        <i class="fas fa-plane-arrival mr-2"></i> Прилёты
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            {% if request.GET.direction == 'arr' %}
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-plane-arrival mr-2"></i> Прилёты</h3>
+                </div>
+                <div class="card-body table-responsive p-0">
+                    <table id="inftablo-list" class="table table-hover text-nowrap">
+                        <thead>
+                            <tr>
+                                <th>№</th>
+                                <th>Рейс</th>
+                                <th>Авиакомпания</th>
+                                <th>Откуда</th>
+                                <th>Дата</th>
+                                <th>Время</th>
+                                <th>Дата факт.</th>
+                                <th>Время факт.</th>
+                                <th>Стойки</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inftablo in arrivals %}
+                            <tr data-id="{{ inftablo.id }}" class="div-table">
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ inftablo.flight }}</td>
+                                <td>{{ inftablo.airline }}</td>
+                                <td>{{ inftablo.destination }}</td>
+                                <td>{{ inftablo.date1|date:"d.m.Y" }}</td>
+                                <td>{{ inftablo.time1 }}</td>
+                                <td>{{ inftablo.last_date|date:"d.m.Y"|default:"-" }}</td>
+                                <td>{{ inftablo.last_time|default:"-" }}</td>
+                                <td>
+                                    {% for stoika in inftablo.stoika.all %}
+                                    <span class="badge badge-secondary">{{ stoika.get_number }}</span>{% if not
+                                    forloop.last %}&nbsp;{% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td><span class="badge badge-info">{{ inftablo.status|default:"-" }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-plane-departure mr-2"></i> Вылеты</h3>
+                </div>
+                <div class="card-body table-responsive p-0">
+                    <table id="inftablo-list" class="table table-hover text-nowrap">
+                        <thead>
+                            <tr>
+                                <th>№</th>
+                                <th>Рейс</th>
+                                <th>Авиакомпания</th>
+                                <th>Куда</th>
+                                <th>Дата</th>
+                                <th>Время</th>
+                                <th>Дата факт.</th>
+                                <th>Время факт.</th>
+                                <th>Стойки</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inftablo in departures %}
+                            <tr data-id="{{ inftablo.id }}" class="div-table">
+                                <td class="num">{{ forloop.counter }}</td>
+                                <td>{{ inftablo.flight }}</td>
+                                <td>{{ inftablo.airline }}</td>
+                                <td>{{ inftablo.destination }}</td>
+                                <td>{{ inftablo.date1|date:"d.m.Y" }}</td>
+                                <td>{{ inftablo.time1 }}</td>
+                                <td>{{ inftablo.last_date|date:"d.m.Y"|default:"-" }}</td>
+                                <td>{{ inftablo.last_time|default:"-" }}</td>
+                                <td>
+                                    {% for stoika in inftablo.stoika.all %}
+                                    <span class="badge badge-secondary">{{ stoika.get_number }}</span>{% if not
+                                    forloop.last %}&nbsp;{% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td class="{{ inftablo.status.name_en}}"><span
+                                        class="badge badge-{{ inftablo.status.name_en|lower }}">{{
+                                        inftablo.status|default:"-" }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const formContainer = document.querySelector('#form-container');
+        if (!formContainer) return;
+
+        // Обработка клика на рейс
+        document.querySelectorAll('.div-table').forEach(item => {
+            item.addEventListener('click', function () {
+                const pk = this.getAttribute('data-id');
+                fetch(`/users/inftablo2/?pk=${pk}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Ошибка при загрузке формы.');
+                        return response.json();
+                    })
+                    .then(data => {
+                        formContainer.innerHTML = data.form_html;
+
+                        // Устанавливаем PK в скрытое поле формы
+                        const pkInput = document.querySelector('input[name="pk"]');
+                        if (pkInput) {
+                            pkInput.value = pk;
+                        }
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        alert('Ошибка при загрузке формы.');
+                    });
+            });
+        });
+
+        // Делегирование обработки отправки формы
+        formContainer.addEventListener('submit', function (event) {
+            if (event.target.tagName === 'FORM') {
+                event.preventDefault();
+                const form = event.target;
+
+                // Сохраняем текущие параметры URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const formData = new FormData(form);
+
+                // Добавляем параметры URL в formData
+                urlParams.forEach((value, key) => {
+                    formData.append(key, value);
+                });
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                    .then(response => {
+                        if (!response.ok) return response.json().then(err => Promise.reject(err));
+                        return response.json();
+                    })
+                    .then(data => {
+                        alert(data.message);
+                        location.reload(); // Обновление списка рейсов
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        if (error.errors) {
+                            formContainer.innerHTML = error.errors;
+                        } else {
+                            alert('Ошибка при сохранении рейса.');
+                        }
+                    });
+            }
+        });
+    });
+</script>
+{% endblock %}

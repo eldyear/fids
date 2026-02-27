@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block page_header %}Суточный план{% endblock %}
+
+{% block content %}
+
+<!-- Переключение между таблицами -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="btn-group" role="group" aria-label="Switch Tables">
+        <a href="?direction=dep" 
+           class="btn {% if request.GET.direction == 'dep' or not request.GET.direction %}btn-primary{% else %}btn-secondary{% endif %}">
+            Вылеты
+        </a>
+        <a href="?direction=arr" 
+           class="btn {% if request.GET.direction == 'arr' %}btn-primary{% else %}btn-secondary{% endif %}">
+            Прилёты
+        </a>
+    </div>
+    <a href="{% url 'inftablo_add' %}" class="btn btn-success">Добавить новый рейс</a>
+</div>
+
+<!-- Форма фильтрации по дате -->
+<div class="filter-add mb-3">
+    <form method="get" class="date-filter-form">
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Фильтровать</button>
+    </form>
+</div>
+
+<!-- Отображение таблиц -->
+{% if request.GET.direction == 'arr' %}
+    <h3>Прилёты</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Логотип</th>
+                <th>Авиакомпания</th>
+                <th>Рейс №</th>
+                <th>Пункт назначения</th>
+                <th>Дата плановая</th>
+                <th>Время плановая</th>
+                <th>Стойки</th>
+                <th>Статус</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inftablo in arrivals %}
+            <tr>
+                <td>
+                    <img src="{{ inftablo.airline.svg_logo.url }}" 
+                         alt="{{ inftablo.airline.name }}" 
+                         width="40">
+                </td>
+                <td>{{ inftablo.airline }}</td>
+                <td>{{ inftablo.flight }}</td>
+                <td>{{ inftablo.destination }}</td>
+                <td>{{ inftablo.date1 }}</td>
+                <td>{{ inftablo.time1 }}</td>
+                <td>
+                    {% for stoika in inftablo.stoika.all %}
+                        {{ stoika }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    <form action="{% url 'update_status' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="inftablo_id" value="{{ inftablo.id }}">
+                        <select name="status_id">
+                            <option value="" {% if inftablo.status is None %}selected{% endif %}>------</option>
+                            {% for status_choice in status_choices %}
+                            <option value="{{ status_choice.id }}" 
+                                    {% if inftablo.status == status_choice %}selected{% endif %}>
+                                {{ status_choice.name_ru }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-link">✅</button>
+                    </form>
+                </td>
+                <td>
+                    <a href="{% url 'inftablo_edit' inftablo.pk %}" class="btn btn-secondary">Редактировать</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- Пагинация для прилётов -->
+    <div class="pagination">
+        <span class="step-links">
+            {% if arrivals.has_previous %}
+                <a href="?direction=arr&page=1">&laquo; первая</a>
+                <a href="?direction=arr&page={{ arrivals.previous_page_number }}"><</a>
+            {% endif %}
+
+            <span class="current">
+                Страница {{ arrivals.number }} из {{ arrivals.paginator.num_pages }}
+            </span>
+
+            {% if arrivals.has_next %}
+                <a href="?direction=arr&page={{ arrivals.next_page_number }}">></a>
+                <a href="?direction=arr&page={{ arrivals.paginator.num_pages }}">последняя &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+{% else %}
+    <h3>Вылеты</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Логотип</th>
+                <th>Авиакомпания</th>
+                <th>Рейс №</th>
+                <th>Пункт назначения</th>
+                <th>Дата плановая</th>
+                <th>Время плановая</th>
+                <th>Стойки</th>
+                <th>Статус</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inftablo in departures %}
+            <tr>
+                <td>
+                    <img src="{{ inftablo.airline.svg_logo.url }}" 
+                         alt="{{ inftablo.airline.name }}" 
+                         width="40">
+                </td>
+                <td>{{ inftablo.airline }}</td>
+                <td>{{ inftablo.flight }}</td>
+                <td>{{ inftablo.destination }}</td>
+                <td>{{ inftablo.date1 }}</td>
+                <td>{{ inftablo.time1 }}</td>
+                <td>
+                    {% for stoika in inftablo.stoika.all %}
+                        {{ stoika }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    <form action="{% url 'update_status' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="inftablo_id" value="{{ inftablo.id }}">
+                        <select name="status_id">
+                            <option value="" {% if inftablo.status is None %}selected{% endif %}>------</option>
+                            {% for status_choice in status_choices %}
+                            <option value="{{ status_choice.id }}" 
+                                    {% if inftablo.status == status_choice %}selected{% endif %}>
+                                {{ status_choice.name_ru }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-link">✅</button>
+                    </form>
+                </td>
+                <td>
+                    <a href="{% url 'inftablo_edit' inftablo.pk %}" class="btn btn-secondary">Редактировать</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- Пагинация для вылетов -->
+    <div class="pagination">
+        <span class="step-links">
+            {% if departures.has_previous %}
+                <a href="?direction=dep&page=1">&laquo; первая</a>
+                <a href="?direction=dep&page={{ departures.previous_page_number }}"><</a>
+            {% endif %}
+
+            <span class="current">
+                Страница {{ departures.number }} из {{ departures.paginator.num_pages }}
+            </span>
+
+            {% if departures.has_next %}
+                <a href="?direction=dep&page={{ departures.next_page_number }}">></a>
+                <a href="?direction=dep&page={{ departures.paginator.num_pages }}">последняя &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+{% endif %}
+{% endblock %}

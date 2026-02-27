@@ -1,0 +1,37 @@
+{% extends 'app/dashboard/base_dashboard.html' %}
+
+{% block page_title %}Gates{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Gates List</h2>
+        <a href="{% url 'gate_add' %}" class="btn btn-primary">+ Add Gate</a>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Gate Number</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for gate in gates %}
+                <tr>
+                    <td style="font-weight: 600;">{{ gate.gate }}</td>
+                    <td>
+                        <a href="{% url 'gate_edit' gate.pk %}" style="color: var(--accent-color); text-decoration: none;">Edit</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" style="text-align: center; padding: 20px;">No gates found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

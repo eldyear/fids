@@ -1,0 +1,121 @@
+<tr class="flight-row" data-flight-id="{{ flight.pk }}">
+    <td style="padding: 8px; text-align: center;">
+        {% if flight.airline %}
+        <img src="/static/images/airlines/{{ flight.airline }}.svg" alt="{{ flight.airline }}"
+            style="max-height: 32px; width: 80px; max-width: 100%; display: inline-block;"
+            onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 40%22%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%23666%22%3E{{ flight.airline }}%3C/text%3E%3C/svg%3E';">
+        {% else %}
+        <span style="color: var(--text-secondary); font-size: 0.85rem;">-</span>
+        {% endif %}
+    </td>
+    <td style="font-weight: 600;">{{ flight.flight.flights }}</td>
+    <td>{{ flight.destination.city_name_ru }}</td>
+    <td style="font-weight: 600; color: var(--accent-color);">
+        {% if flight.last_time %}
+        <span style="text-decoration: line-through; color: var(--text-secondary); margin-right: 5px;">
+            {{ flight.time1|time:"H:i" }}</span>
+        {{ flight.last_time|time:"H:i" }}
+        {% else %}
+        {{ flight.time1|time:"H:i" }}
+        {% endif %}
+    </td>
+    <td>
+        <span class="badge 
+            {% if flight.status.name_en == 'DELAYED' %}badge-danger
+            {% elif flight.status.name_en == 'ARRIVED' or flight.status.name_en == 'DEPARTED' %}badge-success
+            {% else %}badge-warning{% endif %}">
+            {{ flight.status.name_ru|default:"Scheduled" }}
+        </span>
+    </td>
+    <td>
+        {% for desk in flight.stoika.all %}
+        {{ desk.stoiki }}{% if not forloop.last %}, {% endif %}
+        {% empty %}
+        -
+        {% endfor %}
+    </td>
+    <td>
+        {% for gate in flight.gate.all %}
+        {{ gate.gate }}{% if not forloop.last %}, {% endif %}
+        {% empty %}
+        -
+        {% endfor %}
+    </td>
+    <td>
+        <div style="display: flex; gap: 20px;">
+            <a href="{% url 'inftablo_edit' flight.pk %}" style="color: var(--accent-color); text-decoration: none;"
+                class="btn btn-secondary">
+                <i class="fas fa-edit"></i>
+            </a>
+            <a href="{% url 'inftablo_delete' flight.pk %}?direction={{ direction }}&selected_date={{ selected_date }}"
+                style="color: var(--danger-color); text-decoration: none;" class="btn btn-secondary">
+                <i class="fas fa-trash"></i>
+            </a>
+        </div>
+    </td>
+</tr>
+<!-- Details Row (Accordion) -->
+<tr id="details-{{ flight.pk }}" class="details-row">
+    <td colspan="8">
+        <div class="details-content">
+            <form class="inline-update-form" data-flight-id="{{ flight.pk }}">
+                <div style="display: flex; gap: 30px; align-items: flex-start;">
+                    <!-- Gates -->
+                    <div class="inline-form-group">
+                        <label class="inline-label">Gates (comma separated)</label>
+                        <input type="text" name="gates" class="inline-input"
+                            value="{% for gate in flight.gate.all %}{{ gate.gate }}{% if not forloop.last %}, {% endif %}{% endfor %}"
+                            placeholder="e.g. 1, 2">
+                    </div>
+
+                    <!-- Desks -->
+                    <div class="inline-form-group">
+                        <label class="inline-label">Check-in Desks (comma separated)</label>
+                        <input type="text" name="desks" class="inline-input"
+                            value="{% for desk in flight.stoika.all %}{{ desk.stoiki }}{% if not forloop.last %}, {% endif %}{% endfor %}"
+                            placeholder="e.g. 10, 11, 12">
+                    </div>
+
+                    <!-- Sky Priority Desks -->
+                    <div class="inline-form-group">
+                        <label class="inline-label" style="color: var(--accent-color);">Sky Priority Desks</label>
+                        <input type="text" name="sky_priority_desks" class="inline-input"
+                            value="{% for desk in flight.sky_priority_desks.all %}{{ desk.stoiki }}{% if not forloop.last %}, {% endif %}{% endfor %}"
+                            placeholder="e.g. 10">
+                        <div style="font-size: 0.7rem; color: var(--text-secondary);">Must be included in Check-in Desks
+                        </div>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="inline-form-group">
+                        <label class="inline-label">Status</label>
+                        <select name="status" class="inline-select">
+                            {% for status in status_choices %}
+                            <option value="{{ status.id }}" {% if flight.status.id == status.id %}selected{% endif %}>
+                                {{ status.name_ru }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Airline Logo in Accordion -->
+                    <div class="inline-form-group"
+                        style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <label class="inline-label" style="opacity: 0;">Logo</label>
+                        {% if flight.airline %}
+                        <img src="/static/images/airlines/{{ flight.airline }}.svg" alt="{{ flight.airline }}"
+                            style="max-height: 60px; width: 150px;"
+                            onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 40%22%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%23666%22%3E{{ flight.airline }}%3C/text%3E%3C/svg%3E';">
+                        {{ flight.flight.flights }}
+                        {% endif %}
+                    </div>
+
+                    <!-- Save Indicator -->
+                    <div style="align-self: center; margin-top: 25px;">
+                        <span id="indicator-{{ flight.pk }}" class="save-indicator">Saved</span>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </td>
+</tr>

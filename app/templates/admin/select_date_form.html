@@ -1,0 +1,12 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<h1>Формирование суточного плана</h1>
+<p>Выберите дату и нажмите "Применить".</p>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" name="apply" class="btn btn-primary">Применить</button>
+</form>
+{% endblock %}

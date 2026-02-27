@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Расписание Рейсов</title>
+    <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+    <link rel="stylesheet" href="static/css/flights.css">
+    <!-- NEW YEAR SURPRISE START -->
+    <link rel="stylesheet" href="static/css/newyear.css">
+    <script src="static/js/newyear.js" defer></script>
+    <!-- NEW YEAR SURPRISE END -->
+</head>
+<body>
+    <div class="header-bar">
+        <div class="airport-title">
+            <h1>РАСПИСАНИЕ РЕЙСОВ</h1>
+            <div id="currentTime" class="clock">00:00</div>
+        </div>
+    </div>
+
+    <div class="controls-container">
+        <div class="tabs-day">
+            <button class="tab-btn" data-day="yesterday">Вчера</button>
+            <button class="tab-btn active" data-day="today">Сегодня</button>
+            <button class="tab-btn" data-day="tomorrow">Завтра</button>
+        </div>
+        <div class="tabs-dir">
+            <button class="filter-btn active" data-dir="all">Все</button>
+            <button class="filter-btn" data-dir="dep">Вылет</button>
+            <button class="filter-btn" data-dir="arr">Прилет</button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Рейс</th>
+                    <th>Направление / Откуда</th>
+                    <th>Время</th>
+                    <th>Статус</th>
+                </tr>
+            </thead>
+            <tbody id="flightsTableBody">
+                <!-- Rows injected here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="static/js/flights.js"></script>
+</body>
+</html>

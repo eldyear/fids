@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отчеты по сканированиям</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background-color: #fff;
+            border-bottom: 2px solid #2c5aa0;
+            padding: 15px 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #2c5aa0;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .user-info {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #2c5aa0;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1e3f7a;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .filter-section h2 {
+            font-size: 18px;
+            color: #2c5aa0;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #2c5aa0;
+            box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2c5aa0;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Table Section */
+        .table-section {
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background-color: #2c5aa0;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-export {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #f8f9fa;
+        }
+
+        th {
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+            font-size: 14px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #dee2e6;
+            transition: background-color 0.2s;
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        tbody tr.expandable {
+            cursor: pointer;
+        }
+
+        td {
+            padding: 12px 15px;
+            font-size: 14px;
+        }
+
+        .flight-row {
+            font-weight: 500;
+        }
+
+        .passenger-details {
+            display: none;
+            background-color: #f8f9fa;
+        }
+
+        .passenger-details.show {
+            display: table-row;
+        }
+
+        .passenger-details td {
+            padding: 0;
+        }
+
+        .passenger-list {
+            padding: 15px 20px;
+        }
+
+        .passenger-item {
+            padding: 10px;
+            background-color: white;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .passenger-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .passenger-name {
+            font-weight: 600;
+            color: #2c5aa0;
+            margin-bottom: 5px;
+        }
+
+        .passenger-info {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .badge-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .expand-icon {
+            display: inline-block;
+            transition: transform 0.3s;
+            margin-right: 5px;
+        }
+
+        .expand-icon.expanded {
+            transform: rotate(90deg);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-section {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th,
+            td {
+                padding: 8px 10px;
+            }
+
+            .export-buttons {
+                flex-direction: column;
+            }
+
+            .table-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+        }
+
+        /* Highlight search results */
+        mark {
+            background-color: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>📊 Отчеты по сканированиям</h1>
+            <div class="header-actions">
+                <span class="user-info">👤 {{ current_user.username }}</span>
+                <!-- <a href="{% url 'get_barcode_scan' %}" class="btn btn-primary">К сканеру</a>
+                <a href="{% url 'all_scans_view' %}" class="btn btn-secondary">Все сканирования</a> -->
+                <a href="{% url 'logout_view' %}" class="btn btn-secondary">Выйти</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <h2>Фильтры</h2>
+            <form method="GET">
+                <div class="filter-grid">
+                    <div class="form-group">
+                        <label for="start_date">Дата начала:</label>
+                        <input type="date" class="form-control" id="start_date" name="start_date"
+                            value="{{ start_date }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="end_date">Дата окончания:</label>
+                        <input type="date" class="form-control" id="end_date" name="end_date" value="{{ end_date }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="airline">Авиакомпания:</label>
+                        <select class="form-control" id="airline" name="airline">
+                            <option value="">Все</option>
+                            {% for airline in airlines %}
+                            <option value="{{ airline }}" {% if airline == airline_filter %}selected{% endif %}>{{ airline }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="flight_number">Номер рейса:</label>
+                        <input type="text" class="form-control" id="flight_number" name="flight_number"
+                            value="{{ flight_number_filter }}" placeholder="Например: 123">
+                    </div>
+                    <div class="form-group">
+                        <label for="passenger">Поиск пассажира:</label>
+                        <input type="text" class="form-control" id="passenger" name="passenger"
+                            value="{{ passenger_search }}" placeholder="Имя или фамилия">
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-primary">Применить фильтры</button>
+                    <a href="{% url 'reports_view' %}" class="btn btn-secondary">Сбросить</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-number">{{ total_flights }}</div>
+                <div class="stat-label">Всего рейсов</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ total_scans }}</div>
+                <div class="stat-label">Всего сканирований</div>
+            </div>
+        </div>
+
+        <!-- Table Section -->
+        <div class="table-section">
+            <div class="table-header">
+                <h2>Список рейсов</h2>
+                <div class="export-buttons">
+                    <a href="{% url 'export_to_excel' %}?{{ request.GET.urlencode }}"
+                        class="btn btn-success btn-export">📥 Excel</a>
+                    <a href="{% url 'export_to_pdf' %}?{{ request.GET.urlencode }}"
+                        class="btn btn-success btn-export">📄 PDF</a>
+                </div>
+            </div>
+
+            {% if flights %}
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 50px;"></th>
+                        <th>Рейс</th>
+                        <th>Авиакомпания</th>
+                        <th>Направление</th>
+                        <th>Статус</th>
+                        <th>Время вылета</th>
+                        <th>Сканирований</th>
+                        <th>Уникальных пассажиров</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for flight_key, flight_data in flights.items %}
+                    <tr class="flight-row expandable" onclick="togglePassengers('{{ flight_key }}')">
+                        <td>
+                            <span class="expand-icon" id="icon-{{ flight_key }}">▶</span>
+                        </td>
+                        <td><strong>{{ flight_data.carrier_code }}{{ flight_data.flight_number }}</strong></td>
+                        <td>{{ flight_data.carrier_code }}</td>
+                        <td>
+                            {% if flight_data.flight_info %}
+                            {{ flight_data.flight_info.destination }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if flight_data.flight_info %}
+                            {{ flight_data.flight_info.status|default:"-" }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if flight_data.flight_info and flight_data.flight_info.time %}
+                            {{ flight_data.flight_info.time|time:"H:i" }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>{{ flight_data.passenger_count }}</td>
+                        <td>{{ flight_data.unique_passengers_count }}</td>
+                    </tr>
+                    <tr class="passenger-details" id="details-{{ flight_key }}">
+                        <td colspan="8">
+                            <div class="passenger-list">
+                                <h3 style="margin-bottom: 15px; color: #2c5aa0;">Список пассажиров</h3>
+                                {% for scan in flight_data.scans %}
+                                <div class="passenger-item">
+                                    <div class="passenger-name">{{ scan.passenger_name|default:"Не указан" }}</div>
+                                    <div class="passenger-info">
+                                        <strong>PNR:</strong> {{ scan.pnr|default:"-" }} |
+                                        <strong>Место:</strong> {{ scan.seat_number|default:"-" }} |
+                                        <strong>Тип:</strong> {{ scan.pax_type|default:"-" }} |
+                                        <strong>Дата вылета:</strong> {{ scan.flight_date|date:"d.m.Y"|default:"-" }} |
+                                        <strong>Время:</strong> {{ scan.timestamp|date:"H:i:s" }}
+                                        {% if current_user.is_staff %}
+                                        | <strong>Пользователь:</strong> {{ scan.user.username|default:"-" }}
+                                        {% if scan.parsed_data_json %}
+                                        <br>
+                                        <details style="margin-top: 5px;">
+                                            <summary style="cursor: pointer; color: #2c5aa0;"><strong>📋 Оригинальные
+                                                    данные сканера</strong></summary>
+                                            <pre
+                                                style="background: #f5f5f5; padding: 10px; border-radius: 4px; margin-top: 5px; font-size: 0.85em; overflow-x: auto; border: 1px solid #ddd;">{{ scan.parsed_data_json|safe }}</pre>
+                                        </details>
+                                        {% endif %}
+                                        {% endif %}
+                                        {% if scan.is_duplicate %}
+                                        <span class="badge badge-danger">Дубликат</span>
+                                        {% endif %}
+                                        
+                                        {% if scan.is_suspicious %}
+                                        <span class="badge badge-warning" title="{{ scan.suspicious_reason }}">⚠️ Подозрительный: {{ scan.suspicious_reason }}</span>
+                                        {% endif %}
+
+                                        {% if not scan.is_duplicate and not scan.is_suspicious %}
+                                        <span class="badge badge-success">Успешно</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="no-data">
+                <p>Нет данных для отображения</p>
+                <p style="font-size: 14px; margin-top: 10px;">Попробуйте изменить параметры фильтров</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function togglePassengers(flightKey) {
+            const detailsRow = document.getElementById('details-' + flightKey);
+            const icon = document.getElementById('icon-' + flightKey);
+
+            if (detailsRow.classList.contains('show')) {
+                detailsRow.classList.remove('show');
+                icon.classList.remove('expanded');
+            } else {
+                detailsRow.classList.add('show');
+                icon.classList.add('expanded');
+            }
+        }
+
+        // Highlight search results
+        const passengerSearch = '{{ passenger_search }}';
+        if (passengerSearch) {
+            document.addEventListener('DOMContentLoaded', function () {
+                const passengerNames = document.querySelectorAll('.passenger-name');
+                passengerNames.forEach(function (element) {
+                    const text = element.textContent;
+                    const regex = new RegExp('(' + passengerSearch + ')', 'gi');
+                    element.innerHTML = text.replace(regex, '<mark>$1</mark>');
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>

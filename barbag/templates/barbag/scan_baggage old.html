@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Сканирование багажа</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        h1, h2, h3 {
+            margin: 0;
+            margin-bottom: 10px;
+        }
+        .container {
+            border: 1px solid #000;
+            padding: 10px;
+            margin-bottom: 20px;
+            width: 40%;
+        }
+        .header {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .form-container {
+            border: 1px solid #000;
+            padding: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        form {
+            display: block;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: calc(100% - 12px);
+            padding: 5px;
+            border: 1px solid #000;
+        }
+        .scan-input {
+            /* max-width: 40%; */
+            padding: 10px;
+            font-size: 1.2em;
+            text-align: center;
+            background-color: #b6b5b5;
+            caret-color: transparent;
+        }
+        button {
+            padding: 5px 10px;
+            border: 1px solid #000;
+            cursor: pointer;
+            background-color: #eee;
+            margin-top: 5px;
+        }
+        .message-box {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #000;
+            text-align: center;
+        }
+        .error {
+            background-color: #fdd;
+        }
+        .success {
+            background-color: #dfd;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            border: 1px solid #000;
+            margin: 0;
+        }
+        li {
+            padding: 8px;
+            border-bottom: 1px solid #000;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        .back-button {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 5px 10px;
+            border: 1px solid #000;
+            text-decoration: none;
+            color: #000;
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        Программный комплекс "Управление багажом"
+    </div>
+    <div class="container">
+        <h1>Сканирование багажа для рейса: {{ flight.flight_num }}</h1>
+        <h3>Направление: {{ flight.destination }}</h3>
+        
+        {% if error %}
+            <div class="message-box error">{{ error }}</div>
+        {% endif %}
+        {% if success_message %}
+            <div class="message-box success">{{ success_message }}</div>
+        {% endif %}
+
+        <div class="form-container">
+            <form method="get" action="{% url 'search_baggage' %}">
+                <label for="barcode_search">Поиск багажа:</label>
+                <input type="text" id="barcode_search" name="barcode" placeholder="Введите штрихкод">
+                <button type="submit">Найти</button>
+            </form>
+            
+            <form method="post" action="{% url 'scan_baggage' flight_id=flight.id %}">
+                {% csrf_token %}
+                <label for="barcode">Сканируйте штрихкод:</label>
+                <input type="text" id="barcode" name="barcode" autofocus class="scan-input">
+                <button type="submit">Добавить</button>
+            </form>
+        </div>
+
+        <a href="{% url 'flight_list' %}" class="back-button">Вернуться к списку рейсов</a>
+    </div>
+
+    <div class="container">
+        <h3>Активные контейнеры</h3>
+        <ul>
+        {% for container in open_containers %}
+            <li>
+                Контейнер: **{{ container.barcode }}** (Багажа: **{{ container.baggage_count }}** из 30)
+            </li>
+        {% empty %}
+            <li>Нет активных контейнеров. Отсканируйте штрихкод контейнера, чтобы начать.</li>
+        {% endfor %}
+        </ul>
+        
+        {% if closed_containers %}
+        <h3>Последние закрытые контейнеры:</h3>
+        <ul>
+            {% for container in closed_containers %}
+                <li>Контейнер: **{{ container.barcode }}** (Багажа: **{{ container.baggage_count }}**)</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if scanned_baggage_list %}
+        <h3>Отсканированный багаж в текущем контейнере:</h3>
+        <ul>
+            {% for bag in scanned_baggage_list %}
+                <li>{{ bag.barcode }} - {{ bag.scanned_at|date:"H:i:s" }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+</body>
+</html>

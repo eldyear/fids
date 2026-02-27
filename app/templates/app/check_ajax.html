@@ -1,0 +1,21 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="3600">
+    <link href="{% static 'css/check.css' %}" rel="stylesheet">
+    <title>Check-in {{pk}}</title>
+</head>
+<body>
+    
+    <div id="content" class="container"></div>
+    <div class="checkin-number">{{ pk }}</div>
+
+    <script>
+        const advertImageURL = "{% static 'images/advertisement/advert.png' %}";
+    </script>
+    <script src="{% static 'js/check_in.js' %}"></script>
+</body>
+</html>

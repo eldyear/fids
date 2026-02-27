@@ -1,0 +1,44 @@
+{% extends 'app/dashboard/base_dashboard.html' %}
+
+{% block page_title %}Delete Flight{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 40px auto;">
+    <h2 style="margin-bottom: 20px; color: var(--danger-color);">
+        <i class="fas fa-exclamation-triangle"></i> Confirm Deletion
+    </h2>
+    
+    <div style="background-color: rgba(239, 68, 68, 0.1); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <p style="font-size: 1.1rem; margin-bottom: 10px;">Are you sure you want to delete this flight?</p>
+        <div style="background-color: var(--bg-body); padding: 15px; border-radius: 6px; margin-top: 15px;">
+            <p><strong>Flight:</strong> {{ object.flight.flights }}</p>
+            <p><strong>Date:</strong> {{ object.date1|date:"d.m.Y" }}</p>
+            <p><strong>Time:</strong> {{ object.time1|time:"H:i" }}</p>
+            <p><strong>Destination:</strong> {{ object.destination.city_name_ru }}</p>
+            <p><strong>Direction:</strong> {{ object.direction|upper }}</p>
+        </div>
+    </div>
+    
+    <form method="post" style="display: flex; gap: 15px; justify-content: flex-end;">
+        {% csrf_token %}
+        <a href="{% url 'inftablo_list' %}?direction={{ request.GET.direction }}&selected_date={{ request.GET.selected_date }}" 
+           class="btn btn-secondary">
+            Cancel
+        </a>
+        <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash"></i> Yes, Delete
+        </button>
+    </form>
+</div>
+
+<style>
+    .btn-danger {
+        background-color: var(--danger-color);
+        color: white;
+        border: none;
+    }
+    .btn-danger:hover {
+        opacity: 0.9;
+    }
+</style>
+{% endblock %}

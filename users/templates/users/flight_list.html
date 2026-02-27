@@ -1,0 +1,254 @@
+{% extends 'app/dashboard/base_dashboard.html' %}
+
+{% block page_title %}Суточный план полетов{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="margin: 0; font-size: 1.5rem;">
+            План на день: {{ selected_date|date:"d.m.Y" }}
+        </h2>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <input type="date" id="date-picker" value="{{ selected_date }}" 
+                   onchange="window.location.href='?direction={{ direction }}&selected_date='+this.value"
+                   style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); background-color: var(--bg-body); color: var(--text-primary);">
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <!-- Filters -->
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <div class="btn-group">
+                <a href="?direction=dep&selected_date={{ selected_date }}" class="btn {% if direction == 'dep' %}btn-primary{% else %}btn-secondary{% endif %}" style="background-color: {% if direction != 'dep' %}var(--bg-body){% endif %};">Вылеты</a>
+                <a href="?direction=arr&selected_date={{ selected_date }}" class="btn {% if direction == 'arr' %}btn-primary{% else %}btn-secondary{% endif %}" style="background-color: {% if direction != 'arr' %}var(--bg-body){% endif %};">Прилеты</a>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display: flex; gap: 10px;">
+            <form method="post" action="{% url 'import_flights' %}" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="date" value="{{ selected_date }}">
+                <button type="submit" class="btn btn-secondary" onclick="return confirm('Import flights from API for {{ selected_date }}?')">
+                    <i class="fas fa-download"></i> <span>Импорт из API</span>
+                </button>
+            </form>
+            <a href="{% url 'generate_daily_schedule' %}" class="btn btn-secondary">
+                <i class="fas fa-calendar-plus"></i> <span>Создать расписание</span>
+            </a>
+            <a href="{% url 'inftablo_add' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> <span>Добавить рейс</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Export Options -->
+    <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+        <span style="color: var(--text-secondary);">Экспорт:</span>
+        <a href="{% url 'export_daily_plan_to_docx' %}?direction={{ direction }}&selected_date={{ selected_date }}" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fas fa-file-word"></i> DOCX
+        </a>
+        <a href="{% url 'export_daily_plan_xlsx' %}?direction={{ direction }}&selected_date={{ selected_date }}" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fas fa-file-excel"></i> XLSX
+        </a>
+        <a href="{% url 'export_daily_plan_pdf' %}?direction={{ direction }}&selected_date={{ selected_date }}" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fas fa-file-pdf"></i> PDF
+        </a>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 80px;">Авиакомпания</th>
+                    <th>Рейс</th>
+                    <th>Маршрут</th>
+                    <th>Время</th>
+                    <th>Статус</th>
+                    <th>Стойка</th>
+                    <th>Выход</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if direction == 'dep' %}
+                    {% for flight in departures %}
+                        {% include 'users/partials/flight_row.html' %}
+                    {% empty %}
+                        <tr><td colspan="10" style="text-align: center; padding: 20px;">No departures found for this date.</td></tr>
+                    {% endfor %}
+                {% else %}
+                    {% for flight in arrivals %}
+                        {% include 'users/partials/flight_row.html' %}
+                    {% empty %}
+                        <tr><td colspan="10" style="text-align: center; padding: 20px;">No arrivals found for this date.</td></tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <style>
+        /* Accordion Styles */
+        .flight-row {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .flight-row:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        .details-row {
+            display: none;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+        .details-row.active {
+            display: table-row;
+        }
+        .details-content {
+            padding: 20px;
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+        .inline-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .inline-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .inline-select {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            min-width: 150px;
+        }
+        .inline-input {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            min-width: 200px;
+        }
+        .inline-checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 25px; /* Align with inputs */
+        }
+        .save-indicator {
+            font-size: 0.8rem;
+            margin-left: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .save-indicator.saving { color: var(--warning-color); opacity: 1; }
+        .save-indicator.saved { color: var(--success-color); opacity: 1; }
+        .save-indicator.error { color: var(--danger-color); opacity: 1; }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle Accordion
+            document.querySelectorAll('.flight-row').forEach(row => {
+                row.addEventListener('click', function(e) {
+                    // Prevent toggle if clicking buttons/links inside the row
+                    if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input')) return;
+                    
+                    const flightId = this.dataset.flightId;
+                    const detailsRow = document.getElementById(`details-${flightId}`);
+                    if (detailsRow) {
+                        detailsRow.classList.toggle('active');
+                    }
+                });
+            });
+
+            // AJAX Update
+            document.querySelectorAll('.inline-update-form').forEach(form => {
+                form.addEventListener('change', function() {
+                    submitForm(this);
+                });
+            });
+        });
+
+        function submitForm(form) {
+            const flightId = form.dataset.flightId;
+            const indicator = document.getElementById(`indicator-${flightId}`);
+            const formData = new FormData(form);
+            
+            // Show saving state
+            indicator.textContent = 'Saving...';
+            indicator.className = 'save-indicator saving';
+
+            fetch(`/users/update_flight_inline/${flightId}/`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    indicator.textContent = 'Saved';
+                    indicator.className = 'save-indicator saved';
+                    setTimeout(() => { indicator.style.opacity = '0'; }, 2000);
+                    
+                    // Update the main row display if needed (e.g. badges)
+                    // For now, we rely on page refresh for major visual updates, 
+                    // but the inline values persist.
+                } else {
+                    indicator.textContent = 'Error';
+                    indicator.className = 'save-indicator error';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                indicator.textContent = 'Error';
+                indicator.className = 'save-indicator error';
+            });
+        }
+    </script>
+</div>
+
+<style>
+    /* Quick fix for form inputs in the header */
+    input[type="date"] {
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        background-color: var(--bg-body);
+        color: var(--text-primary);
+    }
+    .btn-sm {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+    
+    /* Btn group styling */
+    .btn-group {
+        display: flex;
+        gap: 0;
+    }
+    .btn-group .btn {
+        text-decoration: none !important;
+        border-radius: 0;
+    }
+    .btn-group .btn:first-child {
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
+    }
+    .btn-group .btn:last-child {
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
+    }
+    .btn-group .btn:visited {
+        color: inherit;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,242 @@
+body {
+    font-family: 'Segoe UI', 'Roboto', Helvetica, Arial, sans-serif;
+    background: linear-gradient(135deg, #1e2029 0%, #232530 100%);
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.header-bar {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.airport-title h1 {
+    margin: 0;
+    font-size: 1.8em;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #E9B13F;
+}
+
+.clock {
+    font-size: 1.5em;
+    font-weight: 300;
+    color: #fff;
+}
+
+/* Controls */
+.controls-container {
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.tabs-day,
+.tabs-dir {
+    display: flex;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 5px;
+    border-radius: 8px;
+}
+
+button {
+    background: transparent;
+    border: none;
+    color: #aaa;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s;
+    font-weight: 600;
+}
+
+button:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+button.active {
+    background: #E9B13F;
+    /* Gold for active day */
+    color: #1e2029;
+}
+
+.tabs-dir button.active {
+    background: #3498db;
+    /* Blue for direction */
+    color: #fff;
+}
+
+/* Table */
+.table-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 30px 30px 30px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    /* No spacing between rows */
+    border-spacing: 0;
+}
+
+thead th {
+    text-align: left;
+    padding: 8px 12px;
+    color: #888;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    position: sticky;
+    top: 0;
+    background: #1e2029;
+    z-index: 10;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+tbody tr {
+    background: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    /* Thin divider */
+    transition: background 0.1s;
+}
+
+tbody tr:hover {
+    transform: none;
+    /* remove scaling */
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: none;
+}
+
+td {
+    padding: 8px 12px;
+    /* Dense padding */
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.95rem;
+}
+
+td:first-child {
+    border-radius: 0;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #E9B13F;
+}
+
+td:last-child {
+    border-radius: 0;
+    text-align: right;
+}
+
+.flt-dest {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.flt-sub {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 2px;
+}
+
+.flt-time {
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: monospace;
+    /* Align numbers */
+}
+
+.status-badge {
+    padding: 2px 8px;
+    /* Tiny badge */
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.status-scheduled {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ccc;
+}
+
+.status-ontime {
+    background: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+}
+
+.status-boarding {
+    background: #f39c12;
+    color: #fff;
+    animation: blink 1.5s infinite;
+}
+
+.status-departed {
+    background: #3498db;
+    color: #fff;
+}
+
+.status-landed {
+    background: #3498db;
+    color: #fff;
+}
+
+.status-cancelled {
+    background: #e74c3c;
+    color: #fff;
+}
+
+.status-delayed {
+    background: #e74c3c;
+    color: #fff;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}

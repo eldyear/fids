@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="combinedTitle">Combined Flights</title>
+    <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+    <link rel="stylesheet" href="static/css/dep_arr.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Ensure body takes full viewport height */
+        }
+        .main-container {
+            display: flex;
+            flex-grow: 1; /* Allow container to grow and take available space */
+            gap: 20px; /* Space between tables */
+            padding: 20px;
+            box-sizing: border-box; /* Include padding in element's total width and height */
+            overflow-x: auto; /* Allow horizontal scrolling if content overflows */
+            margin-top: -2vh;
+        }
+        .flights-section {
+            flex: 1; /* Each section takes equal width */
+            min-width: 48%; /* Ensure tables don't get too small */
+            display: flex;
+            flex-direction: column;
+        }
+        .table-container {
+            overflow-y: auto; /* Allow vertical scrolling for tables if needed */
+            max-height: calc(100vh - 150px); /* Adjust based on header/footer height */
+            flex-grow: 1;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            /* border: 1px solid #ddd; */
+            text-align: left;
+        }
+        tbody, tr, td {
+            max-height: 1vh;
+        }
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #151a1d; /* Example background */
+            border-bottom: 1px solid #151a1d;
+            color: #333;
+            margin-bottom: -5vh;
+        }
+        .airport-info, .time-info {
+            text-align: left;
+        }
+        .airport-info {
+            flex-basis: 25%; /* Adjust as needed */
+        }
+        .main-header {
+            flex-basis: 50%; /* Adjust as needed */
+            text-align: center;
+        }
+        .time-info {
+            flex-basis: 25%; /* Adjust as needed */
+            text-align: right;
+        }
+        .depart-logo, .arr-logo {
+            vertical-align: middle;
+            margin-right: 10px;
+            height: 30px; /* Adjust size as needed */
+        }
+        .connection-status {
+            text-align: center;
+            padding: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+        .language-switcher {
+            text-align: center;
+            padding: 10px;
+        }
+        .language-switcher button {
+            padding: 8px 15px;
+            margin: 0 5px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .language-switcher button.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .table-header th {
+            background-color: #e2e2e2;
+        }
+        .first-text { font-size: 1.5em; color: #fff; }
+        .second-text { font-size: 1.1em; color: #9b9b9b; }
+        #depColAirline {
+            max-width: 10vw;
+        }
+        #arrColAirline {
+            max-width: 10vw;
+        }
+        #depColDate {
+            max-width: 6vw;
+        }
+        #arrColDate {
+            max-width: 6vw;
+        }
+        #depColFlight {
+            max-width: 9vw;
+        }
+        #arrColFlight {
+            max-width: 9vw;
+        }
+    </style>
+    <!-- NEW YEAR SURPRISE START -->
+    <link rel="stylesheet" href="static/css/newyear.css">
+    <script src="static/js/newyear.js" defer></script>
+    <!-- NEW YEAR SURPRISE END -->
+</head>
+<body class="dep-arr-body">
+    <div class="header-bar">
+        <div class="airport-info">
+            <p class="roboto-light second-text">OSS/UCFO</p>
+            <p id="AirportName" class="roboto-bold first-text">Ош Аэропорту</p>
+            <p id="Manas" class="roboto-light second-text">МАНАС</p>
+        </div>
+        <div class="main-header">
+            <h1 id="combinedMainHeader" class="roboto-bold"></h1>
+        </div>
+        <div class="time-info">
+            <p id="current-date" class="roboto-light second-text"></p>
+            <p id="current-time" class="roboto-bold first-text"></p>
+            <p id="TimeTitle" class="roboto-light second-text">время:</p>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="flights-section">
+            <div class="depart" style="text-align: center; margin-bottom: 10px;">
+                <img src="static/images/departplane.png" alt="Departures" class="dep-arr-logo">
+                <span id="depHeader" class="roboto-bold" style="font-size: 0.8em;">ВЫЛЕТЫ</span>
+            </div>
+            <div class="table-container">
+                <table class="table text-center roboto-light">
+                    <thead>
+                        <tr class="roboto-light table-header">
+                            <th id="depColAirline">А/К</th>
+                            <th id="depColFlight">Рейс</th>
+                            <th id="depColDestination">Направление</th>
+                            <th id="depColDate">Дата</th>
+                            <th id="depColTime">Время</th>
+                            <th id="depColStatus">Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody id="flightsDepTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="flights-section">
+            <div class="depart" style="text-align: center; margin-bottom: 10px;">
+                <img src="static/images/arrplane.png" alt="Arrivals" class="dep-arr-logo">
+                <span id="arrHeader" class="roboto-bold" style="font-size: 0.8em;">Прилеты</span>
+            </div>
+            <div class="table-container">
+                <table class="table text-center roboto-light">
+                    <thead>
+                        <tr class="roboto-light table-header">
+                            <th id="arrColAirline">А/К</th>
+                            <th id="arrColFlight">Рейс</th>
+                            <th id="arrColDestination">Направление</th>
+                            <th id="arrColDate">Дата</th>
+                            <th id="arrColTime">Время</th>
+                            <th id="arrColStatus">Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody id="flightsArrTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="connectionStatus" class="connection-status">Подключение...</div>
+    <div class="pagination-info">
+        <span id="depPageInfo"></span>
+        <span id="arrPageInfo" style="margin-left: 40px;"></span>
+    </div>
+
+    <script src="static/js/dep_arr.js"></script>
+</body>
+</html>

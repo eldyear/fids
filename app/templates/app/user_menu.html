@@ -1,0 +1,15 @@
+<!-- templates/inftablo_form.html -->
+{% extends "base.html" %}
+
+{% block page_header %}Меню{% endblock %}
+
+{% block content %}
+
+<div class="menu">
+    <a href="{% url 'inftablo_list' %}" class="btn btn-success menu-btn">Суточный план</a>
+    <a href="{% url 'update_flights' %}" class="btn btn-success menu-btn">Импорт данных</a>
+    <a href="{% url 'flight_template_list' %}" class="btn btn-success menu-btn">Шаблон Суточный план</a>
+    <a href="{% url 'generate_daily_schedule' %}" class="btn btn-success menu-btn">Формирование суточного плана</a>
+</div>
+
+{% endblock %}

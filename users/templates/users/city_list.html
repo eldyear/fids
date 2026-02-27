@@ -1,0 +1,43 @@
+{% extends 'app/dashboard/base_dashboard.html' %}
+
+{% block page_title %}Cities{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Cities List</h2>
+        <a href="{% url 'city_add' %}" class="btn btn-primary">+ Add City</a>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>City (RU)</th>
+                    <th>City (EN)</th>
+                    <th>IATA</th>
+                    <th>ICAO</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for city in cities %}
+                <tr>
+                    <td style="font-weight: 600;">{{ city.city_name_ru }}</td>
+                    <td>{{ city.city_name_en }}</td>
+                    <td>{{ city.iata_code }}</td>
+                    <td>{{ city.icao_code }}</td>
+                    <td>
+                        <a href="{% url 'city_edit' city.pk %}" style="color: var(--accent-color); text-decoration: none;">Edit</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 20px;">No cities found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Детали технологической карты</title>
+</head>
+<body>
+    <h1>Детали технологической карты</h1>
+    <p>Номер рейса: {{ tech_card.flight_number }}</p>
+    <p>Тип ВС: {{ tech_card.aircraft_type }}</p>
+    <p>Номер ВС: {{ tech_card.aircraft_number }}</p>
+    <p>MTOW: {{ tech_card.mtow }}</p>
+    <p>TZK: {{ tech_card.tzk }}</p>
+    <p>Время прибытия: {{ tech_card.arrival_time }}</p>
+    <p>Время вылета: {{ tech_card.departure_time }}</p>
+    <p>Место стоянки: {{ tech_card.parking_spot }}</p>
+    <p>Маршрут: {{ tech_card.route }}</p>
+
+    <h2>Услуги</h2>
+    <ul>
+        {% for service in tech_card.services.all %}
+        <li>{{ service.service_type }} ({{ service.start_time }} - {{ service.end_time }})</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'service_create' tech_card.pk %}">Добавить услугу</a>
+    <a href="{% url 'tech_card_list' %}">Назад к списку</a>
+</body>
+</html>

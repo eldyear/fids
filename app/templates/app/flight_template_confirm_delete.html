@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Удаление шаблона{% endblock %}
+
+{% block content %}
+<h2>Вы уверены, что хотите удалить этот шаблон?</h2>
+
+<p><strong>Рейс:</strong> {{ object.flight }}</p>
+<p><strong>Направление:</strong> {{ object.get_direction_display }}</p>
+<p><strong>Сезон:</strong> {{ object.season_start }} - {{ object.season_end }}</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Удалить</button>
+    <a href="{% url 'flight_template_list' %}" class="btn btn-secondary">Отмена</a>
+</form>
+{% endblock %}

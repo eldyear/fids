@@ -1,0 +1,316 @@
+/* Vertical Layout CSS */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@300;400;700&display=swap');
+
+body {
+    background-color: #0b0e11;
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1vh 4vw;
+    background: linear-gradient(180deg, #151a1d 0%, rgba(21, 26, 29, 0) 100%);
+    height: 8vh;
+}
+
+.title-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.airport-name {
+    font-size: 2.2vw;
+    font-weight: 700;
+    color: #E9B13F;
+    text-transform: uppercase;
+}
+
+.sub-title {
+    font-size: 1.2vw;
+    color: #ffffff;
+    opacity: 0.8;
+}
+
+.page-title {
+    font-size: 4vw;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.depart-title {
+    color: #E9B13F;
+}
+
+.arrive-title {
+    color: #3498db;
+}
+
+.time-container {
+    text-align: right;
+}
+
+.current-time {
+    font-size: 3vw;
+    font-weight: 700;
+    color: #fff;
+}
+
+.current-date {
+    font-size: 1.2vw;
+    color: #ffffff;
+    opacity: 0.8;
+}
+
+/* Flight List Container */
+.flights-container {
+    flex-grow: 1;
+    padding: 0.5vh 2vw;
+    overflow-y: hidden;
+}
+
+/* Flights Table */
+.flights-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.3vh;
+}
+
+.flights-table thead th {
+    background: #E9B13F;
+    padding: 0.8vh 1.5vw;
+    text-align: center;
+    font-size: 1.5vw;
+    font-weight: 700;
+    color: #0b0e11;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid rgba(162, 160, 161, 0.2);
+}
+
+.flights-table thead th:first-child {
+    border-radius: 6px 0 0 6px;
+}
+
+.flights-table thead th:last-child {
+    border-radius: 0 6px 6px 0;
+}
+
+.flights-table tbody tr {
+    background: rgba(25, 30, 35, 0.6);
+    backdrop-filter: blur(10px);
+    max-height: 1vh;
+}
+
+/* Striped rows effect */
+.flights-table tbody tr:nth-child(even) {
+    background: #20272c;
+}
+
+.flights-table tbody tr:nth-child(odd) {
+    background: #2d373e;
+}
+
+.flights-table tbody td {
+    padding: 0.3vh 1.5vw;
+    color: #ffffff;
+    vertical-align: middle;
+    border-left: 3px solid transparent;
+    height: 3.2vh;
+    font-size: 1.8vw;
+    text-align: center;
+}
+
+.flights-table tbody td:first-child {
+    border-radius: 6px 0 0 6px;
+}
+
+.flights-table tbody td:last-child {
+    border-radius: 0 6px 6px 0;
+}
+
+/* Status Border Colors - Using dep_arr.css colors */
+.flights-table tbody tr.status-ontime td:first-child {
+    border-left-color: #ffffff;
+}
+
+.flights-table tbody tr.status-delayed td:first-child {
+    border-left-color: #ff4d4d;
+}
+
+.flights-table tbody tr.status-boarding td:first-child {
+    border-left-color: #ffcc00;
+}
+
+.flights-table tbody tr.status-checkin td:first-child {
+    border-left-color: #16af56;
+}
+
+.flights-table tbody tr.status-cancelled td:first-child {
+    border-left-color: #555;
+}
+
+.flights-table tbody tr.status-landed td:first-child {
+    border-left-color: #3498db;
+}
+
+.flights-table tbody tr.status-departed td:first-child {
+    border-left-color: #3498db;
+}
+
+/* Column: Airline Logo */
+.col-logo {
+    width: 140px;
+    min-width: 140px;
+    max-width: 140px;
+    text-align: center;
+    background-color: #ffffff;
+    padding: 0.3vh 0.5vw !important;
+}
+
+.airline-logo {
+    height: auto;
+    width: 12vw;
+    max-height: 2.8vh;
+    object-fit: contain;
+}
+
+/* Column: Flight Number */
+.col-flight {
+    width: 12%;
+    font-size: 1.8vw;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+/* Column: Destination */
+.col-destination {
+    width: 25%;
+    font-size: 1.8vw;
+    font-weight: 600;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Column: Date */
+.col-date {
+    width: 10%;
+    text-align: center;
+    font-size: 1.8vw;
+    font-weight: 500;
+    color: #A2A0A1;
+}
+
+/* Column: Time */
+.col-time {
+    width: 20%;
+    text-align: center;
+}
+
+.time-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1vw;
+}
+
+.scheduled-time {
+    font-size: 1.8vw;
+    color: #A2A0A1;
+    opacity: 0.7;
+    text-decoration: line-through;
+}
+
+.actual-time {
+    font-size: 1.8vw;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+/* Column: Status */
+.col-status {
+    width: 25%;
+    text-align: right;
+}
+
+.status-text {
+    font-size: 1.8vw;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* Status Colors - Using dep_arr.css colors */
+.status-checkin {
+    color: #16af56;
+}
+
+.status-boarding {
+    color: #ffcc00;
+    animation: pulse 0.8s infinite;
+}
+
+.status-cancelled {
+    color: #555;
+}
+
+.status-ontime {
+    color: #ffffff;
+}
+
+.status-landed {
+    color: #3498db;
+}
+
+.status-arrived {
+    color: #3498db;
+}
+
+.status-departed {
+    color: #3498db;
+}
+
+.status-delayed {
+    color: #ff4d4d;
+}
+
+.desk-info {
+    font-size: 1.8vw;
+    margin-top: 0.2vh;
+    color: #A2A0A1;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+/* Footer / Pagination */
+.footer-bar {
+    height: 4vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ffffff;
+    opacity: 0.6;
+    font-size: 1vw;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}

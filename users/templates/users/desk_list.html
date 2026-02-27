@@ -1,0 +1,45 @@
+{% extends 'app/dashboard/base_dashboard.html' %}
+
+{% block page_title %}Desks (Stoiki){% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Desks List</h2>
+        <a href="{% url 'desk_add' %}" class="btn btn-primary">+ Add Desk</a>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Desk Number</th>
+                    <th>Sky Priority</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for desk in desks %}
+                <tr>
+                    <td style="font-weight: 600;">{{ desk.stoiki }}</td>
+                    <td>
+                        {% if desk.sky_priority %}
+                            <span class="badge badge-success">Yes</span>
+                        {% else %}
+                            <span class="badge badge-warning">No</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'desk_edit' desk.pk %}" style="color: var(--accent-color); text-decoration: none;">Edit</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" style="text-align: center; padding: 20px;">No desks found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

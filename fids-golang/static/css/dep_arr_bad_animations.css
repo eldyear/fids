@@ -1,0 +1,402 @@
+body {
+    /* width: 100vw;
+    height: 100vh; */
+    font-family: 'Montserrat', sans-serif; /* Везде шрифт Montserrat */
+    background-color: #151a1d; /* Темная тема */
+    background-image: url('../images/arnament.svg');
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* Это свойство фиксирует фон относительно окна просмотра */
+    background-position: right bottom; /* Позиционирует фон в правый нижний угол */
+    /* Или можно использовать: background-position: 100% 100%; */
+    background-size: 50em;
+    margin: 0;
+    padding: 0;
+
+}
+
+.roboto-light {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    margin: 0;
+    padding: 0;
+  }
+
+.roboto-bold {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    color: #fff !important;
+    font-size: 30px;
+    padding: 0;
+    margin: 0;
+}
+
+
+
+table {
+    width: 100vw;
+    /* height: 100vh; */
+    border-collapse: collapse;
+    text-align: center;
+    margin: 0 auto;
+    border: 0;
+
+}
+
+thead{
+    background-color: #151a1d;
+}
+
+tbody td {
+    height: 18px !important; /* Высота строк в tbody */
+    /* font-size: clamp(0.1em, 0.6em + 0.9rem, 14rem); */
+    font-size: 1.7em;
+    max-width: 350px;
+    /* border-color: #393939; */
+    
+
+}
+.dep-arr-body tbody td {
+    /* font-size: clamp(0.1em, 0.6em + 0.9rem, 14rem); */
+    font-size: 1.9vh;
+    
+
+}
+
+
+td > div {
+    display: block; /* Убираем лишние отступы */
+    margin: 0; /* Убираем внешние отступы */
+    padding: 0; /* Убираем внутренние отступы */
+  }
+
+th, td {
+    margin-left: 30px;
+    margin-right: 30px;
+    height: 42px; /* Увеличенная высота строк для вылета и прилета */
+    max-width: 350px;
+    padding: 0;
+}
+
+.dep-arr-body th, .dep-arr-body td {
+    margin-left: 30px;
+    margin-right: 30px;
+    height: 20px; /* Увеличенная высота строк для вылета и прилета */
+    max-width: 350px;
+    padding: 0;
+    font-size: 2vh;
+}
+
+th {
+    /* border: 2px solid #393939;
+    border-bottom: 10px solid #393939; */
+    color: #A2A0A1;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: clamp(0.1em, 0.9em + 0.9rem, 14rem);
+    margin-left: 40px;
+    width: 14vw;
+}
+
+.depart {
+    font-size: clamp(0.2em, 3vw + 1rem, 14rem);
+    color: #F1C14B;
+    display: flex;
+    justify-content: center;
+    margin-left: -40px;
+}
+
+.depart-text {
+    margin-left: 20px;
+}
+
+.depart-logo {
+    height: 8vh;
+}
+
+#current-date-ru, #current-date-ky, #current-date-en, #current-time-ru, #current-time-ky, #current-time-en {
+    /* font-weight: bold; */
+    color: #A2A0A1; /* Белый текст для текущей даты и времени */
+}
+
+.hidden {
+    display: none;
+}
+
+/* Стилизация для полосатой таблицы */
+tbody tr:nth-child(even) {
+    background-color: #20272c !important; /* Цвет для четных строк */
+    color: #A2A0A1 !important; /* Цвет текста для четных строк */
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #2d373e !important; /* Цвет для нечетных строк */
+    color: #fff !important; /* Цвет текста для нечетных строк */
+}
+
+.align-right {
+    padding-left: 0px;
+}
+
+#status-cell {
+    text-align: left;
+
+}
+
+.table-bar {
+    background-color: #151a1d !important;
+    border: 3px solid #151a1d;
+    border-top: 6px solid #151a1d;
+    border-bottom: 6px solid #151a1d;
+}
+
+.table-header th {
+    background-color: #20272c !important;
+    border: 3px solid #151a1d;
+    border-top: 6px solid #151a1d;
+    border-bottom: 10px solid #151a1d;
+}
+
+.second-text {
+    font-size: 35px;
+}
+
+.first-text {
+    font-size: 40px;
+}
+
+#table-body-ru{
+    background-image: url('arnament.svg');
+}
+#table-body-ky{
+    background-image: url('arnament.svg');
+}
+#table-body-en{
+    background-image: url('arnament.svg');
+}
+
+#top-header {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+#bttm {
+    padding-bottom: 40px !important;
+    margin-bottom: 40px !important;
+}
+
+.text-right {
+    text-align: right !important;
+    padding-right: 20px !important;
+}
+
+.text-left {
+    text-align: left !important;
+    padding-left: 20px !important;
+}
+
+.logo {
+    max-width: 190px;
+    width: auto;
+    max-height: 4.1vh;
+    display: block;
+    
+    
+}
+
+.dep-arr-logo {
+    height: 5vh;
+    margin: 5px;
+}
+
+.logo-container {
+    height: 4.5vh;
+    width: 200px;
+    background-color: #fff;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    margin-left: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dep-arr-logo-container {
+    height: 3vh;
+    width: 130px;
+    background-color: #fff;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    margin-left: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dep-arr-airline-logo {
+    max-width: 120px;
+    width: auto;
+    max-height: 2.5vh;
+    display: block;
+    
+    
+}
+
+.weather-icon{
+    width: 50px;
+    height: auto;
+}
+
+/* .row {
+    max-width: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-left: 10px;
+    margin-right: 10px;
+} */
+
+  
+  .remark {
+    display: flex;
+    justify-content: flex-end;
+    align-items: baseline;
+  }
+
+  /* STATUS */
+  .statusdiv {
+    width: 360px;
+    height: 4vh;
+    margin: 5px;
+    /* margin-left: 100px; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    
+}
+
+.DELAYED {
+    background-color: #ff4d4d;
+    color: white;
+    font-weight: bold;
+}
+
+.BOARDING {
+    background-color: #ffcc00;
+    color: black;
+    font-weight: bold;
+}
+
+.CHECK-IN {
+    background-color: #16af56;
+    color: white;
+    font-weight: 600;
+}
+
+.DEPARTED {
+    background-color: #3498db;
+    color: white;
+    font-weight: bold;
+}
+
+.ARRIVED {
+    background-color: #3498db;
+    color: white;
+    font-weight: bold;
+}
+
+.CANCELLED {
+    background-color: #555;
+    color: white;
+    font-weight: bold;
+}
+
+.DEFAULT {
+    background-color: #ddd;
+    color: black;
+    font-weight: bold;
+}
+
+.ASAP {
+    background-color: #ddd;
+    color: black;
+    font-weight: bold;
+}
+
+
+
+
+#connectionStatus {
+    position: absolute;
+    right: 1vw;
+    bottom: 1vh;
+    color: #696868;
+}
+
+.info-box {
+    width: 50%;
+}
+
+#colAirline {
+    width: 13%;
+}
+
+#colFlight {
+    width: 10%;
+}
+
+#colDestination {
+    width: 23%;
+}
+
+#colDate {
+    width: 10%;
+}
+
+
+/* --- Стили для Анимации "Волна/Рябь" --- */
+
+/* Контейнер в ячейке, который обернет символы */
+.animated-text-container {
+    /* Важно для предотвращения скачков строки при трансформации */
+    display: inline-block; 
+    white-space: nowrap;
+    overflow: hidden; 
+    /* Высота, основанная на текущем font-size */
+    height: 1.2em; 
+}
+
+/* Стили для каждого символа */
+.char-span {
+    display: inline-block;
+    /* Наследуем базовый размер, но делаем жирнее для контраста */
+    font-weight: 600; 
+    /* Настраиваем плавность всех трансформаций */
+    transition: all 0.2s ease-out; 
+    transform: translateY(0) scale(1); /* Стабильное состояние */
+    opacity: 1;
+}
+
+/* Класс, который JS будет добавлять для запуска эффекта */
+.char-span.wave-active {
+    /* Можно использовать любой яркий цвет, чтобы привлечь внимание */
+    color: #F1C14B; 
+    /* Поднимаем и немного увеличиваем (эффект "тык") */
+    transform: translateY(-5px) scale(1.1); 
+    opacity: 0.8;
+}
+
+/* Сброс стилей для td, чтобы текст корректно работал с анимацией */
+.dep-arr-body tbody td, tbody td {
+    padding: 0 10px; /* Добавляем небольшой внутренний отступ для эстетики */
+    text-align: center; /* Центрируем содержимое в ячейках */
+}
+
+/* Убираем лишние стили для логотипов, если они мешают */
+td > div.logo-container {
+    margin: 0 auto;
+    /* Убедитесь, что логотип не влияет на выравнивание текста */
+}

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отображение Значения</title>
+    <style>
+        /* Стили для страницы с выводом */
+        html {
+            width: 100vw;
+            height: 98vh;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 98vh;
+            background-color: #e0f7fa;
+            overflow: hidden;
+            background-color: #0e4d92;
+        }
+
+        .logo {
+            height: 15vh;
+        }
+        
+        .sky {
+            width: 100vw;
+            height: auto;
+            margin-bottom: 40px;
+        }
+        
+        .sky-container {
+            width: 100vw;
+            height: 98vh;
+            z-index: -1;
+            display: flex;
+            align-items: end;
+        }
+
+        .output-text {
+            font-size: 10vh;
+            color: #ffffff;
+            margin: 0px;
+        }
+        .output-text2 {
+            font-size: 15vh;
+            color: #ffffff;
+            margin: 0px;
+        }
+
+        .number {
+            color: #e0f7fa;
+            font-size: 180px;
+
+        }
+
+        .header {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0px;
+            text-align: end;
+            width: 95vw;
+            height: 20vh;
+            /* z-index: -2; */
+        }
+    </style>
+</head>
+<body>
+    <!-- Логотип -->
+    <div class="header">
+        <img src="../../../media/airline_logos/svg/SU.svg" alt="Логотип" class="logo">
+        <h1 class="number">20</h1>
+    </div>
+    
+    <!-- Отображение значения -->
+    <p class="output-text" id="output-text"></p>
+    <p class="output-text2" id="output-text-2"></p> <!-- Новое поле для второго значения -->
+
+    <div class="sky-container">
+        <img src="../../../media/airline_logos/svg/Sky.png" alt="Логотип" class="sky">
+    </div>
+
+    <script>
+        // Получаем значения из sessionStorage и выводим их
+        const displayValue = sessionStorage.getItem("displayValue");
+        const displayValue2 = sessionStorage.getItem("displayValue2");
+    
+        if (displayValue) {
+            document.getElementById("output-text").innerText = displayValue;
+        } else {
+            document.getElementById("output-text").innerText = "Нет данных для отображения.";
+        }
+    
+        if (displayValue2) {
+            document.getElementById("output-text-2").innerText = displayValue2;
+        } else {
+            document.getElementById("output-text-2").innerText = "Нет второго значения для отображения.";
+        }
+    </script>
+    
+</body>
+</html>

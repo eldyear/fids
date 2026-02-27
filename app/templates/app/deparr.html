@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="3600">
+    <title>Flight Information</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        .iframe-container {
+            display: flex;
+            overflow: hidden;
+        }
+        .iframe-section {
+            width: 50vw; /* Установим ширину для равномерного размещения */
+            height: 100vh; /* Устанавливаем высоту для полноэкранного отображения */
+            border: none; 
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="iframe-container">
+        <!-- Замените URL ниже на нужные страницы -->
+        <iframe src="/iframe_dep"  class="iframe-section" title="Вылеты"></iframe>
+        <iframe src="/iframe_arr/" class="iframe-section" title="Прилеты"></iframe>
+    </div>
+</body>
+</html>

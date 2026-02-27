@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Диспетчерское Табло: Актуальные Рейсы</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #23243a 0%, #181c2b 100%);
+            color: #f3f6fa;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        body::before, body::after {
+            content: "";
+            position: absolute;
+            z-index: 0;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.18;
+            pointer-events: none;
+        }
+        body::before {
+            width: 520px;
+            height: 520px;
+            left: -180px;
+            top: 0;
+            background: radial-gradient(circle, #2ecc71 0%, #23243a 80%);
+        }
+        body::after {
+            width: 420px;
+            height: 420px;
+            right: -120px;
+            bottom: -80px;
+            background: radial-gradient(circle, #3498db 0%, #23243a 80%);
+        }
+        
+        /* Headers */
+        .column-header {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+        }
+        .header-dep { color: #E9B13F; border-bottom: 2px solid #E9B13F; }
+        .header-arr { color: #3498db; border-bottom: 2px solid #3498db; }
+
+        main {
+            display: flex;
+            flex-direction: row; /* Horizontal split */
+            width: 100vw;
+            height: 100vh;
+            padding: 20px;
+            gap: 20px;
+            box-sizing: border-box;
+            z-index: 1;
+            position: relative;
+        }
+
+        .column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(35,36,58,0.3);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .list-container {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-grow: 1;
+        }
+
+        /* Flight Item Styles */
+        .flight-item {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: rgba(35,36,58,0.55);
+            box-shadow: 0 2px 8px 0 rgba(0,0,0,0.18);
+            border: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.95em;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-sizing: border-box;
+        }
+        
+        .flight-card-content {
+            display: grid;
+            grid-template-columns: 80px 60px 1fr 120px;
+            align-items: center;
+            width: 100%;
+            gap: 15px;
+        }
+
+        .flight-number-main {
+            font-size: 1.3em;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .flight-time-badge {
+            background: #2ecc71;
+            color: #23243a;
+            font-weight: 700;
+            border-radius: 4px;
+            padding: 4px 8px;
+            text-align: center;
+        }
+
+        .flight-destination-main {
+            font-size: 1em;
+            font-weight: 600;
+            color: #7ed6a7;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .flight-status-badge {
+            font-size: 0.9em;
+            font-weight: 700;
+            border-radius: 4px;
+            padding: 4px 8px;
+            text-align: center;
+            background: #2ecc71;
+            color: #23243a;
+        }
+        .flight-status-badge.status-orange {
+            background: #f39c12;
+            color: #fff;
+        }
+
+        /* Animations */
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .new-arrival { animation: fadeInOut 0.5s ease-out forwards; border: 1px solid #2ecc71; }
+
+        @keyframes blink-border {
+            0%, 100% { border-color: transparent; }
+            50% { border-color: #f39c12; box-shadow: 0 0 10px rgba(243, 156, 18, 0.5); }
+        }
+        .blink { animation: blink-border 1s infinite; }
+
+        /* Control Panel */
+        .control-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1099;
+            background: rgba(30, 36, 56, 0.97);
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.3;
+            transition: opacity 0.3s;
+        }
+        .control-panel:hover { opacity: 1; }
+        
+        /* Modal */
+        #soundPromptOverlay {
+            position: fixed; z-index: 2000; left: 0; top: 0; right: 0; bottom: 0;
+            width: 100vw; height: 100vh; background: rgba(24,28,43,0.95);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .sound-prompt-modal {
+            background: #23243a; padding: 40px; border-radius: 12px; text-align: center;
+        }
+        button { padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; }
+        #enableSoundBtn { background: #2ecc71; color: #1e2e1e; }
+        #disableSoundBtn { background: #e74c3c; color: #fff; }
+
+    </style>
+</head>
+<body>
+
+    <main>
+        <div class="column">
+            <div class="column-header header-dep">Вылеты (Departures)</div>
+            <ul id="departuresList" class="list-container">
+                <!-- Departures injected here -->
+            </ul>
+        </div>
+        <div class="column">
+            <div class="column-header header-arr">Прилеты (Arrivals)</div>
+            <ul id="arrivalsList" class="list-container">
+                <!-- Arrivals injected here -->
+            </ul>
+        </div>
+    </main>
+
+    <div class="control-panel">
+        <label>Звук <input type="checkbox" id="toggleSound" checked></label>
+        <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.7" style="width: 80px;">
+    </div>
+
+    <!-- Sound Prompt -->
+    <div id="soundPromptOverlay">
+      <div class="sound-prompt-modal">
+        <h2>Включить звук уведомлений?</h2>
+        <div style="display: flex; gap: 20px; justify-content: center; margin-top: 20px;">
+          <button id="enableSoundBtn">Да</button>
+          <button id="disableSoundBtn">Нет</button>
+        </div>
+      </div>
+    </div>
+
+    <audio id="notificationSound" src="/go/static/notification.mp3" preload="auto"></audio> 
+
+    <script>
+        const departuresList = document.getElementById('departuresList');
+        const arrivalsList = document.getElementById('arrivalsList');
+        const notificationSound = document.getElementById('notificationSound');
+        const toggleSoundButton = document.getElementById('toggleSound');
+        const volumeSlider = document.getElementById('volumeSlider');
+
+        let isSoundEnabled = true;
+        let previousFlightsMap = {};
+        let ws;
+        let reconnectTimeout = null;
+        let isInitialData = true;
+
+        notificationSound.volume = parseFloat(volumeSlider.value);
+        volumeSlider.addEventListener('input', () => notificationSound.volume = parseFloat(volumeSlider.value));
+        toggleSoundButton.addEventListener('change', () => isSoundEnabled = toggleSoundButton.checked);
+
+        function playNotificationSound() {
+            if (isSoundEnabled) notificationSound.play().catch(()=>{});
+        }
+
+        function createFlightItem(flight, isNew, shouldBlink) {
+            const li = document.createElement('li');
+            li.className = 'flight-item';
+            if (isNew && !isInitialData) li.classList.add('new-arrival');
+            if (shouldBlink) li.classList.add('blink');
+
+            const time = flight.time1 ? (flight.time1.includes('T') ? flight.time1.substr(11,5) : flight.time1.substr(0,5)) : '--:--';
+            const dest = flight.destination.name_ru || flight.destination.name_en;
+            const status = flight.status.name_ru || flight.status.name_en;
+            
+            // Status Color Logic
+            let statusClass = '';
+            const statusEn = (flight.status.name_en || '').toUpperCase();
+            if (statusEn.includes('BOARDING') || statusEn.includes('LAST CALL')) statusClass = 'status-orange';
+            
+            li.innerHTML = `
+                <div class="flight-card-content">
+                    <div class="flight-number-main">${flight.flight}</div>
+                    <div class="flight-time-badge">${time}</div>
+                    <div class="flight-destination-main">${dest}</div>
+                    <div class="flight-status-badge ${statusClass}">${status}</div>
+                </div>
+            `;
+            return li;
+        }
+
+        function updateDisplay(flights) {
+            const newFlightsMap = {};
+            let alertTriggered = false;
+            
+            const depHTML = document.createDocumentFragment();
+            const arrHTML = document.createDocumentFragment();
+            
+            // Sort by time
+            flights.sort((a,b) => (a.time1 || '').localeCompare(b.time1 || ''));
+
+            flights.forEach(f => {
+                // FILTER: Only show active/relevant statuses
+                const statusEn = (f.status.name_en || '').toUpperCase();
+                const statusRu = (f.status.name_ru || '').toUpperCase();
+                
+                // Active Keywords
+                const isActive = 
+                    statusEn.includes('CHECK-IN') || 
+                    statusEn.includes('BOARDING') || 
+                    statusEn.includes('LAST CALL') || 
+                    statusEn.includes('DELAY') || 
+                    statusEn.includes('CANCEL') || 
+                    statusEn.includes('LANDED') ||
+                    statusEn.includes('ARRIVED') ||
+                    statusRu.includes('РЕГИСТ') ||
+                    statusRu.includes('ПОСАДКА') ||
+                    statusRu.includes('ЗАДЕРЖ') ||
+                    statusRu.includes('ОТМЕН') ||
+                    statusRu.includes('ПРИБЫЛ') ||
+                    statusRu.includes('ПРИЗЕМЛИЛСЯ');
+
+                // Exclude if mostly "Scheduled" / "On Time" / "Departed" (unless delayed)
+                if (!isActive) return;
+
+                newFlightsMap[f.id] = f;
+                
+                // Diff logic
+                const prev = previousFlightsMap[f.id];
+                const isNew = !prev;
+                
+                // Check if status changed to critical
+                const isBoarding = statusEn.includes('BOARDING') || statusEn.includes('LAST CALL');
+                const prevBoarding = prev && (prev.status.name_en.toUpperCase().includes('BOARDING') || prev.status.name_en.toUpperCase().includes('LAST CALL'));
+                
+                let shouldBlink = isBoarding;
+                
+                // Sound logic: New flight OR Status changed to Boarding
+                if (!isInitialData) {
+                    if (isNew || (isBoarding && !prevBoarding)) {
+                        alertTriggered = true;
+                    }
+                }
+
+                const item = createFlightItem(f, isNew, shouldBlink);
+                
+                if (f.direction === 'dep') {
+                    depHTML.appendChild(item);
+                } else {
+                    arrHTML.appendChild(item);
+                }
+            });
+
+            departuresList.innerHTML = '';
+            arrivalsList.innerHTML = '';
+            departuresList.appendChild(depHTML);
+            arrivalsList.appendChild(arrHTML);
+            
+            // Show "No Active Flights" if empty
+            if (departuresList.children.length === 0) {
+                 departuresList.innerHTML = '<li class="flight-item"><div class="flight-info" style="opacity:0.5">Нет активных уведомлений</div></li>';
+            }
+            if (arrivalsList.children.length === 0) {
+                 arrivalsList.innerHTML = '<li class="flight-item"><div class="flight-info" style="opacity:0.5">Нет активных уведомлений</div></li>';
+            }
+
+            previousFlightsMap = newFlightsMap;
+            if (alertTriggered) playNotificationSound();
+            if (flights.length > 0) isInitialData = false;
+        }
+
+        function connectWebSocket() {
+            ws = new WebSocket('ws://' + window.location.host + '/go/ws/dispatcher');
+            ws.onopen = () => console.log('Connected');
+            ws.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                if (Array.isArray(data)) updateDisplay(data);
+                else if (data.type === 'notification') playNotificationSound();
+            };
+            ws.onclose = () => setTimeout(connectWebSocket, 3000);
+        }
+
+        // Modal Logic
+        const overlay = document.getElementById('soundPromptOverlay');
+        document.getElementById('enableSoundBtn').onclick = () => {
+            isSoundEnabled = true;
+            toggleSoundButton.checked = true;
+            overlay.style.display = 'none';
+            playNotificationSound();
+            connectWebSocket();
+        };
+        document.getElementById('disableSoundBtn').onclick = () => {
+            isSoundEnabled = false;
+            toggleSoundButton.checked = false;
+            overlay.style.display = 'none';
+            connectWebSocket();
+        };
+
+    </script>
+</body>
+</html>

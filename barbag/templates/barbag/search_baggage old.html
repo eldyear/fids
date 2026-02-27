@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Поиск багажа</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        h1, h2 {
+            margin: 0;
+            margin-bottom: 10px;
+        }
+        .container {
+            /* display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; */
+            width: 40%;
+            border: 1px solid #000;
+            padding: 10px;
+            margin-bottom: 20px;
+            /* margin-left: 30%; */
+        }
+        .header {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #000;
+        }
+        label {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        input[type="text"] {
+            padding: 5px;
+            border: 1px solid #000;
+            flex-grow: 1;
+        }
+        button {
+            padding: 5px 10px;
+            background-color: #eee;
+            color: #000;
+            border: 1px solid #000;
+            cursor: pointer;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            border: 1px solid #000;
+            margin: 0;
+        }
+        li {
+            padding: 8px;
+            border-bottom: 1px solid #000;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        p.error {
+            color: red;
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid red;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        .back-button {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 5px 10px;
+            border: 1px solid #000;
+            text-decoration: none;
+            color: #000;
+            background-color: #eee;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        Программный комплекс "Управление багажом"
+    </div>
+    <div class="container">
+        <h1>Поиск багажа по части штрихкода</h1>
+
+        <form method="get" action="{% url 'search_baggage' %}">
+            <label for="barcode">Введите часть штрихкода багажа:</label>
+            <input type="text" id="barcode" name="barcode" value="{{ search_query }}">
+            <button type="submit">Найти</button>
+        </form>
+
+        {% if search_query and not baggage_list %}
+            <p class="error">Багаж с таким штрихкодом не найден.</p>
+        {% endif %}
+
+        {% if baggage_list %}
+            <h2>Результаты поиска ({{ baggage_list|length }}):</h2>
+            <ul>
+            {% for bag in baggage_list %}
+                <li>
+                    Штрихкод: **{{ bag.barcode }}**<br>
+                    Контейнер: **{{ bag.container.barcode }}**<br>
+                    Рейс: **{{ bag.container.flight.flight_num }}**<br>
+                    Пункт назначения: **{{ bag.container.flight.destination }}**<br>
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+
+        <p><a href="{% url 'flight_list' %}" class="back-button">Вернуться к списку рейсов</a></p>
+    </div>
+</body>
+</html>

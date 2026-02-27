@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Шаблоны суточного плана{% endblock %}
+
+{% block page_header %}Шаблоны суточного плана{% endblock %}
+
+{% block content %}
+
+<!-- Кнопка для добавления нового шаблона -->
+<div class="flight-template-add">
+    <a href="{% url 'flight_template_add' %}" class="btn btn-success">Добавить новый шаблон</a>
+</div>
+
+<!-- Таблица с шаблонами -->
+<table class="table">
+    <thead>
+        <tr>
+            <th>Направление</th>
+            <th>Рейс</th>
+            <th>Сезон</th>
+            <th>Дни вылета</th>
+            <th>Время</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for template in flight_templates %}
+        <tr>
+            <td>{{ template.get_direction_display }}</td>
+            <td>{{ template.flight }}</td>
+            <td>{{ template.season_start }} - {{ template.season_end }}</td>
+            <td>{{ template.weekdays }}</td>
+            <td>{{ template.time }}</td>
+            <td class="row action-td">
+                <form action="{% url 'flight_template_delete' template.pk %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger"></button>
+                </form>
+                <a href="{% url 'flight_template_edit' template.pk %}" class="btn-edit"></a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Пагинация -->
+<div class="pagination">
+    <span class="step-links">
+        {% if flight_templates.has_previous %}
+            <a href="?page=1">&laquo; первая</a>
+            <a href="?page={{ flight_templates.previous_page_number }}"><</a>
+        {% endif %}
+
+        <span class="current">
+            Страница {{ flight_templates.number }} из {{ flight_templates.paginator.num_pages }}
+        </span>
+
+        {% if flight_templates.has_next %}
+            <a href="?page={{ flight_templates.next_page_number }}">></a>
+            <a href="?page={{ flight_templates.paginator.num_pages }}">последняя &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+{% endblock %}

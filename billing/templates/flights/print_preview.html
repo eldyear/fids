@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Техническая карта рейса {{ flight.flight_num }}</title>
+    <style>
+        /* Загружаем обычную версию шрифта */
+        @font-face {
+            font-family: 'DejaVu Sans';
+            src: url("/static/fonts/DejaVuSans.ttf");
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        /* Загружаем жирную версию шрифта */
+        @font-face {
+            font-family: 'DejaVu Sans';
+            src: url("/static/fonts/DejaVuSans-Bold.ttf");
+            font-weight: bold;
+            font-style: normal;
+        }
+
+        body { font-family: 'DejaVu Sans', sans-serif; font-size: 12px; background-color:rgb(42, 44, 48);}
+        .header { text-align: center; margin-bottom: 15px; }
+        .header h1 { font-size: 18px; margin-bottom: 5px; }
+        .header h3 { font-size: 14px; margin-bottom: 0; }
+
+        /* Стиль для таблицы деталей рейса в формате "сетки" */
+        .details-grid-table { width: 100%; border-collapse: collapse; margin-bottom: 5px;}
+        .details-grid-table th, .details-grid-table td {
+            padding: 2px 8px;
+            text-align: left;
+            vertical-align: top;
+            border: none;
+        }
+        /* Стиль для названий */
+        .details-grid-table th { font-weight: normal; }
+        /* Стиль для значений */
+        .details-grid-table td { font-weight: bold; }
+
+        /* Стиль для таблицы услуг */
+        .service-table { width: 100%; border-collapse: collapse; margin-bottom: 2px; }
+        .service-table th, .service-table td {
+            border: 1px solid #000000;
+            padding: 2px;
+            text-align: left;
+        }
+        .service-table-secondary {
+            text-align: center;
+        }
+        .service-table th { background-color: #f2f2f2; }
+
+        .total-cost { text-align: right; font-size: 14px; font-weight: bold; margin-top: 10px; }
+
+        .container {
+            background-color: #ffffff;
+            width: 210mm;
+            height: 297mm;
+            margin-left: 32vw;
+            margin-top: 5vh;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    
+
+    <div class="container">
+        <div class="header">
+            <h1>Техническая карта</h1>
+            <h3>{{ flight.airline.name|default:"-" }} ({{ flight.airline.code|default:"-" }}) от {{ flight.date|date:"d.m.Y" }}</h3>
+        </div>
+    
+        <table class="details-grid-table">
+            <tbody>
+                <tr>
+                    <th style="width: 25%;">Номер рейса:</th>
+                    <th style="width: 25%;">Аэропорт:</th>
+                    <th style="width: 25%;">Тип ВС:</th>
+                    <th style="width: 25%;">Бортовой номер:</th>
+                </tr>
+                <tr>
+                    <td>{{ flight.flight_num }} ⇆ {{ flight.linked_flight.flight_num|default:"-" }}</td>
+                    <td>{{ flight.dep_airport.code }} → {{ flight.arr_airport.code }}</td>
+                    <td>{{ flight.aircraft_type|default:"-" }}</td>
+                    <td>{{ flight.board_num|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <th>Макс. взлетная масса:</th>
+                    <th>Стоянка:</th>
+                    <th>Дата рейса:</th>
+                    <th>Дата ⇆ рейса:</th>
+                </tr>
+                <tr>
+                    <td>{{ flight.linked_flight.max_takeoff_weight|default:"-" }}</td>
+                    <td>{{ flight.stand|default:"-" }}</td>
+                    <td>{{ flight.date|date:"d.m.Y" }}</td>
+                    <td>{{ flight.linked_flight.date|date:"d.m.Y" }}</td>
+                </tr>
+                <tr>
+                    <th>Время П/П:</th>
+                    <th>Время П/Ф:</th>
+                    <th>Время В/П:</th>
+                    <th>Время В/Ф:</th>
+                </tr>
+                <tr>
+                    <td>{{ flight.time|default:"-" }}</td>
+                    <td>{{ flight.actual_time|default:"-" }}</td>
+                    <td>{{ flight.linked_flight.time|default:"-" }}</td>
+                    <td>{{ flight.linked_flight.actual_time|default:"-" }}</td>
+                </tr>
+            </tbody>
+        </table>
+    
+        <table class="service-table">
+            <thead>
+                <tr>
+                    <th style="text-align: center; width: 300px;">Тип услуги</th>
+                    <th style="text-align: center; width: 60px;">Время нач.</th>
+                    <th style="text-align: center; width: 60px;">Время кон.</th>
+                    <th style="text-align: center; width: 60px;">Кол-во</th>
+                    <th style="text-align: center; width: 50px;">Ед. изм.</th>
+                    <th style="text-align: center; width: 200px;">Описание</th>
+                    {% if is_finance %}
+                    <th style="text-align: center;">Цена за ед.</th>
+                    <th style="text-align: center;">Итого</th>
+                    {% endif %}
+                </tr>
+    </thead>
+    <tbody>
+                {% for service in services %}
+                <tr>
+                    <td>{{ service.service_type.name }}</td>
+                    <td style="text-align: center;">{{ service.start_time|date:"H:i"|default:"-" }}</td>
+                    <td style="text-align: center;">{{ service.end_time|date:"H:i"|default:"-" }}</td>
+                    <td style="text-align: center;">{{ service.quantity }}</td>
+                    <td style="text-align: center;">{{ service.unit_of_measure|default:"-" }}</td>
+                    <td style="text-align: center;">{{ service.description|default:"-" }}</td>
+                    {% if is_finance %}
+                    <td style="text-align: center;">{{ item.price_per_unit|floatformat:2 }} руб.</td>
+                    <td style="text-align: center;">{{ item.service_total_cost|floatformat:2 }} руб.</td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    
+        {% if is_finance %}
+        <p class="total-cost">Общая стоимость: {{ total_cost|floatformat:2 }} руб.</p>
+        {% endif %}
+    
+        <table style="width: 30%; margin-top: 50px; border-collapse: collapse;">
+            <tr>
+                <td style="width: 50%; vertical-align: top;">
+                    <div style="font-weight: normal; margin-bottom: 5px;">Ответственный:</div>
+                    <div style="font-weight: bold;">{{ current_user_name }}</div>
+                </td>
+                <td style="width: 50%; text-align: right; vertical-align: top;">
+                    <div style="font-weight: normal; margin-bottom: 5px;">Подпись:</div>
+                    {% if signature_url %}
+                        <img src="{{ signature_url }}" alt="Подпись пользователя" style="height: 40px; width: auto; margin-top: -10px;">
+                    {% else %}
+                        <div style="margin-top: 10px;">_____________</div>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    {% comment %} <script>
+        window.onload = function() {
+            // Вызываем окно печати после загрузки страницы
+            window.print();
+        };
+
+        // Этот код сработает после того, как пользователь закроет диалог печати
+        window.onafterprint = function() {
+            // Закрываем текущее окно (то есть окно печати)
+            window.close();
+        };
+    </script> {% endcomment %}
+
+</body>
+</html>

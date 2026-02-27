@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration Desk <span id="deskNumber"></span></title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .lang-switcher {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 14px;
+            color: #666;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        #flightInfo {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .flight-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        
+        .airline-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .airline-logo {
+            width: 60px;
+            height: 60px;
+            margin-right: 15px;
+        }
+        
+        .flight-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .destination-info {
+            text-align: right;
+        }
+        
+        .destination-city {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .destination-iata {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .details-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        
+        .detail-block {
+            flex: 1;
+            padding: 0 10px;
+        }
+        
+        .detail-title {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .weather-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .weather-icon {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .status {
+            color: #2a7f2a;
+            font-weight: bold;
+        }
+        
+        .counters {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .sky-priority-logo {
+            height: 30px;
+            margin-left: 10px;
+        }
+        
+        .error-message {
+            color: red;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-switcher">
+        <span id="currentLangLabel">Текущий язык:</span> <span id="currentLang">ru</span>
+    </div>
+    
+    <h1 id="mainHeader">Registration Desk <span id="deskNumber"></span></h1>
+    <div id="flightInfo"></div>
+
+    <script>
+        const translations = {
+            ru: {
+                registrationDesk: "Стойка регистрации",
+                noActiveRegistration: "Нет активной регистрации",
+                direction: "Направление",
+                time: "Время",
+                status: "Статус",
+                counters: "Стойки",
+                weather: "Погода",
+                currentLang: "Текущий язык:",
+                flight: "Рейс",
+                depart: "Вылет",
+                localTime: "Местное время"
+            },
+            en: {
+                registrationDesk: "Registration Desk",
+                noActiveRegistration: "No active registration",
+                direction: "Destination",
+                time: "Time",
+                status: "Status",
+                counters: "Counters",
+                weather: "Weather",
+                currentLang: "Current language:",
+                flight: "Flight",
+                depart: "Depart",
+                localTime: "Local time"
+            },
+            ky: {
+                registrationDesk: "Каттоо столу",
+                noActiveRegistration: "Активдүү каттоо жок",
+                direction: "Багыты",
+                time: "Убакыт",
+                status: "Статус",
+                counters: "Столдор",
+                weather: "Аба ырайы",
+                currentLang: "Учурдагы тил:",
+                flight: "Рейс",
+                depart: "Учуу",
+                localTime: "Жергиликтүү убакыт"
+            }
+        };
+
+        // Получаем номер стойки из URL
+        const pathParts = window.location.pathname.split('/');
+        const deskNumber = pathParts[pathParts.length - 1];
+        document.getElementById('deskNumber').textContent = deskNumber;
+        
+        // Настройки смены языка
+        const langs = ['ru', 'en', 'ky'];
+        let langIndex = 0;
+        let currentLang = 'ru';
+        const LANG_SWITCH_INTERVAL = 15000; // 15 секунд
+        let langTimer;
+
+        function updateLanguage() {
+            langIndex = (langIndex + 1) % langs.length;
+            currentLang = langs[langIndex];
+            document.getElementById('currentLang').textContent = currentLang;
+            document.getElementById('currentLangLabel').textContent = translations[currentLang].currentLang;
+            document.getElementById('mainHeader').textContent = `${translations[currentLang].registrationDesk} ${deskNumber}`;
+            
+            // Обновляем данные, если они уже загружены
+            if (window.lastFlight) {
+                updateFlightInfo(window.lastFlight);
+            }
+        }
+
+        function startLanguageRotation() {
+            clearInterval(langTimer);
+            langTimer = setInterval(updateLanguage, LANG_SWITCH_INTERVAL);
+        }
+
+        function updateFlightInfo(flight) {
+            const flightInfo = document.getElementById('flightInfo');
+            const cityName = flight.destination[`name_${currentLang}`] || flight.destination.name_ru || flight.destination.city_name_ru;
+            const statusName = flight.status?.[`name_${currentLang}`] || flight.status?.name_ru || translations[currentLang].noActiveRegistration;
+            
+            // Проверяем Sky Priority для текущей стойки
+            const isSkyPriority = Array.isArray(flight.stoika) && 
+                flight.stoika.includes(deskNumber) && 
+                flight.stoika.some(s => s.stoiki === deskNumber && s.sky_priority);
+            
+            let weatherHTML = '';
+            if (flight.weather) {
+                weatherHTML = `
+                    <div class="detail-block">
+                        <div class="detail-title">${translations[currentLang].weather}</div>
+                        <div class="detail-value weather-info">
+                            <img src="${flight.weather.icon_url}" alt="Weather icon" class="weather-icon">
+                            <span>${Math.round(flight.weather.temp)}°C</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            flightInfo.innerHTML = `
+                <div class="flight-header">
+                    <div class="airline-info">
+                        <img src="/static/images/airlines/st/${flight.airline}.svg" alt="Airline Logo" class="airline-logo">
+                        <div class="flight-number">${flight.flight}</div>
+                        ${isSkyPriority ? 
+                            `<img src="/static/images/sky_priority.svg" alt="Sky Priority" class="sky-priority-logo">` : ''
+                        }
+                    </div>
+                    <div class="destination-info">
+                        <div class="destination-city">${cityName}</div>
+                        <div class="destination-iata">${flight.destination.iata_code || ''}</div>
+                    </div>
+                </div>
+                
+                <div class="details-container">
+                    <div class="detail-block">
+                        <div class="detail-title">${translations[currentLang].depart}</div>
+                        <div class="detail-value">${formatTime(flight.time1)}</div>
+                    </div>
+                    
+                    <div class="detail-block">
+                        <div class="detail-title">${translations[currentLang].localTime}</div>
+                        <div class="detail-value">${new Date().toLocaleTimeString(currentLang, {hour: '2-digit', minute:'2-digit'})}</div>
+                    </div>
+                    
+                    ${weatherHTML}
+                </div>
+                
+                <div class="counters">
+                    <div class="detail-title">${translations[currentLang].counters}</div>
+                    <div class="detail-value">${Array.isArray(flight.stoika) ? flight.stoika.join(', ') : 'N/A'}</div>
+                </div>
+                
+                <div class="status">${translations[currentLang].status}: ${statusName}</div>
+            `;
+        }
+
+        function formatTime(timeString) {
+            if (!timeString) return '';
+            try {
+                const [hours, minutes] = timeString.split(':');
+                return `${hours}:${minutes}`;
+            } catch (e) {
+                console.error('Error formatting time:', e);
+                return '';
+            }
+        }
+
+        const ws = new WebSocket('ws://' + window.location.host + '/ws/st/' + deskNumber);
+        
+        ws.onmessage = function(event) {
+            try {
+                const flights = JSON.parse(event.data) || [];
+                if (flights.length > 0) {
+                    window.lastFlight = flights[0];
+                    updateFlightInfo(flights[0]);
+                } else {
+                    document.getElementById('flightInfo').innerHTML = 
+                        `<div class="error-message">${translations[currentLang].noActiveRegistration}</div>`;
+                }
+            } catch (e) {
+                console.error("Error processing flight data:", e);
+                document.getElementById('flightInfo').innerHTML = 
+                    `<div class="error-message">Ошибка загрузки данных</div>`;
+            }
+        };
+    
+        ws.onopen = function() {
+            startLanguageRotation();
+        };
+
+        ws.onerror = function(error) {
+            console.error("WebSocket error:", error);
+            document.getElementById('flightInfo').innerHTML = 
+                `<div class="error-message">Ошибка соединения</div>`;
+            clearInterval(langTimer);
+        };
+
+        ws.onclose = function() {
+            clearInterval(langTimer);
+        };
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('currentLangLabel').textContent = translations[currentLang].currentLang;
+            document.getElementById('currentLang').textContent = currentLang;
+            updateLanguage();
+        });
+    </script>
+</body>
+</html>

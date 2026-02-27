@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Departures</title>
+    <link rel="stylesheet" href="static/css/dep_vert.css">
+    <!-- NEW YEAR SURPRISE START -->
+    <link rel="stylesheet" href="static/css/newyear.css">
+    <script src="static/js/newyear.js" defer></script>
+    <!-- NEW YEAR SURPRISE END -->
+</head>
+<body>
+    <div class="header-bar">
+        <div class="title-container">
+            <div class="airport-name">OSS / UCFO</div>
+            <div class="sub-title">Osh Int'l Airport</div>
+        </div>
+        <div class="page-title depart-title">DEPARTURES</div>
+        <div class="time-container">
+            <div class="current-time" id="clock">00:00</div>
+            <div class="current-date" id="date">--.--.----</div>
+        </div>
+    </div>
+
+    <div class="flights-container" id="flightsContainer">
+        <!-- Flight Cards injected by JS -->
+    </div>
+
+    <div class="footer-bar">
+        <span id="pageInfo">Page 1 of 1</span> | <span id="connectionStatus">Connecting...</span>
+    </div>
+
+    <script src="static/js/dep_vert.js"></script>
+</body>
+</html>

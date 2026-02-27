@@ -1,0 +1,1090 @@
+[
+    {
+        "flightNum": "CZ8007",
+        "direction": "ПРИЛЕТ",
+        "airline": "CZ",
+        "origin": "ZWWW URUMQI (DIWOPU)",
+        "destination": "UCFO OSH",
+        "aircraft": "B738"
+    },
+    {
+        "flightNum": "DP743",
+        "direction": "ПРИЛЕТ",
+        "airline": "DP",
+        "origin": "UUWW MOSCOW :VNUKOVO ART",
+        "destination": "UCFO OSH",
+        "aircraft": "B738"
+    },
+    {
+        "flightNum": "EGY1931",
+        "direction": "ПРИЛЕТ",
+        "airline": "ATI",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "IL76"
+    },
+    {
+        "flightNum": "FV6793",
+        "direction": "ПРИЛЕТ",
+        "airline": "FV",
+        "origin": "UNKL KRASNOYARSK",
+        "destination": "UCFO OSH",
+        "aircraft": "B738"
+    },
+    {
+        "flightNum": "J91655",
+        "direction": "ПРИЛЕТ",
+        "airline": "J9",
+        "origin": "OKKK EL-KUWAIT",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "J9655.",
+        "direction": "ПРИЛЕТ",
+        "airline": "J9",
+        "origin": "OKKK EL-KUWAIT",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "J9655",
+        "direction": "ПРИЛЕТ",
+        "airline": "J9",
+        "origin": "OKKK EL-KUWAIT",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "K1309",
+        "direction": "ПРИЛЕТ",
+        "airline": "K1",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "K1310",
+        "direction": "ПРИЛЕТ",
+        "airline": "K1",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "K1311",
+        "direction": "ПРИЛЕТ",
+        "airline": "K1",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "K9103",
+        "direction": "ПРИЛЕТ",
+        "airline": "K9",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "RJ85"
+    },
+    {
+        "flightNum": "K9103D",
+        "direction": "ПРИЛЕТ",
+        "airline": "K9",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "RJ85"
+    },
+    {
+        "flightNum": "K9107",
+        "direction": "ПРИЛЕТ",
+        "airline": "K9",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "RJ85"
+    },
+    {
+        "flightNum": "K9111",
+        "direction": "ПРИЛЕТ",
+        "airline": "K9",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "MD83"
+    },
+    {
+        "flightNum": "K9117",
+        "direction": "ПРИЛЕТ",
+        "airline": "K9",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "MD83"
+    },
+    {
+        "flightNum": "K9117D",
+        "direction": "ПРИЛЕТ",
+        "airline": "K9",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "RJ85"
+    },
+    {
+        "flightNum": "K9118",
+        "direction": "ПРИЛЕТ",
+        "airline": "K9",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "MD83"
+    },
+    {
+        "flightNum": "K9119",
+        "direction": "ПРИЛЕТ",
+        "airline": "K9",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "MD83"
+    },
+    {
+        "flightNum": "K9151",
+        "direction": "ПРИЛЕТ",
+        "airline": "K9",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "RJ85"
+    },
+    {
+        "flightNum": "K9154",
+        "direction": "ПРИЛЕТ",
+        "airline": "K9",
+        "origin": "UCFD DJALALABAD",
+        "destination": "UCFO OSH",
+        "aircraft": "RJ85"
+    },
+    {
+        "flightNum": "KA113",
+        "direction": "ПРИЛЕТ",
+        "airline": "KA",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "KA224",
+        "direction": "ПРИЛЕТ",
+        "airline": "KA",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "KA556",
+        "direction": "ПРИЛЕТ",
+        "airline": "KA",
+        "origin": "UUWW MOSCOW :VNUKOVO ART",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "KA568",
+        "direction": "ПРИЛЕТ",
+        "airline": "KA",
+        "origin": "USRR SURGUT",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "MN01",
+        "direction": "ПРИЛЕТ",
+        "airline": "MN",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "MN03",
+        "direction": "ПРИЛЕТ",
+        "airline": "MN",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "MN05",
+        "direction": "ПРИЛЕТ",
+        "airline": "MN",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "MN07",
+        "direction": "ПРИЛЕТ",
+        "airline": "MN",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "MN11",
+        "direction": "ПРИЛЕТ",
+        "airline": "MN",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "MN15",
+        "direction": "ПРИЛЕТ",
+        "airline": "MN",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "MN21",
+        "direction": "ПРИЛЕТ",
+        "airline": "MN",
+        "origin": "UCFK KARAKOL",
+        "destination": "UCFO OSH",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "MN41",
+        "direction": "ПРИЛЕТ",
+        "airline": "MN",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "MN41D",
+        "direction": "ПРИЛЕТ",
+        "airline": "MN",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "MN43",
+        "direction": "ПРИЛЕТ",
+        "airline": "MN",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "MN43D",
+        "direction": "ПРИЛЕТ",
+        "airline": "MN",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "N41475",
+        "direction": "ПРИЛЕТ",
+        "airline": "N4",
+        "origin": "USTR TYUMEN",
+        "destination": "UCFO OSH",
+        "aircraft": "B738"
+    },
+    {
+        "flightNum": "PC710",
+        "direction": "ПРИЛЕТ",
+        "airline": "PC",
+        "origin": "LTFJ ISTANBUL SABIHA",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "S75545",
+        "direction": "ПРИЛЕТ",
+        "airline": "S7",
+        "origin": "UNNT NOVOSIBIRSK:TOLMOCHEVO",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "S76327",
+        "direction": "ПРИЛЕТ",
+        "airline": "S7",
+        "origin": "UIII IRKUTSK",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "SU1883",
+        "direction": "ПРИЛЕТ",
+        "airline": "SU",
+        "origin": "UCFL TAMCHY",
+        "destination": "UCFO OSH",
+        "aircraft": "A321"
+    },
+    {
+        "flightNum": "SU1894",
+        "direction": "ПРИЛЕТ",
+        "airline": "SU",
+        "origin": "UUEE MOSCOW :SHEREMETYEVO",
+        "destination": "UCFO OSH",
+        "aircraft": "A321"
+    },
+    {
+        "flightNum": "U62165",
+        "direction": "ПРИЛЕТ",
+        "airline": "U6",
+        "origin": "USSS YEKATERINBURG",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "U62447",
+        "direction": "ПРИЛЕТ",
+        "airline": "U6",
+        "origin": "UUBW ZHUKOVSKY",
+        "destination": "UCFO OSH",
+        "aircraft": "A321"
+    },
+    {
+        "flightNum": "U62513",
+        "direction": "ПРИЛЕТ",
+        "airline": "U6",
+        "origin": "UWKD KAZAN",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "U62519",
+        "direction": "ПРИЛЕТ",
+        "airline": "U6",
+        "origin": "URSS ADLER SOCHI",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "U62705",
+        "direction": "ПРИЛЕТ",
+        "airline": "U6",
+        "origin": "USNN NIZHNEVARTOVSK",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "U62709",
+        "direction": "ПРИЛЕТ",
+        "airline": "U6",
+        "origin": "UUDD MOSCOW :DOMODEDOVO",
+        "destination": "UCFO OSH",
+        "aircraft": "A321"
+    },
+    {
+        "flightNum": "U62733",
+        "direction": "ПРИЛЕТ",
+        "airline": "U6",
+        "origin": "ULLI SAINT-PETERSBURG",
+        "destination": "UCFO OSH",
+        "aircraft": "A321"
+    },
+    {
+        "flightNum": "U62805",
+        "direction": "ПРИЛЕТ",
+        "airline": "U6",
+        "origin": "UNKL KRASNOYARSK",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "U62873",
+        "direction": "ПРИЛЕТ",
+        "airline": "U6",
+        "origin": "USCC CHELYABINSK",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "U62903",
+        "direction": "ПРИЛЕТ",
+        "airline": "U6",
+        "origin": "USSS YEKATERINBURG",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "U62905",
+        "direction": "ПРИЛЕТ",
+        "airline": "U6",
+        "origin": "UWWW SAMARA(KURUMOCH)",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "U62909",
+        "direction": "ПРИЛЕТ",
+        "airline": "U6",
+        "origin": "UUDD MOSCOW :DOMODEDOVO",
+        "destination": "UCFO OSH",
+        "aircraft": "A321"
+    },
+    {
+        "flightNum": "U68319",
+        "direction": "ПРИЛЕТ",
+        "airline": "U6",
+        "origin": "USNN NIZHNEVARTOVSK",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "U68705",
+        "direction": "ПРИЛЕТ",
+        "airline": "U6",
+        "origin": "USNN NIZHNEVARTOVSK",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "U68735",
+        "direction": "ПРИЛЕТ",
+        "airline": "U6",
+        "origin": "USNN NIZHNEVARTOVSK",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "XY699",
+        "direction": "ПРИЛЕТ",
+        "airline": "XY",
+        "origin": "OEJN JEDDAH",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "YK179",
+        "direction": "ПРИЛЕТ",
+        "airline": "YK",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "YK181",
+        "direction": "ПРИЛЕТ",
+        "airline": "YK",
+        "origin": "UCFM BISHKEK(MANAS)",
+        "destination": "UCFO OSH",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "YK4026",
+        "direction": "ПРИЛЕТ",
+        "airline": "YK",
+        "origin": "OMSJ SHARJAH",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "YK748",
+        "direction": "ПРИЛЕТ",
+        "airline": "YK",
+        "origin": "UUDD MOSCOW :DOMODEDOVO",
+        "destination": "UCFO OSH",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "YK768",
+        "direction": "ПРИЛЕТ",
+        "airline": "YK",
+        "origin": "UNKL KRASNOYARSK",
+        "destination": "UCFO OSH",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "YK770",
+        "direction": "ПРИЛЕТ",
+        "airline": "YK",
+        "origin": "UNNT NOVOSIBIRSK:TOLMOCHEVO",
+        "destination": "UCFO OSH",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "YK778",
+        "direction": "ПРИЛЕТ",
+        "airline": "YK",
+        "origin": "UIII IRKUTSK",
+        "destination": "UCFO OSH",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "YK866",
+        "direction": "ПРИЛЕТ",
+        "airline": "YK",
+        "origin": "USSS YEKATERINBURG",
+        "destination": "UCFO OSH",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "YK882",
+        "direction": "ПРИЛЕТ",
+        "airline": "YK",
+        "origin": "ULLI SAINT-PETERSBURG",
+        "destination": "UCFO OSH",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "YK960",
+        "direction": "ПРИЛЕТ",
+        "airline": "YK",
+        "origin": "UUDD MOSCOW :DOMODEDOVO",
+        "destination": "UCFO OSH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "YK966",
+        "direction": "ПРИЛЕТ",
+        "airline": "YK",
+        "origin": "UUDD MOSCOW :DOMODEDOVO",
+        "destination": "UCFO OSH",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "CZ8008",
+        "direction": "ВЫЛЕТ",
+        "airline": "CZ",
+        "origin": "UCFO OSH",
+        "destination": "ZWWW URUMQI (DIWOPU)",
+        "aircraft": "B738"
+    },
+    {
+        "flightNum": "DP744",
+        "direction": "ВЫЛЕТ",
+        "airline": "DP",
+        "origin": "UCFO OSH",
+        "destination": "UUWW MOSCOW :VNUKOVO ART",
+        "aircraft": "B738"
+    },
+    {
+        "flightNum": "EGY1931",
+        "direction": "ВЫЛЕТ",
+        "airline": "ATI",
+        "origin": "UCFO OSH",
+        "destination": "HECA CAIRO INTL",
+        "aircraft": "IL76"
+    },
+    {
+        "flightNum": "FV6794",
+        "direction": "ВЫЛЕТ",
+        "airline": "FV",
+        "origin": "UCFO OSH",
+        "destination": "UNKL KRASNOYARSK",
+        "aircraft": "B738"
+    },
+    {
+        "flightNum": "J91656",
+        "direction": "ВЫЛЕТ",
+        "airline": "J9",
+        "origin": "UCFO OSH",
+        "destination": "OKKK EL-KUWAIT",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "J9656.",
+        "direction": "ВЫЛЕТ",
+        "airline": "J9",
+        "origin": "UCFO OSH",
+        "destination": "OKKK EL-KUWAIT",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "J9656",
+        "direction": "ВЫЛЕТ",
+        "airline": "J9",
+        "origin": "UCFO OSH",
+        "destination": "OKKK EL-KUWAIT",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "K1310",
+        "direction": "ВЫЛЕТ",
+        "airline": "K1",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "K1312",
+        "direction": "ВЫЛЕТ",
+        "airline": "K1",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "K9104",
+        "direction": "ВЫЛЕТ",
+        "airline": "K9",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "RJ85"
+    },
+    {
+        "flightNum": "K9104D",
+        "direction": "ВЫЛЕТ",
+        "airline": "K9",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "RJ85"
+    },
+    {
+        "flightNum": "K9108",
+        "direction": "ВЫЛЕТ",
+        "airline": "K9",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "RJ85"
+    },
+    {
+        "flightNum": "K9112",
+        "direction": "ВЫЛЕТ",
+        "airline": "K9",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "MD83"
+    },
+    {
+        "flightNum": "K9118",
+        "direction": "ВЫЛЕТ",
+        "airline": "K9",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "MD83"
+    },
+    {
+        "flightNum": "K9118D",
+        "direction": "ВЫЛЕТ",
+        "airline": "K9",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "MD83"
+    },
+    {
+        "flightNum": "K9120",
+        "direction": "ВЫЛЕТ",
+        "airline": "K9",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "MD83"
+    },
+    {
+        "flightNum": "K9154",
+        "direction": "ВЫЛЕТ",
+        "airline": "K9",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "RJ85"
+    },
+    {
+        "flightNum": "KA112",
+        "direction": "ВЫЛЕТ",
+        "airline": "KA",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "KA114",
+        "direction": "ВЫЛЕТ",
+        "airline": "KA",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "KA221",
+        "direction": "ВЫЛЕТ",
+        "airline": "KA",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "KA223",
+        "direction": "ВЫЛЕТ",
+        "airline": "KA",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "KA223D",
+        "direction": "ВЫЛЕТ",
+        "airline": "KA",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "KA555",
+        "direction": "ВЫЛЕТ",
+        "airline": "KA",
+        "origin": "UCFO OSH",
+        "destination": "UUWW MOSCOW :VNUKOVO ART",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "KA567",
+        "direction": "ВЫЛЕТ",
+        "airline": "KA",
+        "origin": "UCFO OSH",
+        "destination": "USRR SURGUT",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "MN02",
+        "direction": "ВЫЛЕТ",
+        "airline": "MN",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "MN04",
+        "direction": "ВЫЛЕТ",
+        "airline": "MN",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "MN06",
+        "direction": "ВЫЛЕТ",
+        "airline": "MN",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "MN08",
+        "direction": "ВЫЛЕТ",
+        "airline": "MN",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "MN12",
+        "direction": "ВЫЛЕТ",
+        "airline": "MN",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "MN16",
+        "direction": "ВЫЛЕТ",
+        "airline": "MN",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "MN22",
+        "direction": "ВЫЛЕТ",
+        "airline": "MN",
+        "origin": "UCFO OSH",
+        "destination": "UCFK KARAKOL",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "MN42",
+        "direction": "ВЫЛЕТ",
+        "airline": "MN",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "MN42D",
+        "direction": "ВЫЛЕТ",
+        "airline": "MN",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "MN44",
+        "direction": "ВЫЛЕТ",
+        "airline": "MN",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "MN44D",
+        "direction": "ВЫЛЕТ",
+        "airline": "MN",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "DH8D"
+    },
+    {
+        "flightNum": "N41476",
+        "direction": "ВЫЛЕТ",
+        "airline": "N4",
+        "origin": "UCFO OSH",
+        "destination": "USTR TYUMEN",
+        "aircraft": "B738"
+    },
+    {
+        "flightNum": "PC711",
+        "direction": "ВЫЛЕТ",
+        "airline": "PC",
+        "origin": "UCFO OSH",
+        "destination": "LTFJ ISTANBUL SABIHA",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "S75546",
+        "direction": "ВЫЛЕТ",
+        "airline": "S7",
+        "origin": "UCFO OSH",
+        "destination": "UNNT NOVOSIBIRSK:TOLMOCHEVO",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "S76328",
+        "direction": "ВЫЛЕТ",
+        "airline": "S7",
+        "origin": "UCFO OSH",
+        "destination": "UIII IRKUTSK",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "SU1895",
+        "direction": "ВЫЛЕТ",
+        "airline": "SU",
+        "origin": "UCFO OSH",
+        "destination": "UUEE MOSCOW :SHEREMETYEVO",
+        "aircraft": "A321"
+    },
+    {
+        "flightNum": "SU1993",
+        "direction": "ВЫЛЕТ",
+        "airline": "SU",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "A321"
+    },
+    {
+        "flightNum": "U62166",
+        "direction": "ВЫЛЕТ",
+        "airline": "U6",
+        "origin": "UCFO OSH",
+        "destination": "USSS YEKATERINBURG",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "U62448",
+        "direction": "ВЫЛЕТ",
+        "airline": "U6",
+        "origin": "UCFO OSH",
+        "destination": "UUBW ZHUKOVSKY",
+        "aircraft": "A321"
+    },
+    {
+        "flightNum": "U62514",
+        "direction": "ВЫЛЕТ",
+        "airline": "U6",
+        "origin": "UCFO OSH",
+        "destination": "UWKD KAZAN",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "U62706",
+        "direction": "ВЫЛЕТ",
+        "airline": "U6",
+        "origin": "UCFO OSH",
+        "destination": "USNN NIZHNEVARTOVSK",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "U62710",
+        "direction": "ВЫЛЕТ",
+        "airline": "U6",
+        "origin": "UCFO OSH",
+        "destination": "UUDD MOSCOW :DOMODEDOVO",
+        "aircraft": "A321"
+    },
+    {
+        "flightNum": "U62734",
+        "direction": "ВЫЛЕТ",
+        "airline": "U6",
+        "origin": "UCFO OSH",
+        "destination": "ULLI SAINT-PETERSBURG",
+        "aircraft": "A321"
+    },
+    {
+        "flightNum": "U62806",
+        "direction": "ВЫЛЕТ",
+        "airline": "U6",
+        "origin": "UCFO OSH",
+        "destination": "UNKL KRASNOYARSK",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "U62874",
+        "direction": "ВЫЛЕТ",
+        "airline": "U6",
+        "origin": "UCFO OSH",
+        "destination": "USCC CHELYABINSK",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "U62904",
+        "direction": "ВЫЛЕТ",
+        "airline": "U6",
+        "origin": "UCFO OSH",
+        "destination": "USSS YEKATERINBURG",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "U62906",
+        "direction": "ВЫЛЕТ",
+        "airline": "U6",
+        "origin": "UCFO OSH",
+        "destination": "UWWW SAMARA(KURUMOCH)",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "U62910",
+        "direction": "ВЫЛЕТ",
+        "airline": "U6",
+        "origin": "UCFO OSH",
+        "destination": "UUDD MOSCOW :DOMODEDOVO",
+        "aircraft": "A321"
+    },
+    {
+        "flightNum": "U68320",
+        "direction": "ВЫЛЕТ",
+        "airline": "U6",
+        "origin": "UCFO OSH",
+        "destination": "USNN NIZHNEVARTOVSK",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "U68706",
+        "direction": "ВЫЛЕТ",
+        "airline": "U6",
+        "origin": "UCFO OSH",
+        "destination": "USNN NIZHNEVARTOVSK",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "U68736",
+        "direction": "ВЫЛЕТ",
+        "airline": "U6",
+        "origin": "UCFO OSH",
+        "destination": "USNN NIZHNEVARTOVSK",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "UPEM015",
+        "direction": "ВЫЛЕТ",
+        "airline": "UUU",
+        "origin": "UCFO OSH",
+        "destination": "UCFK KARAKOL",
+        "aircraft": "E135"
+    },
+    {
+        "flightNum": "XY700",
+        "direction": "ВЫЛЕТ",
+        "airline": "XY",
+        "origin": "UCFO OSH",
+        "destination": "OEJN JEDDAH",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "YK180",
+        "direction": "ВЫЛЕТ",
+        "airline": "YK",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "YK182",
+        "direction": "ВЫЛЕТ",
+        "airline": "YK",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "YK4026",
+        "direction": "ВЫЛЕТ",
+        "airline": "YK",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "YK747",
+        "direction": "ВЫЛЕТ",
+        "airline": "YK",
+        "origin": "UCFO OSH",
+        "destination": "UUDD MOSCOW :DOMODEDOVO",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "YK767",
+        "direction": "ВЫЛЕТ",
+        "airline": "YK",
+        "origin": "UCFO OSH",
+        "destination": "UNKL KRASNOYARSK",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "YK769",
+        "direction": "ВЫЛЕТ",
+        "airline": "YK",
+        "origin": "UCFO OSH",
+        "destination": "UNNT NOVOSIBIRSK:TOLMOCHEVO",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "YK777",
+        "direction": "ВЫЛЕТ",
+        "airline": "YK",
+        "origin": "UCFO OSH",
+        "destination": "UIII IRKUTSK",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "YK865",
+        "direction": "ВЫЛЕТ",
+        "airline": "YK",
+        "origin": "UCFO OSH",
+        "destination": "USSS YEKATERINBURG",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "YK881",
+        "direction": "ВЫЛЕТ",
+        "airline": "YK",
+        "origin": "UCFO OSH",
+        "destination": "ULLI SAINT-PETERSBURG",
+        "aircraft": "B733"
+    },
+    {
+        "flightNum": "YK960",
+        "direction": "ВЫЛЕТ",
+        "airline": "YK",
+        "origin": "UCFO OSH",
+        "destination": "UCFM BISHKEK(MANAS)",
+        "aircraft": "A320"
+    },
+    {
+        "flightNum": "YK965",
+        "direction": "ВЫЛЕТ",
+        "airline": "YK",
+        "origin": "UCFO OSH",
+        "destination": "UUDD MOSCOW :DOMODEDOVO",
+        "aircraft": "B733"
+    }
+]

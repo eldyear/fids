@@ -1,0 +1,47 @@
+{% load flights_extras %}
+<div class="accordion accordion-flush" id="servicesAccordion">
+    {% if services %}
+        {% for service in services %}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading-{{ service.id }}">
+                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ service.id }}" aria-expanded="false" aria-controls="collapse-{{ service.id }}">
+                    {{ service.service_type.name }}
+                </button>
+            </h2>
+            <div id="collapse-{{ service.id }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ service.id }}" data-bs-parent="#servicesAccordion">
+                <div class="accordion-body py-2">
+                    <ul class="list-unstyled mb-2">
+                        <li><strong>Время:</strong> {{ service.start_time|time:'H:i'|default:"-" }} - {{ service.end_time|time:'H:i'|default:"-" }} ({{ service.duration|format_duration }})</li>
+                        <li><strong>Кол-во:</strong> {{ service.quantity }} {{ service.unit_of_measure|default:"-" }}</li>
+                        {% if service.description %}
+                        <li><strong>Прим.:</strong> {{ service.description }}</li>
+                        {% endif %}
+                    </ul>
+                    {% if not read_only %}
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-warning btn-sm me-2 edit-btn"
+                                data-id="{{ service.id }}"
+                                data-service_type="{{ service.service_type_id }}"
+                                data-description="{{ service.description }}"
+                                data-quantity="{{ service.quantity }}"
+                                data-unit_of_measure="{{ service.unit_of_measure }}"
+                                data-start_time="{{ service.start_time|time:'H:i'|default:'' }}"
+                                data-end_time="{{ service.end_time|time:'H:i'|default:'' }}">
+                            Редактировать
+                        </button>
+                        <form action="{% url 'delete_service' service.id %}" method="post" class="d-inline-block">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Вы уверены?');">
+                                Удалить
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+    <div class="alert alert-info text-center mt-3">К этому рейсу пока не добавлены услуги.</div>
+    {% endif %}
+</div>

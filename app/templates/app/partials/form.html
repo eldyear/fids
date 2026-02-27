@@ -1,0 +1,103 @@
+<form method="post" id="inf-tablo-form" class="tablo-form">
+    {% csrf_token %}
+    
+    <div class="form-column">
+        <div class="form-column">
+            {{ form.direction.label_tag }}
+            {{ form.direction }}
+        </div>
+        <div class="form-column">
+            {{ form.airline.label_tag }}
+            {{ form.airline }}
+        </div>
+    </div>
+    
+    <div class="form-column">
+        <div class="form-column">
+            {{ form.flight.label_tag }}
+            {{ form.flight }}
+        </div>
+        <div class="form-column">
+            {{ form.destination.label_tag }}
+            {{ form.destination }}
+        </div>
+    </div>
+    
+    <div class="form-column">
+        <div class="form-column">
+            {{ form.date1.label_tag }}
+            {{ form.date1 }}
+        </div>
+        <div class="form-column">
+            {{ form.time1.label_tag }}
+            {{ form.time1 }}
+        </div>
+    </div>
+    
+    <div class="form-column">
+        <div class="form-column">
+            {{ form.last_date.label_tag }}
+            {{ form.last_date }}
+        </div>
+        <div class="form-column">
+            {{ form.last_time.label_tag }}
+            {{ form.last_time }}
+        </div>
+    </div>
+    
+    <div class="form-column-reverse">
+        <div class="form-column">
+            {{ form.status.label_tag }}
+            {{ form.status }}
+        </div>
+        <div class="form-column">
+            {{ form.stoika_input.label_tag }}
+            {{ form.stoika_input }}
+        </div>
+    </div>
+    
+    <!-- Скрытое поле для pk -->
+    <input type="hidden" name="pk" value="{{ form.instance.pk }}" />
+    
+    <button type="submit" class="btn-form">Сохранить</button>
+</form>
+
+<script>
+    document.getElementById('edit-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    fetch(this.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert(data.message);  // Уведомление об успешном сохранении
+        } else if (data.errors) {
+            // Вывод ошибок формы
+            console.error(data.errors);
+        }
+    })
+    .catch(error => console.error('Ошибка:', error));
+});
+
+    // Сброс формы при клике вне её области или области таблицы
+    document.addEventListener('click', function (event) {
+        const form = document.getElementById('inf-tablo-form');
+        const isClickInsideTable = event.target.closest('.div-table');
+        
+        // Если клик был не внутри таблицы и не внутри формы
+        if (!form.contains(event.target) && !isClickInsideTable) {
+            form.reset(); // Сброс всех полей формы
+            const pkInput = form.querySelector('input[name="pk"]');
+            if (pkInput) {
+                pkInput.value = ''; // Очистка значения pk
+            }
+        }
+    });
+</script>
+

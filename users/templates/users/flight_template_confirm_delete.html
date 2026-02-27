@@ -1,0 +1,18 @@
+{% extends 'app/dashboard/base_dashboard.html' %}
+
+{% block page_title %}Delete Template{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 0 auto; text-align: center;">
+    <h2 style="margin-bottom: 20px;">Confirm Deletion</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 30px;">Are you sure you want to delete the template for flight <strong>{{ object.flight.flight.flights }}</strong>?</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div style="display: flex; justify-content: center; gap: 10px;">
+            <a href="{% url 'flight_template_list' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-danger" style="background-color: var(--danger-color); border: none;">Delete</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

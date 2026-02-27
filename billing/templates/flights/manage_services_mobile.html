@@ -1,0 +1,556 @@
+{% load flights_extras %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Рейс {{ flight.flight_num }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Общие стили для страницы */
+        body { 
+            background-color: #f8f9fa;
+            font-size: 0.9rem; 
+        }
+        .container-mobile {
+            max-width: 95vw;
+        }
+        
+        /* Стили для карточек */
+        .card { 
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card-header-main {
+            background-color: #007bff;
+            color: white;
+            border-bottom: 2px solid #0056b3;
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
+            margin: -1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+        }
+        
+        /* Стили для заголовков и текста */
+        h3 { 
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        h5 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        p { margin-bottom: 0.5rem; }
+        
+        /* Стили для форм и кнопок */
+        .form-control, .form-select {
+            font-size: 0.9rem;
+            border-radius: 0.5rem;
+        }
+        .btn {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+        }
+        .btn-primary { background-color: #007bff; border-color: #007bff; }
+        .btn-primary:hover { background-color: #0056b3; border-color: #0056b3; }
+        
+        /* Стили для прогресс-бара */
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            height: 30px;
+            margin-top: 10px;
+            position: relative;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #28a745;
+            transition: width 0.5s ease, background-color 0.5s ease;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        .progress-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            color: #495057;
+            font-weight: bold;
+            line-height: 30px;
+        }
+        .progress-bar.red {
+            background-color: #dc3545;
+        }
+        .progress-bar.gray {
+            background-color: #6c757d;
+        }
+
+        /* Дополнительные стили для элементов */
+        .info-block {
+            background-color: #e9ecef;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        /* Обновленные стили для поля ввода "Макс. масса" */
+        .max-takeoff-weight-input {
+            border: 1px solid #ced4da;
+            background-color: #fff;
+            text-align: center;
+            font-weight: 600;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .max-takeoff-weight-input:focus {
+            border-color: #86b7fe;
+            outline: 0;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .btn-group-export .btn {
+            border-radius: 0.75rem !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-mobile mx-auto py-3">
+        {% include 'includes/messages.html' %}
+    
+        <div class="row">
+            <div class="col-12">
+                <div class="card bg-white shadow-sm">
+                    <div class="card-header-main">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h3 class="m-0 text-white">
+                                {% if read_only %}{{ tech_card.author.get_full_name }}{% else %}{{ current_user_name }}{% endif %}
+                            </h3>
+                            <span class="badge bg-light text-dark fw-bold" style="font-size: 1.1rem;">{{ flight.flight_num }}</span>
+                        </div>
+                        <p class="text-white-50 m-0" style="font-size: 0.8rem;">ID техкарты: <strong>{{ tech_card.id }}</strong></p>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <p class="mb-1"><strong class="text-secondary">Стоянка:</strong></p>
+                            <div class="info-block">{{ flight.stand|default:"-" }}</div>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-1"><strong class="text-secondary">Макс.масса:</strong></p>
+                            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                            <input type="hidden" name="tech_card_id" value="{{ tech_card.id }}">
+                            <input type="text"
+                                data-field-name="max_takeoff_weight"
+                                value="{{ tech_card.max_takeoff_weight|default:'' }}"
+                                class="max-takeoff-weight-input w-100 p-1 mt-1"
+                                {% if read_only %}readonly{% endif %}>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-1"><strong class="text-secondary">Плановое время:</strong></p>
+                            <div class="info-block">{{ flight.time|default:"-" }}</div>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-1"><strong class="text-secondary">Факт. время прилета:</strong></p>
+                            <div class="info-block">{{ flight.actual_time|default:"-" }}</div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-3">
+
+                    <!-- Прогресс-бар -->
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="mb-1"><strong class="text-secondary">Оставшееся время до вылета:</strong></p>
+                            <div class="progress-bar-container" id="turnaround-progress-bar"
+                                data-actual-time="{{ flight.actual_time|default:'' }}"
+                                data-planned-time="{{ flight.time|default:'' }}"
+                                data-flight-date="{{ flight.date|date:'Y-m-d' }}">
+                                <div class="progress-bar" role="progressbar" style="width: 0%;"></div>
+                                <span class="progress-text"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-3">
+                    
+                    <div class="row g-2">
+                        <a class="text-decoration-none text-dark" data-bs-toggle="collapse" href="#flightDetails" role="button" aria-expanded="false" aria-controls="flightDetails">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="m-0">Остальные детали рейса</h5>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="collapse" id="flightDetails">
+                        <hr class="my-2">
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <p class="mb-1"><strong class="text-secondary">Аэропорт:</strong></p>
+                                <div class="info-block">{{ flight.dep_airport.code|default:"-" }} → {{ flight.arr_airport.code|default:"-" }} → {{ flight.dep_airport.code|default:"-" }}</div>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-1"><strong class="text-secondary">Рейс:</strong></p>
+                                <div class="info-block">{{ flight.flight_num }} ⇆ {{ flight.linked_flight.flight_num|default:"-" }}</div>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-1"><strong class="text-secondary">АК:</strong></p>
+                                <div class="info-block">{{ flight.airline.name }}</div>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-1"><strong class="text-secondary">Тип ВС:</strong></p>
+                                <div class="info-block">{{ flight.aircraft_type|default:"-" }}</div>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-1"><strong class="text-secondary">Борт. №:</strong></p>
+                                <div class="info-block">{{ flight.board_num|default:"-" }}</div>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-1"><strong class="text-secondary">Дата:</strong></p>
+                                <div class="info-block">{{ flight.date|date:"d.m.Y" }}</div>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-1"><strong class="text-secondary">Дата ⇆:</strong></p>
+                                <div class="info-block">{{ flight.linked_flight.date|date:"d.m.Y" }}</div>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-1"><strong class="text-secondary">Время ожид.:</strong></p>
+                                <div class="info-block">{{ flight.estimated_time|default:"-" }}</div>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-1"><strong class="text-secondary">Время факт. ⇆:</strong></p>
+                                <div class="info-block">{{ flight.linked_flight.actual_time|default:"-" }}</div>
+                            </div>
+                            <div class="col-12">
+                                <p class="mb-1"><strong class="text-secondary">Примечание:</strong></p>
+                                <div class="info-block">{{ flight.remark|default:"-" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            {% if not read_only %}
+            <div class="col-12">
+                <div class="card bg-white shadow-sm">
+                    <h5 class="mb-3">Добавить/редактировать услугу</h5>
+                    <form method="post" id="service-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="service_id" id="service-id-input">
+                        
+                        <div class="row g-2 mb-3">
+                            <div class="col-12">
+                                <label for="id_service_type" class="form-label">Тип услуги</label>
+                                <select name="service_type" id="id_service_type" class="form-select">
+                                    <option value="" data-category="">Выберите тип услуги...</option>
+                                    {% for service_type in service_types %}
+                                        <option value="{{ service_type.id }}" 
+                                                data-category="{{ service_type.category }}" 
+                                                {% if form.service_type.value|stringformat:"s" == service_type.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ service_type.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label for="{{ form.start_time.id_for_label }}" class="form-label">Время начала</label>
+                                <div class="input-group">
+                                    {{ form.start_time|add_class:"form-control form-control-sm" }}
+                                    <button type="button" class="btn btn-outline-secondary" id="set-start-time-btn"><i class="fas fa-clock"></i></button>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <label for="{{ form.end_time.id_for_label }}" class="form-label">Время окончания</label>
+                                <div class="input-group">
+                                    {{ form.end_time|add_class:"form-control form-control-sm" }}
+                                    <button type="button" class="btn btn-outline-secondary" id="set-end-time-btn"><i class="fas fa-clock"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="passenger-fields" class="dynamic-fields" style="display: none;">
+                            <div class="row g-2 mb-3">
+                                <div class="col-4">
+                                    <label for="id_adults_count" class="form-label">Взр.</label>
+                                    <input type="number" class="form-control form-control-sm" id="id_adults_count" name="adults_count" min="0">
+                                </div>
+                                <div class="col-4">
+                                    <label for="id_children_count" class="form-label">Рб.</label>
+                                    <input type="number" class="form-control form-control-sm" id="id_children_count" name="children_count" min="0">
+                                </div>
+                                <div class="col-4">
+                                    <label for="id_infants_count" class="form-label">Рм.</label>
+                                    <input type="number" class="form-control form-control-sm" id="id_infants_count" name="infants_count" min="0">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="duration-fields" class="dynamic-fields" style="display: none;">
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <label for="id_duration_hours" class="form-label">Часы</label>
+                                    <input type="number" class="form-control form-control-sm" id="id_duration_hours" name="duration_hours" min="0">
+                                </div>
+                                <div class="col-6">
+                                    <label for="id_duration_minutes" class="form-label">Минуты</label>
+                                    <input type="number" class="form-control form-control-sm" id="id_duration_minutes" name="duration_minutes" min="0" max="59">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="default-fields" class="dynamic-fields" style="display: none;">
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <label for="id_quantity" class="form-label">Кол-во</label>
+                                    <input type="number" class="form-control form-control-sm" id="id_quantity" name="quantity" min="0">
+                                </div>
+                                <div class="col-6">
+                                    <label for="id_unit_of_measure" class="form-label">Ед. изм.</label>
+                                    <input type="text" class="form-control form-control-sm" id="id_unit_of_measure" name="unit_of_measure">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">Примечание</label>
+                            {{ form.description|add_class:"form-control" }}
+                        </div>
+                    
+                        <button type="submit" class="btn btn-primary me-2">Сохранить</button>
+                        <button type="button" class="btn btn-secondary" id="cancel-edit-btn" style="display:none;">Отмена</button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="col-12 d-flex justify-content-between align-items-center mb-3">
+                <button id="back-to-dashboard-btn" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Вернуться
+                </button>
+                <div class="btn-group btn-group-export" role="group" aria-label="Export options">
+                    {% if tech_card %}
+                        <a href="{% url 'export_to_pdf' flight.id tech_card.id %}" target="_blank" class="btn btn-danger">PDF</a>
+                        <a href="{% url 'preview_pdf_template' flight.id tech_card.id %}" target="_blank" class="btn btn-success">Печать</a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-12">
+                {% if services %}
+                <h5 class="mb-3">Список услуг</h5>
+                {% for service in services %}
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="m-0 text-primary">{{ service.service_type.name }}</h6>
+                            <small class="text-muted">{{ service.start_time|time:'H:i'|default:"-" }} - {{ service.end_time|time:'H:i'|default:"-" }}</small>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6"><p><strong>Длительность:</strong> {{ service.duration|format_duration }}</p></div>
+                            <div class="col-6"><p><strong>Количество:</strong> {{ service.quantity }} {{ service.unit_of_measure|default:"-" }}</p></div>
+                            <div class="col-12"><p><strong>Примечание:</strong> {{ service.description|default:"-" }}</p></div>
+                        </div>
+                        {% if not read_only %}
+                        <div class="mt-2 text-end">
+                            <button class="btn btn-warning btn-sm edit-btn"
+                                data-service-id="{{ service.id }}"
+                                data-service-type="{{ service.service_type.id }}"
+                                data-start-time="{{ service.start_time|time:'H:i' }}"
+                                data-end-time="{{ service.end_time|time:'H:i' }}"
+                                data-duration-hours="{{ service.duration_field.seconds|div:3600 }}"
+                                data-duration-minutes="{{ service.duration_field.seconds|mod:3600|div:60 }}"
+                                data-quantity="{{ service.quantity|default:'' }}"
+                                data-unit-of-measure="{{ service.unit_of_measure|default:'' }}"
+                                data-adults-count="{{ service.adults_count|default:'' }}"
+                                data-children-count="{{ service.children_count|default:'' }}"
+                                data-infants-count="{{ service.infants_count|default:'' }}"
+                                data-comment="{{ service.comment|default:'' }}">
+                                <i class="fas fa-edit"></i> Ред.
+                            </button>
+                            <form action="{% url 'delete_service_mobile' service.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Удалить?');">
+                                    <i class="fas fa-trash-alt"></i> Удал.
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="alert alert-info text-center mt-3">К этому рейсу пока не добавлены услуги.</div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // --- ОБЩИЕ ПЕРЕМЕННЫЕ И ФУНКЦИИ ---
+                const serviceForm = document.getElementById('service-form');
+                const serviceIdInput = document.getElementById('service-id-input');
+                const serviceTypeSelect = document.getElementById('id_service_type');
+                const cancelButton = document.getElementById('cancel-edit-btn');
+                
+                const passengerFields = document.getElementById('passenger-fields');
+                const durationFields = document.getElementById('duration-fields');
+                const defaultFields = document.getElementById('default-fields');
+                
+                const startTimeInput = document.getElementById('id_start_time');
+                const endTimeInput = document.getElementById('id_end_time');
+                const descriptionInput = serviceForm ? serviceForm.querySelector('textarea[name="description"]') : null;
+
+                // --- ДИНАМИЧЕСКОЕ ПЕРЕКЛЮЧЕНИЕ ПОЛЕЙ ФОРМЫ ---
+                function toggleServiceFields() {
+                    const selectedOption = serviceTypeSelect.options[serviceTypeSelect.selectedIndex];
+                    const category = selectedOption ? selectedOption.dataset.category : '';
+                
+                    [passengerFields, durationFields, defaultFields].forEach(el => {
+                        if (el) el.style.display = 'none';
+                    });
+                    
+                    switch (category) {
+                        case 'pass':
+                            if (passengerFields) passengerFields.style.display = 'block';
+                            break;
+                        case 'time':
+                            if (durationFields) durationFields.style.display = 'block';
+                            break;
+                        case 'int':
+                            if (defaultFields) defaultFields.style.display = 'block';
+                            break;
+                    }
+                }
+                
+                if (serviceTypeSelect) {
+                    serviceTypeSelect.addEventListener('change', toggleServiceFields);
+                    toggleServiceFields(); // Устанавливаем начальное состояние
+                }
+                
+                // --- ОБРАБОТЧИК КНОПОК РЕДАКТИРОВАНИЯ И УДАЛЕНИЯ ---
+                document.addEventListener('click', function(event) {
+                    const editButton = event.target.closest('.edit-btn');
+                    
+                    if (editButton) {
+                        event.preventDefault();
+                        
+                        const data = editButton.dataset;
+                        
+                        // Заполнение формы на странице
+                        if (serviceIdInput) serviceIdInput.value = data.serviceId;
+                        if (serviceTypeSelect) {
+                            serviceTypeSelect.value = data.serviceType;
+                            toggleServiceFields(); // Переключаем поля в зависимости от категории
+                        }
+                        
+                        if (startTimeInput) startTimeInput.value = data.startTime || '';
+                        if (endTimeInput) endTimeInput.value = data.endTime || '';
+                        if (descriptionInput) descriptionInput.value = data.comment || '';
+                        
+                        // Заполнение динамических полей
+                        switch (serviceTypeSelect.options[serviceTypeSelect.selectedIndex].dataset.category) {
+                            case 'pass':
+                                document.getElementById('id_adults_count').value = data.adultsCount || '';
+                                document.getElementById('id_children_count').value = data.childrenCount || '';
+                                document.getElementById('id_infants_count').value = data.infantsCount || '';
+                                break;
+                            case 'time':
+                                document.getElementById('id_duration_hours').value = data.durationHours || '';
+                                document.getElementById('id_duration_minutes').value = data.durationMinutes || '';
+                                break;
+                            case 'int':
+                                document.getElementById('id_quantity').value = data.quantity || '';
+                                document.getElementById('id_unit_of_measure').value = data.unitOfMeasure || '';
+                                break;
+                        }
+
+                        if (cancelButton) cancelButton.style.display = 'inline-block';
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                });
+                
+                // --- ОБРАБОТЧИК КНОПКИ 'ОТМЕНА' ---
+                if (cancelButton) {
+                    cancelButton.addEventListener('click', function() {
+                        serviceForm.reset();
+                        if (serviceIdInput) serviceIdInput.value = '';
+                        cancelButton.style.display = 'none';
+                        toggleServiceFields();
+                    });
+                }
+
+                // --- ОБРАБОТЧИК КНОПОК ВРЕМЕНИ UTC ---
+                function setInputTimeToUTC(inputElement) {
+                    const now = new Date();
+                    const utcHours = String(now.getUTCHours()).padStart(2, '0');
+                    const utcMinutes = String(now.getUTCMinutes()).padStart(2, '0');
+                    const utcTime = `${utcHours}:${utcMinutes}`;
+                    if (inputElement) {
+                        inputElement.value = utcTime;
+                    }
+                }
+                const setStartTimeBtn = document.getElementById('set-start-time-btn');
+                const setEndTimeBtn = document.getElementById('set-end-time-btn');
+                if (setStartTimeBtn) {
+                    setStartTimeBtn.addEventListener('click', () => setInputTimeToUTC(startTimeInput));
+                }
+                if (setEndTimeBtn) {
+                    setEndTimeBtn.addEventListener('click', () => setInputTimeToUTC(endTimeInput));
+                }
+
+                // --- ЛОГИКА ОТКЛЮЧЕНИЯ СКРЫТЫХ ПОЛЕЙ ПЕРЕД ОТПРАВКОЙ ---
+                if (serviceForm) {
+                    serviceForm.addEventListener('submit', function(event) {
+                        serviceForm.querySelectorAll('.dynamic-fields').forEach(container => {
+                            if (container.style.display === 'none') {
+                                container.querySelectorAll('input, select, textarea').forEach(field => {
+                                    field.disabled = true;
+                                });
+                            }
+                        });
+                    });
+                }
+                
+                // --- ОБРАБОТЧИК КНОПКИ 'ЗАКРЫТЬ ТЕХКАРТУ' ---
+                const closeTechcardBtn = document.getElementById('close-techcard-btn');
+                if (closeTechcardBtn) {
+                    closeTechcardBtn.addEventListener('click', function() {
+                        if (confirm('Вы уверены, что хотите закрыть техкарту? После закрытия редактировать её сможет только автор.')) {
+                            const techCardId = this.dataset.techCardId;
+                            const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+                            fetch(`/billing/supervisor/techcards/${techCardId}/close/`, {
+                                method: 'POST',
+                                headers: { 'X-CSRFToken': csrfToken }
+                            })
+                            .then(response => response.ok ? response.json() : response.json().then(errorData => {
+                                throw new Error(errorData.message || 'Произошла ошибка при закрытии техкарты.');
+                            }))
+                            .then(data => {
+                                alert(data.message);
+                                window.location.reload();
+                            })
+                            .catch(error => {
+                                console.error('Ошибка:', error);
+                                alert(error.message);
+                            });
+                        }
+                    });
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>

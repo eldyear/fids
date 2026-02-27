@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block page_header %}Сформировать суточный план{% endblock %}
+
+{% block content %}
+
+
+<div class="magic-content">
+    <form method="post" class="magic-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="magic-btn"></button>
+    </form>
+    <div class="form-btns magic-btns">
+        <a href="{% url 'inftablo_list' %}" class="btn btn-secondary mt-3">Суточный план</a>
+        <a href="{% url 'user_menu' %}" class="btn btn-secondary mt-3">Назад</a>
+    </div>
+</div>
+{% endblock %}

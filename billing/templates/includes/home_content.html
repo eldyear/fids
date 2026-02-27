@@ -1,0 +1,107 @@
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Card 1: Overview -->
+    <div class="neomorphic-card p-6 flex flex-col items-center justify-center">
+        <div class="progress-circle-outer flex items-center justify-center">
+            <div class="progress-circle-inner flex items-center justify-center text-orange-500 text-2xl font-bold rounded-full">
+                50%
+            </div>
+        </div>
+        <h3 class="text-lg font-semibold mt-4">Выполнено сегодня</h3>
+        <p class="text-gray-500 text-sm">24/48 услуг</p>
+    </div>
+    
+    <!-- Card 2: Services Overview -->
+    <div class="neomorphic-card p-6">
+        <div class="flex items-start justify-between">
+            <div>
+                <h3 class="text-xl font-bold">Услуги</h3>
+                <p class="text-sm text-gray-500">За последние 7 дней</p>
+            </div>
+            <div class="bg-orange-100 text-orange-500 px-3 py-1 rounded-full text-xs font-semibold">
+                +12%
+            </div>
+        </div>
+        <div class="mt-4">
+            <!-- Placeholder for a graph -->
+            <canvas id="lineChart" class="w-full h-32"></canvas>
+        </div>
+    </div>
+
+    <!-- Card 3: New Flights -->
+    <div class="neomorphic-card p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold">Новые рейсы</h3>
+            <a href="#" class="text-orange-500 text-sm font-semibold hover:underline">Все</a>
+        </div>
+        <ul class="space-y-4 text-sm">
+            <li class="flex justify-between items-center">
+                <div>
+                    <p class="font-semibold">Рейс YK748</p>
+                    <p class="text-gray-500">Ан-124</p>
+                </div>
+                <span class="text-orange-500 font-semibold">14:30</span>
+            </li>
+            <li class="flex justify-between items-center">
+                <div>
+                    <p class="font-semibold">Рейс AF234</p>
+                    <p class="text-gray-500">A320</p>
+                </div>
+                <span class="text-orange-500 font-semibold">15:00</span>
+            </li>
+            <li class="flex justify-between items-center">
+                <div>
+                    <p class="font-semibold">Рейс LX195</p>
+                    <p class="text-gray-500">Boeing 777</p>
+                </div>
+                <span class="text-orange-500 font-semibold">15:45</span>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    // JS для имитации графика
+    document.addEventListener('DOMContentLoaded', function() {
+        const lineChartCanvas = document.getElementById('lineChart');
+        if (!lineChartCanvas) return;
+        const ctx = lineChartCanvas.getContext('2d');
+        
+        const data = [10, 20, 15, 25, 20, 30, 28];
+        const labels = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+
+        const width = lineChartCanvas.width;
+        const height = lineChartCanvas.height;
+
+        ctx.clearRect(0, 0, width, height);
+
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'var(--primary-orange)';
+        ctx.fillStyle = 'rgba(255, 107, 74, 0.2)';
+
+        // Draw line
+        ctx.beginPath();
+        ctx.moveTo(0, height - (data[0] / 30) * height);
+        for (let i = 1; i < data.length; i++) {
+            const x = (i / (data.length - 1)) * width;
+            const y = height - (data[i] / 30) * height;
+            ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Draw fill area
+        ctx.lineTo(width, height);
+        ctx.lineTo(0, height);
+        ctx.closePath();
+        ctx.fill();
+
+        // Draw data points
+        for (let i = 0; i < data.length; i++) {
+            const x = (i / (data.length - 1)) * width;
+            const y = height - (data[i] / 30) * height;
+            ctx.beginPath();
+            ctx.arc(x, y, 4, 0, 2 * Math.PI);
+            ctx.fillStyle = 'var(--primary-orange)';
+            ctx.fill();
+        }
+    });
+</script>

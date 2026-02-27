@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% load static %}
+{% block page_header %}Суточный план{% endblock %}
+
+{% block content %}
+
+<div class="form-header">
+    <!-- Контейнер для формы -->
+    <div id="form-container">
+        {% include 'partials/form.html' with form=inftablo_form %}
+    </div>
+    <div class="filters">
+        <div>
+            <form method="get" class="date-filter-form">
+                {{ date_filter_form.as_p }}
+                <button type="submit" class="btn-date-confirm"></button>
+            </form>
+        </div>
+        <div class="align-items-center mb-3">
+            <div class="btn-group" role="group" aria-label="Switch Tables">
+                <a href="?direction=dep" 
+                   class="btn {% if request.GET.direction == 'dep' or not request.GET.direction %}btn-primary{% else %}btn-secondary{% endif %}">
+                    Вылеты
+                </a>
+                <a href="?direction=arr" 
+                   class="btn {% if request.GET.direction == 'arr' %}btn-primary{% else %}btn-secondary{% endif %}">
+                    Прилёты
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row container">
+    <!-- Контейнер для списка -->
+    <div class="container2">
+        {% if request.GET.direction == 'arr' %}
+        <h2 class="direction-title">Прилеты</h2>
+        <table id="inftablo-list" class="table">
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Рейс</th>
+                    <th>Авиакомпания</th>
+                    <th>Откуда</th>
+                    <th>Дата</th>
+                    <th>Время</th>
+                    <th>Дата факт.</th>
+                    <th>Время факт.</th>
+                    <th>Стойки</th>
+                    <th>Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inftablo in arrivals %}
+                <tr data-id="{{ inftablo.id }}" class="div-table">
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ inftablo.flight }}</td> 
+                    <td>{{ inftablo.airline }}</td>
+                    <td>{{ inftablo.destination }}</td>
+                    <td>{{ inftablo.date1 }}</td> 
+                    <td>{{ inftablo.time1 }}</td> 
+                    <td>{{ inftablo.last_date|default:"-" }}</td> 
+                    <td>{{ inftablo.last_time|default:"-" }}</td> 
+                    <td>
+                    {% for stoika in inftablo.stoika.all %}
+                        {{ stoika.get_number }}{% if not forloop.last %}, {% endif %} 
+                    {% endfor %}
+                    </td>
+                    <td class="bg-info">{{ inftablo.status|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const formContainer = document.querySelector('#form-container');
+                if (!formContainer) return;
+
+                // Обработка клика на рейс
+                document.querySelectorAll('.div-table').forEach(item => {
+                    item.addEventListener('click', function () {
+                        const pk = this.getAttribute('data-id');
+                        console.log(pk);  // Выводим id рейса для отладки
+                        fetch(`/users/inftablo2/?pk=${pk}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                            .then(response => {
+                                if (!response.ok) throw new Error('Ошибка при загрузке формы.');
+                                return response.json();
+                            })
+                            .then(data => {
+                                formContainer.innerHTML = data.form_html;
+                    
+                                // Устанавливаем PK в скрытое поле формы
+                                const pkInput = document.querySelector('input[name="pk"]');
+                                if (pkInput) {
+                                    pkInput.value = pk;
+                                }
+                            })
+                            .catch(error => {
+                                console.error(error);
+                                alert('Ошибка при загрузке формы.');
+                            });
+                    });
+                });
+        
+                // Делегирование обработки отправки формы
+                formContainer.addEventListener('submit', function (event) {
+                    if (event.target.tagName === 'FORM') {
+                        event.preventDefault();
+                        const form = event.target;
+            
+                        // Сохраняем текущие параметры URL
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const formData = new FormData(form);
+                        
+                        // Добавляем параметры URL в formData
+                        urlParams.forEach((value, key) => {
+                            formData.append(key, value);
+                        });
+            
+                        fetch(form.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        })
+                        .then(response => {
+                            if (!response.ok) return response.json().then(err => Promise.reject(err));
+                            return response.json();
+                        })
+                        .then(data => {
+                            alert(data.message);
+                            location.reload(); // Обновление списка рейсов
+                        })
+                        .catch(error => {
+                            console.error(error);
+                            if (error.errors) {
+                                formContainer.innerHTML = error.errors;
+                            } else {
+                                alert('Ошибка при сохранении рейса.');
+                            }
+                        });
+                    }
+                });
+            });
+        </script>
+    {% else %}
+    <h2 class="direction-title">Вылеты</h2>
+        <table id="inftablo-list" class="table">
+            <thead>
+                <tr>
+                    <th class="num">№</th>
+                    <th>Рейс</th>
+                    <th>Авиакомпания</th>
+                    <th>Куда</th>
+                    <th>Дата</th>
+                    <th>Время</th>
+                    <th>Дата факт.</th>
+                    <th>Время факт.</th>
+                    <th>Стойки</th>
+                    <th>Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inftablo in departures %}
+                <tr data-id="{{ inftablo.id }}" class="div-table">
+                    <td class="num">{{ forloop.counter }}</td>
+                    <td>{{ inftablo.flight }}</td> 
+                    <td>{{ inftablo.airline }}</td>
+                    <td>{{ inftablo.destination }}</td>
+                    <td>{{ inftablo.date1 }}</td> 
+                    <td>{{ inftablo.time1 }}</td> 
+                    <td>{{ inftablo.last_date|default:"-" }}</td> 
+                    <td>{{ inftablo.last_time|default:"-" }}</td> 
+                    <td>
+                    {% for stoika in inftablo.stoika.all %}
+                        {{ stoika.get_number }}{% if not forloop.last %}, {% endif %} 
+                    {% endfor %}
+                    </td>
+                    <td class="{{ inftablo.status.name_en}}">{{ inftablo.status|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const formContainer = document.querySelector('#form-container');
+        if (!formContainer) return;
+
+        // Обработка клика на рейс
+        document.querySelectorAll('.div-table').forEach(item => {
+            item.addEventListener('click', function () {
+                const pk = this.getAttribute('data-id');
+                console.log(pk);  // Выводим id рейса для отладки
+                fetch(`/users/inftablo2/?pk=${pk}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Ошибка при загрузке формы.');
+                        return response.json();
+                    })
+                    .then(data => {
+                        formContainer.innerHTML = data.form_html;
+
+                        // Устанавливаем PK в скрытое поле формы
+                        const pkInput = document.querySelector('input[name="pk"]');
+                        if (pkInput) {
+                            pkInput.value = pk;
+                        }
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        alert('Ошибка при загрузке формы.');
+                    });
+            });
+        });
+
+        // Делегирование обработки отправки формы
+        formContainer.addEventListener('submit', function (event) {
+            if (event.target.tagName === 'FORM') {
+                event.preventDefault();
+                const form = event.target;
+
+                // Сохраняем текущие параметры URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const formData = new FormData(form);
+                
+                // Добавляем параметры URL в formData
+                urlParams.forEach((value, key) => {
+                    formData.append(key, value);
+                });
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(response => {
+                    if (!response.ok) return response.json().then(err => Promise.reject(err));
+                    return response.json();
+                })
+                .then(data => {
+                    alert(data.message);
+                    location.reload(); // Обновление списка рейсов
+                })
+                .catch(error => {
+                    console.error(error);
+                    if (error.errors) {
+                        formContainer.innerHTML = error.errors;
+                    } else {
+                        alert('Ошибка при сохранении рейса.');
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}
