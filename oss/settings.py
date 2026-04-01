@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     # Optional: uncomment if packages are available
     # 'rangefilter',
     # 'chartjs',
-    # 'mobiledetect',
+    'mobiledetect',
 ]
 
 MIDDLEWARE = [
@@ -60,7 +60,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Optional: uncomment if package is available
-    # 'mobiledetect.middleware.DetectMiddleware',
+    'mobiledetect.middleware.DetectMiddleware',
 ]
 
 ROOT_URLCONF = 'oss.urls'
@@ -89,12 +89,12 @@ WSGI_APPLICATION = 'oss.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT', default=''),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('POSTGRES_DB', default='postgres'),
+        'USER': config('POSTGRES_USER', default='postgres'),
+        'PASSWORD': config('POSTGRES_PASSWORD', default='postgres'),
+        'HOST': config('POSTGRES_HOST', default='db'),
+        'PORT': config('POSTGRES_PORT', default='5432'),
     }
 }
 
@@ -201,14 +201,12 @@ TIME_INPUT_FORMATS = ['%H:%M']
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_FILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# Media files
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-GO_APP_UPLOAD_DIR = '/home/eld/OSS/fids-golang/static/images/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -234,3 +232,5 @@ SESSION_COOKIE_NAME = 'sessionid'
 
 # Настройка отдельной сессии для админки
 CSRF_COOKIE_NAME = 'csrftoken'
+
+GO_APP_UPLOAD_DIR = config('GO_APP_UPLOAD_DIR', default='/app/static/uploads')

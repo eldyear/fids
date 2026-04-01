@@ -164,7 +164,13 @@ func main() {
 	// Initialize sourceURL from environment variable
 	sourceURL = os.Getenv("FLIGHT_API_URL")
 	if sourceURL == "" {
-		sourceURL = "http://localhost/api/fids_full.json"
+		sourceURL = "http://31.192.250.185/api/fids_full.json"
+	}
+
+	// Initialize openWeatherAPIKey from environment variable
+	openWeatherAPIKey = os.Getenv("OPENWEATHER_API_KEY")
+	if openWeatherAPIKey == "" {
+		log.Fatal("OPENWEATHER_API_KEY is not set in the environment")
 	}
 
 	// Initialize router for main app (port 8080)
@@ -202,7 +208,7 @@ func main() {
 	r.HandleFunc("/arr_vert", serveArrVertPage)
 
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/dep", http.StatusFound)
+		http.Redirect(w, r, "dep", http.StatusFound)
 	})
 
 	// Static files serving

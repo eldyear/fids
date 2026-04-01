@@ -1,6 +1,7 @@
 # flights/views.py
 from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.utils import IntegrityError
 from django.db.models import Q, F, Sum, ExpressionWrapper, fields
@@ -68,14 +69,16 @@ def home(request):
     #                     f"Device type: {request.device.get('type', 'Not found')}<br>"
     #                     f"Full device dict: {request.device}")
     if request.user.is_authenticated:
-        # Теперь обращаемся к словарю request.device по ключу 'is_mobile'
-        if request.device['is_mobile']:
+        # Безопасно проверяем наличие request.device и ключа is_mobile
+        is_mobile = getattr(request, 'device', {}).get('is_mobile', False)
+        if is_mobile:
             return redirect('supervisor_dashboard_mobile')
         else:
             return redirect('supervisor_dashboard')
     else:
         # Если пользователь не авторизован, отправляем его на соответствующую страницу входа
-        if request.device['is_mobile']:
+        is_mobile = getattr(request, 'device', {}).get('is_mobile', False)
+        if is_mobile:
             return redirect('login_mobile')
         else:
             return redirect('login')
@@ -295,6 +298,7 @@ def update_flight_field(request):
 
 @login_required
 def manage_services_for_flight(request, flight_id, tech_card_id=None):
+    logger.info(f"--- manage_services_for_flight started for flight_id: {flight_id}, tech_card_id: {tech_card_id} ---")
     flight = get_object_or_404(Flight, pk=flight_id)
 
     # --- ДОБАВЛЕНА КОНВЕРТАЦИЯ FACTDATE ДЛЯ ТЕКУЩЕГО РЕЙСА ---
@@ -318,10 +322,12 @@ def manage_services_for_flight(request, flight_id, tech_card_id=None):
     # --- КОНЕЦ ДОБАВЛЕННОЙ КОНВЕРТАЦИИ ---
 
     current_user_name = f"{request.user.first_name} {request.user.last_name}"
+    logger.debug("Querying supervisors, firms, airlines")
     supervisors = User.objects.filter(groups__name='supervisor').order_by('username')
     firms = Firm.objects.all().order_by('name')
     is_supervisor = request.user.groups.filter(name='supervisor').exists()
     airlines = Airline.objects.all().order_by('code')
+    logger.debug("Queries completed")
 
     tech_card = None
     if tech_card_id:

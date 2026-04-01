@@ -117,16 +117,16 @@ class TechCard(models.Model):
     )
     def save(self, *args, **kwargs):
         # Присваиваем номер только при создании объекта
-        if not self.id:  # Проверяем, является ли объект новым
-            # Блокируем таблицу для предотвращения гонки данных
+        if not self.pk:  # Проверяем, является ли объект новым
             with transaction.atomic():
-                max_num = TechCard.objects.select_for_update().aggregate(Max('tech_card_num'))['tech_card_num__max']
-                
-                # Если максимальный номер найден, увеличиваем его на 1
-                if max_num:
-                    self.tech_card_num = max_num + 1
+                # Блокируем одну существующую запись или всю таблицу для получения Max
+                # В данном случае, так как записей мало, можно использовать простой Max
+                # Но для надежности в высоконагруженных системах лучше использовать F() или Sequence
+                # Для этой системы достаточно простого Max без select_for_update на все поле
+                last_card = TechCard.objects.order_by('-tech_card_num').first()
+                if last_card and last_card.tech_card_num:
+                    self.tech_card_num = last_card.tech_card_num + 1
                 else:
-                    # Если техкарт еще нет, начинаем с 1001
                     self.tech_card_num = 1001
         
         super().save(*args, **kwargs)

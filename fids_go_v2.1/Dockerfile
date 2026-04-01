@@ -8,6 +8,9 @@ COPY go.mod go.sum ./
 # Download dependencies
 RUN go mod download
 
+# Set alternative Go proxy
+ENV GOPROXY=https://goproxy.io,direct
+
 # Copy source code
 COPY . .
 

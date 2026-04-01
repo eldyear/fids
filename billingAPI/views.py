@@ -22,8 +22,8 @@ def get_billing_data(request):
     full_url = f"{base_url}?{urlencode(params)}"
     
     try:
-        # Отправляем HTTP-запрос
-        response = requests.get(full_url, headers={"Accept": "application/json"})
+        # Отправляем HTTP-запрос с таймаутом 10 секунд
+        response = requests.get(full_url, headers={"Accept": "application/json"}, timeout=10)
         response.raise_for_status()  # Вызовет исключение для ошибок HTTP
         print("Response content:", response.text)
         # Парсим JSON-ответ

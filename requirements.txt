@@ -12,3 +12,6 @@ djangorestframework==3.14.0
 django-filter==24.1
 pandas==2.1.4
 xhtml2pdf==0.2.16
+pyserial==3.5
+websockets==11.0.3
+django-mobile-detect==0.1
