@@ -13,6 +13,10 @@ import os
 from pathlib import Path
 from decouple import config, Csv
 
+import logging
+logger = logging.getLogger('django.security.csrf')
+logger.setLevel(logging.DEBUG)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -64,6 +68,18 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'oss.urls'
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://oss.kg',
+    'https://www.oss.kg',
+    'https://*.oss.kg',
+]
+
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 TEMPLATES = [
     {

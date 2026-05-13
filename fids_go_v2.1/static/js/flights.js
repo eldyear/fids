@@ -119,7 +119,9 @@ dirTabs.forEach(btn => {
 // --- WebSocket ---
 
 function connect() {
-    ws = new WebSocket('ws://' + window.location.host + '/go/ws/flights');
+    // ws = new WebSocket('ws://' + window.location.host + '/go/ws/flights');
+    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    const ws = new WebSocket(protocol + window.location.host + '/go/ws/flights');
 
     ws.onopen = () => console.log('Connected to Flights WS');
 

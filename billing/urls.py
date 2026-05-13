@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     # --- Десктопная версия ---
     path('supervisor/', views.supervisor_dashboard, name='supervisor_dashboard'),
+    path('supervisor/import-services/', views.import_services_view, name='import_services'),
     
     # 1. Маршрут для создания новой техкарты
     path('supervisor/manage_services/<int:flight_id>/services/', views.manage_services_for_flight, name='manage_services'),

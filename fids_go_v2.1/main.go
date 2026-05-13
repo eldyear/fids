@@ -164,7 +164,7 @@ func main() {
 	// Initialize sourceURL from environment variable
 	sourceURL = os.Getenv("FLIGHT_API_URL")
 	if sourceURL == "" {
-		sourceURL = "http://31.192.250.185/api/fids_full.json"
+		sourceURL = "http://199.1.1.1/api/fids_full.json"
 	}
 
 	// Initialize openWeatherAPIKey from environment variable

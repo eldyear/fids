@@ -12,6 +12,9 @@ from django.views.decorators.csrf import csrf_exempt
 
 logger = logging.getLogger(__name__)  # Логгер для отладки
 
+def maintenance_page(request):
+    return render(request, 'app/maintenance.html')
+
 def get_flights(direction):
     """Общий метод для получения данных рейсов."""
     now = timezone.now()

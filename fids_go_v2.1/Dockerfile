@@ -23,7 +23,7 @@ FROM alpine:latest
 WORKDIR /app
 
 # Install ca-certificates for HTTPS requests
-RUN apk --no-cache add ca-certificates
+RUN apk --no-cache add ca-certificates tzdata
 
 # Copy the binary from builder
 COPY --from=builder /app/main .

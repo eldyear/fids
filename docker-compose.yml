@@ -17,20 +17,40 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    restart: unless-stopped
+    restart: always
 
   fids_go:
     build:
       context: ./fids_go_v2.1
       dockerfile: Dockerfile
     container_name: fids_go
+    restart: always
     ports:
       - "8085:8085"
+      - "8082:8082"
     environment:
-      FLIGHT_API_URL: ${FLIGHT_API_URL:-http://31.192.250.185/api/fids_full.json}
+      FLIGHT_API_URL: ${FLIGHT_API_URL}
       OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY}
+      TZ: Asia/Bishkek
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     networks:
       - fids_network
+
+  easylock:
+    build:
+      context: ./easy_lock
+      dockerfile: Dockerfile
+    container_name: easylock_app
+    restart: always
+    volumes:
+      - ./easy_lock/data:/app/data
+    networks:
+      - fids_network
+    # Порт 8080 внутри контейнера, пробросим его для прямого теста
+    ports:
+      - "8081:8080"
 
   backend:
     build:
@@ -58,7 +78,7 @@ services:
     networks:
       - fids_network
     command: gunicorn oss.wsgi:application --bind 0.0.0.0:8000 --workers 3
-    restart: unless-stopped
+    restart: always
     healthcheck:
       test: ["CMD", "sh", "-c", "python -c \"import requests; resp=requests.get('http://localhost:8000/', timeout=5); exit(0 if resp.status_code < 500 else 1)\""]
       interval: 30s
@@ -74,20 +94,30 @@ services:
     depends_on:
       - backend
       - fids_go
+      - easylock
     ports:
       - "80:80"
+      - "443:443" # ОТКРЫВАЕМ ПОРТ 443
     volumes:
       - ./static:/app/static
       - ./media:/app/media
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./certbot/conf:/etc/letsencrypt:ro   # Папка с сертификатами
+      - ./certbot/www:/var/www/certbot:ro    # Папка для проверки Let's Encrypt
+      # - ./html:/usr/share/nginx/html
     networks:
       - fids_network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 5s
+    restart: always
+
+  certbot:
+    image: certbot/certbot
+    container_name: fids_certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - fids_network
 
 volumes:
   postgres_data:

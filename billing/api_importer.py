@@ -3,9 +3,10 @@ import json
 from datetime import datetime, timedelta
 from django.db import transaction
 
-from .models import Flight, Airport, Airline
+from .models import Flight, Airport, Airline, ServiceType
 
 MUMPS_API_URL = "http://31.192.250.185:1972/csp/adp/japiutcspp2.csp"
+SERVICES_API_URL = "http://31.192.250.185:1972/csp/adp/uslugi.csp"
 
 def import_flights_from_api(target_date_str=None, from_time_str=None, to_time_str=None):
     """
@@ -183,6 +184,52 @@ def import_flights_from_api(target_date_str=None, from_time_str=None, to_time_st
 
     except requests.exceptions.Timeout:
         return False, "Ошибка: Время ожидания ответа от API истекло."
+    except requests.exceptions.RequestException as e:
+        return False, f"Ошибка при запросе к API: {e}"
+    except Exception as e:
+        return False, f"Произошла непредвиденная ошибка: {e}"
+def import_service_types_from_api():
+    """
+    Извлекает типы услуг из API и сохраняет/обновляет их в базе данных.
+    """
+    print(f"--- Начало импорта типов услуг из {SERVICES_API_URL} ---")
+    
+    try:
+        response = requests.get(SERVICES_API_URL, timeout=30)
+        response.raise_for_status()
+        
+        try:
+            api_data = response.json()
+        except json.JSONDecodeError:
+            print(f"Ошибка декодирования JSON: {response.text[:200]}...")
+            return False, "API вернул невалидный JSON."
+
+        if not isinstance(api_data, list):
+            return False, "API вернул данные не в формате списка."
+
+        created_count = 0
+        updated_count = 0
+
+        with transaction.atomic():
+            for item in api_data:
+                code = item.get('id')
+                name = item.get('description')
+
+                if not code or not name:
+                    continue
+
+                obj, created = ServiceType.objects.update_or_create(
+                    code=code,
+                    defaults={'name': name}
+                )
+
+                if created:
+                    created_count += 1
+                else:
+                    updated_count += 1
+
+        return True, f"Импорт услуг завершен: создано {created_count}, обновлено {updated_count}."
+
     except requests.exceptions.RequestException as e:
         return False, f"Ошибка при запросе к API: {e}"
     except Exception as e:

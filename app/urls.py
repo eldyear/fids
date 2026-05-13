@@ -16,7 +16,7 @@ urlpatterns = [
     path('st/<int:pk>/', views.check_ajax, name='check_in_desk_ajax'),
     path('gate/<int:pk>/', views1.gate, name='gate'),
     path('bag/<int:pk>/', views1.baggage, name='baggage'),
-    path('main/', views1.my_urls, name='main'),
+    path('main/', views1.maintenance_page, name='main'),
     path('get_flight_data_check/<str:lang>/<int:pk>/', views1.get_flight_data_check, name='get_flight_data_check'),
     path('get_flight_data_gate/<str:lang>/G<int:pk>/', views1.get_flight_data_gate, name='get_flight_data_gate'),
     path('get_flight_data_bag/<str:lang>/<int:pk>/', views1.get_flight_data_bag, name='get_flight_data_bag'),
@@ -28,7 +28,7 @@ urlpatterns = [
     path("update_gate/<int:flight_id>/", views1.update_gate, name="update_gate"),
     path("update_baggage/<int:flight_id>/", views1.update_baggage, name="update_baggage"),
     path('update_log/', views1.update_log, name='update_log'),
-    path('', views1.my_urls, name='main'),
+    path('', views1.maintenance_page, name='main'),
 
     # Новые маршруты для агентов
     path('stagent/<str:stand_number>/', views.agent_registration_view, name='agent_registration_view'),

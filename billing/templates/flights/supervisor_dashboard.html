@@ -88,12 +88,16 @@
                         </div>
                     </form>
                 </div>
-                <div class="col-md-3 d-flex align-items-end mb-4">
+                <div class="col-md-3 d-flex flex-column align-items-end mb-4 gap-2">
                     <form method="post" action="{% url 'supervisor_dashboard' %}" class="w-100">
                         {% csrf_token %}
                         <input type="hidden" name="date" value="{{ request.GET.date }}">
-                        <button type="submit" class="btn btn-secondary w-100">Обновить из API</button>
+                        <button type="submit" class="btn btn-secondary w-100">Обновить рейсы</button>
                     </form>
+                    <!-- <form method="post" action="{% url 'import_services' %}" class="w-100">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-secondary w-100">Импорт услуг</button>
+                    </form> -->
                 </div>
             </div>
         </div>

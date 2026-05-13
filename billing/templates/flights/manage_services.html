@@ -488,7 +488,7 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // --- ОБЩИЕ ПЕРЕМЕННЫЕ (Объявляем один раз) ---
+        // --- ОБЩИЕ ПЕРЕМЕННЫЕ ---
         const servicesTableBody = document.getElementById('services-table-body');
         const serviceForm = document.getElementById('service-form');
         const serviceIdInput = document.getElementById('service-id-input');
@@ -513,7 +513,7 @@
         
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         
-        // --- НОВЫЕ ПЕРЕМЕННЫЕ ДЛЯ РЕЙСА (FLIGHT) ---
+        // --- ПЕРЕМЕННЫЕ ДЛЯ РЕЙСА (FLIGHT) ---
         const linkFlightModal = document.getElementById('linkFlightModal');
         const dateFilter = document.getElementById('dateFilter');
         const airlineFilter = document.getElementById('airlineFilter');
@@ -555,6 +555,8 @@
             const utcTime = `${utcHours}:${utcMinutes}`;
             if (inputElement) {
                 inputElement.value = utcTime;
+                // Триггерим blur, чтобы сработало автосохранение, если поле привязано к модели
+                inputElement.blur();
             }
         }
 
@@ -580,6 +582,7 @@
         }
 
         function resetForm() {
+            if (!serviceForm) return;
             serviceForm.reset();
             if (serviceIdInput) serviceIdInput.value = '';
             if (cancelButton) cancelButton.style.display = 'none';
@@ -594,7 +597,22 @@
             toggleServiceFields();
         }
         
-        // --- НОВЫЕ ФУНКЦИИ ДЛЯ РЕЙСА (FLIGHT) ---
+        // Универсальная функция визуальной индикации сохранения
+        function markAsSaved(element, success = true) {
+            if (success) {
+                element.classList.add('is-valid');
+                element.style.borderColor = '#28a745';
+                setTimeout(() => {
+                    element.classList.remove('is-valid');
+                    element.style.borderColor = '';
+                }, 1500);
+            } else {
+                element.classList.add('is-invalid');
+                element.style.borderColor = '#dc3545';
+            }
+        }
+
+        // --- ФУНКЦИИ ОБНОВЛЕНИЯ ДАННЫХ ---
         function updateFlightField(flightId, fieldName, value) {
             return fetch(`/billing/update-flight-field/`, {
                 method: 'POST',
@@ -604,79 +622,117 @@
                 },
                 body: `flight_id=${flightId}&field_name=${fieldName}&value=${encodeURIComponent(value)}`
             })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status !== 'success') throw new Error(data.message);
+                console.log('Flight updated');
+                return data;
+            });
+        }
+
+        function updateTechCardField(techCardId, fieldName, value) {
+            return fetch(`/billing/supervisor/techcards/${techCardId}/update_field/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json', // Говорим серверу, что это JSON
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ 
+                    field_name: fieldName, 
+                    value: value 
+                })
+            })
             .then(response => {
                 if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error(`Server responded with status: ${response.status}. Message: ${text}`);
-                    });
+                    return response.json().then(data => { throw new Error(data.message || 'Ошибка доступа'); });
                 }
                 return response.json();
-            })
-            .then(data => {
-                if (data.status === 'success') {
-                    console.log('Flight field successfully updated:', data.message);
-                } else {
-                    console.error('Flight field update failed:', data.message);
-                }
-                return data;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Произошла ошибка при сохранении: ' + error.message);
-                throw error;
             });
         }
         
-        // --- НОВАЯ ЛОГИКА ДЛЯ МОДАЛЬНОГО ОКНА СВЯЗЫВАНИЯ РЕЙСОВ ---
-        // Функция для загрузки и отображения рейсов в модальном окне
-        function loadFlights() {
-            const selectedDate = dateFilter.value;
-            const selectedAirline = airlineFilter.value;
+        // --- ЛОГИКА АВТОСОХРАНЕНИЯ (Критическая часть) ---
+        function handleAutoSave(event) {
+            const element = event.target;
+            const fieldName = element.dataset.fieldName;
+            if (!fieldName) return;
+
+            const techCardId = element.dataset.techCardId;
+            const flightId = element.dataset.flightId;
             
+            let newValue = element.value;
+            const originalValue = element.dataset.originalValue;
+
+            // Если значение не изменилось — ничего не делаем
+            if (newValue === originalValue) return;
+
+            // Если это число — заменяем запятую на точку (для авиационных весов/масс)
+            if (element.type === 'number' || element.dataset.type === 'decimal') {
+                newValue = newValue.replace(',', '.');
+            }
+
+            if (flightId) {
+                updateFlightField(flightId, fieldName, newValue)
+                    .then(() => {
+                        element.dataset.originalValue = newValue;
+                        markAsSaved(element);
+                    })
+                    .catch(err => alert('Ошибка Flight: ' + err.message));
+            } else if (techCardId) {
+                updateTechCardField(techCardId, fieldName, newValue)
+                    .then(() => {
+                        element.dataset.originalValue = newValue;
+                        markAsSaved(element);
+                    })
+                    .catch(err => alert('Ошибка TechCard: ' + err.message));
+            }
+        }
+
+        // Навешиваем обработчики на все инпуты с dataset.fieldName
+        document.querySelectorAll('input[data-field-name], select[data-field-name]').forEach(el => {
+            if (el.tagName === 'SELECT') {
+                el.addEventListener('change', handleAutoSave);
+            } else {
+                el.addEventListener('blur', handleAutoSave);
+                el.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') { e.preventDefault(); this.blur(); }
+                });
+            }
+        });
+
+        // --- МОДАЛЬНОЕ ОКНО РЕЙСОВ ---
+        function loadFlights() {
             const params = new URLSearchParams({
-                date_filter: selectedDate,
-                airline_filter: selectedAirline,
+                date_filter: dateFilter.value,
+                airline_filter: airlineFilter.value,
                 current_flight_id: currentFlightId,
             });
             
             fetch(`/billing/get_flights_for_linking/?${params.toString()}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Проблема с ответом сервера.');
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 flightsListBody.innerHTML = '';
-                if (data.flights.length === 0) {
+                if (!data.flights || data.flights.length === 0) {
                     flightsListBody.innerHTML = '<tr><td colspan="4" class="text-center">Рейсы не найдены.</td></tr>';
                     return;
                 }
-
                 data.flights.forEach(flight => {
                     const row = document.createElement('tr');
+                    row.style.cursor = 'pointer';
                     row.dataset.flightId = flight.id;
                     row.innerHTML = `
                         <td>${flight.flight_num}</td>
                         <td>${flight.direction}</td>
                         <td>${flight.airline_code}</td>
-                        <td>${flight.actual_time}</td>
-                    `;
+                        <td>${flight.actual_time}</td>`;
                     flightsListBody.appendChild(row);
                 });
             })
-            .catch(error => {
-                console.error('Ошибка при загрузке рейсов:', error);
-                flightsListBody.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Ошибка загрузки.</td></tr>';
-            });
+            .catch(error => console.error('Ошибка загрузки рейсов:', error));
         }
-        
-        // --- ОБРАБОТЧИКИ СОБЫТИЙ ---
-        
+
+        // Остальные обработчики (кнопки, время и т.д.)
         const backBtn = document.getElementById('back-to-dashboard-btn');
-        if (backBtn) {
-            backBtn.addEventListener('click', goBackToDashboard);
-        }
+        if (backBtn) backBtn.addEventListener('click', goBackToDashboard);
 
         updateClientTime();
         setInterval(updateClientTime, 1000);
@@ -691,15 +747,12 @@
             toggleServiceFields();
         }
 
-        if (cancelButton) {
-            cancelButton.addEventListener('click', resetForm);
-        }
+        if (cancelButton) cancelButton.addEventListener('click', resetForm);
 
         if (servicesTableBody) {
             servicesTableBody.addEventListener('click', function(e) {
                 let row = e.target.closest('tr');
                 if (!row || !row.dataset.serviceId) return;
-
                 if (selectedServiceRow === row) {
                     resetForm();
                 } else {
@@ -712,6 +765,7 @@
             });
         }
         
+        // Редактирование услуги
         if (editServiceBtn) {
             editServiceBtn.addEventListener('click', function() {
                 if (!selectedServiceRow) return;
@@ -725,176 +779,66 @@
                 if (startTimeInput) startTimeInput.value = data.startTime || '';
                 if (endTimeInput) endTimeInput.value = data.endTime || '';
                 if (descriptionInput) descriptionInput.value = data.description || '';
+                
                 const selectedCategory = serviceTypeSelect.options[serviceTypeSelect.selectedIndex].dataset.category;
-                switch (selectedCategory) {
-                    case 'pass':
-                        const [adults, children, infants] = (data.passengers || '//').split('/');
-                        document.getElementById('id_adults_count').value = adults || '';
-                        document.getElementById('id_children_count').value = children || '';
-                        document.getElementById('id_infants_count').value = infants || '';
-                        break;
-                    case 'time':
-                        const [hours, minutes] = (data.durationField || ':').split(':');
-                        if (durationHoursInput) durationHoursInput.value = hours || '';
-                        if (durationMinutesInput) durationMinutesInput.value = minutes || '';
-                        break;
-                    case 'int':
-                        document.getElementById('id_quantity').value = data.quantity || '';
-                        document.getElementById('id_unit_of_measure').value = data.unitOfMeasure || '';
-                        break;
+                if (selectedCategory === 'pass') {
+                    const p = (data.passengers || '//').split('/');
+                    document.getElementById('id_adults_count').value = p[0] || '';
+                    document.getElementById('id_children_count').value = p[1] || '';
+                    document.getElementById('id_infants_count').value = p[2] || '';
+                } else if (selectedCategory === 'time') {
+                    const d = (data.durationField || ':').split(':');
+                    if (durationHoursInput) durationHoursInput.value = d[0] || '';
+                    if (durationMinutesInput) durationMinutesInput.value = d[1] || '';
+                } else if (selectedCategory === 'int') {
+                    document.getElementById('id_quantity').value = data.quantity || '';
+                    document.getElementById('id_unit_of_measure').value = data.unitOfMeasure || '';
                 }
                 if (cancelButton) cancelButton.style.display = 'inline-block';
                 if (formTitle) formTitle.textContent = 'Редактировать услугу';
                 window.scrollTo({ top: serviceForm.offsetTop, behavior: 'smooth' });
             });
         }
-        
+
+        // Удаление услуги
         if (deleteServiceBtn) {
             deleteServiceBtn.addEventListener('click', function() {
-                if (!selectedServiceRow) {
-                    alert('Пожалуйста, выберите услугу для удаления.');
-                    return;
-                }
-                if (confirm('Вы уверены, что хотите удалить эту услугу?')) {
-                    const serviceId = selectedServiceRow.dataset.serviceId;
-                    fetch(`/billing/supervisor/delete_service/${serviceId}/`, {
+                if (!selectedServiceRow) return;
+                if (confirm('Удалить услугу?')) {
+                    fetch(`/billing/supervisor/delete_service/${selectedServiceRow.dataset.serviceId}/`, {
                         method: 'POST',
                         headers: { 'X-CSRFToken': csrfToken }
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            window.location.reload();
-                        } else {
-                            alert('Произошла ошибка при удалении услуги.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Ошибка:', error);
-                        alert('Произошла ошибка при удалении услуги.');
-                    });
+                    }).then(() => window.location.reload());
                 }
             });
         }
 
+        // Закрытие техкарты
         if (closeTechcardBtn) {
             closeTechcardBtn.addEventListener('click', function() {
-                if (confirm('Вы уверены, что хотите закрыть техкарту?')) {
-                    const techCardId = this.dataset.techCardId;
-                    fetch(`/billing/supervisor/techcards/${techCardId}/close/`, {
+                if (confirm('Закрыть техкарту?')) {
+                    fetch(`/billing/supervisor/techcards/${this.dataset.techCardId}/close/`, {
                         method: 'POST',
                         headers: { 'X-CSRFToken': csrfToken }
                     })
-                    .then(response => response.ok ? response.json() : response.json().then(errorData => {
-                        throw new Error(errorData.message || 'Произошла ошибка при закрытии техкарты.');
-                    }))
-                    .then(data => {
-                        alert(data.message);
-                        window.location.reload();
-                    })
-                    .catch(error => {
-                        console.error('Ошибка:', error);
-                        alert(error.message);
-                    });
+                    .then(res => res.json())
+                    .then(data => { alert(data.message); window.location.reload(); })
+                    .catch(err => alert(err.message));
                 }
             });
         }
-        
-        function updateTechCardField(techCardId, fieldName, value) {
-            return fetch(`/billing/supervisor/techcards/${techCardId}/update_field/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
-                body: JSON.stringify({ field_name: fieldName, value: value })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error(`Server responded with status: ${response.status}. Message: ${text}`);
-                    });
-                }
-                return response.json();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Произошла ошибка при сохранении: ' + error.message);
-                throw error;
-            });
-        }
-        
-        document.querySelectorAll('input[type="number"], input[type="text"], select').forEach(element => {
-            const techCardId = element.dataset.techCardId;
-            const flightId = element.dataset.flightId;
-            const fieldName = element.dataset.fieldName;
-            if (!fieldName) return;
-            const isSelect = element.tagName === 'SELECT';
-            function saveValue() {
-                const newValue = element.value;
-                const originalValue = element.dataset.originalValue;
-                if (newValue !== originalValue) {
-                    if (flightId) {
-                        updateFlightField(flightId, fieldName, newValue);
-                    } else if (techCardId) {
-                        updateTechCardField(techCardId, fieldName, newValue);
-                    }
-                    element.dataset.originalValue = newValue;
-                }
-            }
-            if (isSelect) {
-                element.addEventListener('change', saveValue);
-            } else {
-                element.addEventListener('blur', saveValue);
-                element.addEventListener('keydown', function(event) {
-                    if (event.key === 'Enter') {
-                        event.preventDefault();
-                        this.blur();
-                    }
-                });
-            }
-        });
-        
-        if (serviceForm) {
-            serviceForm.addEventListener('submit', function(e) {
-                document.querySelectorAll('.dynamic-fields').forEach(container => {
-                    if (container.style.display === 'none') {
-                        container.querySelectorAll('input, select, textarea').forEach(field => {
-                            field.disabled = true;
-                        });
-                        e.target.querySelectorAll('input[type="number"]').forEach(input => {
-                            input.disabled = false;
-                        });
-                    }
-                });
-            });
-        }
-        
-        if (linkFlightModal) {
-            linkFlightModal.addEventListener('show.bs.modal', loadFlights);
-        }
-        if (dateFilter) {
-            dateFilter.addEventListener('change', loadFlights);
-        }
-        if (airlineFilter) {
-            airlineFilter.addEventListener('change', loadFlights);
-        }
+
+        // Связывание рейсов
+        if (linkFlightModal) linkFlightModal.addEventListener('show.bs.modal', loadFlights);
+        [dateFilter, airlineFilter].forEach(f => f && f.addEventListener('change', loadFlights));
 
         if (flightsListBody) {
             flightsListBody.addEventListener('click', function(e) {
                 const row = e.target.closest('tr');
-                if (!row || !row.dataset.flightId) return;
-                const selectedFlightId = row.dataset.flightId;
-                updateFlightField(currentFlightId, 'linked_flight', selectedFlightId)
+                if (!row) return;
+                updateFlightField(currentFlightId, 'linked_flight', row.dataset.flightId)
                 .then(() => {
-                    const selectedFlightNum = row.querySelector('td:nth-child(1)').textContent;
-                    linkedFlightDisplay.textContent = `${currentFlightNum} / ${selectedFlightNum}`;
-                    const modal = bootstrap.Modal.getInstance(linkFlightModal);
-                    if (modal) {
-                        modal.hide();
-                    }
-                })
-                .catch(() => {
-                    // Ошибка уже будет обработана в updateFlightField
+                    location.reload(); // Перезагружаем для обновления всех связей
                 });
             });
         }

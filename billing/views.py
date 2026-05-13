@@ -7,7 +7,7 @@ from django.db.utils import IntegrityError
 from django.db.models import Q, F, Sum, ExpressionWrapper, fields
 from .forms import FlightFilterForm, ServiceForm, LogFilterForm
 from .models import Flight, Service, Airport, ServiceType, ServicePrice, UserProfile, TechCard, LogEntry, Firm, Airline
-from .api_importer import import_flights_from_api
+from .api_importer import import_flights_from_api, import_service_types_from_api
 from .services_to_techcard import generate_tech_card_from_services
 from datetime import datetime, date, timedelta, time
 import logging
@@ -182,6 +182,20 @@ def supervisor_dashboard(request):
             'view_mode': view_mode,
         }
         return render(request, 'flights/supervisor_dashboard.html', context)
+
+@login_required
+@require_POST
+def import_services_view(request):
+    """
+    Представление для ручного запуска импорта типов услуг из API.
+    """
+    success, message = import_service_types_from_api()
+    if success:
+        messages.success(request, message)
+    else:
+        messages.error(request, f"Ошибка при импорте услуг: {message}")
+    
+    return redirect('supervisor_dashboard')
 
 @login_required
 def supervisor_dashboard_mobile(request):
