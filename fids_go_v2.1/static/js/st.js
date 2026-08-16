@@ -44,6 +44,7 @@ let langIndex = 0;
 let currentLang = 'ru';
 const LANG_SWITCH_INTERVAL = 15000;
 let langTimer;
+let pingInterval;
 window.lastFlights = [];
 const pathParts = window.location.pathname.split('/');
 const deskNumber = pathParts[pathParts.length - 1];
@@ -79,17 +80,27 @@ const errorStyles = `
             max-width: 300px;
             opacity: 0.8;
         }
+
+        .flight-number, .first-text {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 0.4vw;
+        }
+
+
+        .main-flight-num {
+            font-weight: bold;
+        }
+
+
+        .codeshare-flight-num {
+            font-size: 0.80em;          /* 65% от размера главного номера */
+            opacity: 0.6;              /* Полупрозрачный */
+            font-weight: bold;                 /* Жирный шрифт */
+        }
     </style>
 `;
 document.head.insertAdjacentHTML('beforeend', errorStyles);
-
-function updateLocalTime() {
-    const now = new Date();
-    const options = { hour: '2-digit', minute: '2-digit', hour12: false };
-    const timeString = now.toLocaleTimeString('ru-RU', options);
-    const localTimeElem = document.getElementById('localTime');
-    if (localTimeElem) localTimeElem.textContent = timeString;
-}
 
 function updateServerTime(serverTime) {
     const localTimeElem = document.getElementById('localTime');
@@ -192,6 +203,40 @@ function updateTextsForCurrentLanguage() {
     }
 }
 
+function renderFlightNumber(flight) {
+    // Брать номер из flight.flight или из flight.flt
+    const mainFlight = flight.flight || flight.flt || '';
+
+    // Получаем значение codeshare (проверяем оба возможных ключа)
+    const codeshareVal = flight.codeshare || flight.cs;
+
+    // Проверяем, есть ли codeshare и не пустой ли он
+    if (!codeshareVal || typeof codeshareVal !== 'string' || !codeshareVal.trim()) {
+        return `<span class="main-flight-num">${mainFlight}</span>`;
+    }
+
+    // Разделяем по двоеточию: "K1310:K1" -> ["K1310", "K1"]
+    const parts = codeshareVal.split(':');
+    const rawCode = parts[0].trim();                      // "K1310"
+    const airlineCode = parts[1] ? parts[1].trim() : '';  // "K1"
+
+    let formattedCodeshare = rawCode;
+
+    if (airlineCode && rawCode.startsWith(airlineCode)) {
+        // Вырезаем точный код авиакомпании (K1) и оставляем только номер рейса (310)
+        const flightNum = rawCode.slice(airlineCode.length).trim();
+        formattedCodeshare = `${airlineCode} ${flightNum}`;
+    } else {
+        // Запасной вариант: разделение строго по двум символам кода IATA
+        formattedCodeshare = rawCode.replace(/^([A-Z0-9]{2})(\d+)/, '$1 $2');
+    }
+
+    return `
+        <span class="main-flight-num">${mainFlight}</span>
+        <span class="codeshare-flight-num">/ ${formattedCodeshare}</span>
+    `;
+}
+
 function createFlightHTML(flight, index) {
     const initialCityName = flight.destination[`name_${currentLang}`] || flight.destination.name_ru;
     let weatherHTML = '';
@@ -254,7 +299,9 @@ function createFlightHTML(flight, index) {
             </div>
             <div class="destination-container">
                 <div class="destination destination-${index} text-animate">${initialCityName}</div>
-                <div class="flight-number sky-priority-flight-number flight-number-${index}">${flight.flight}</div>
+                <div class="flight-number sky-priority-flight-number flight-number-${index}">
+                    ${renderFlightNumber(flight)}
+                </div>
             </div>
             <div class="time-weather-container">
                 <div>
@@ -278,7 +325,7 @@ function createFlightHTML(flight, index) {
                 </div>
                 <div class="destination-container">
                     <div class="destination destination-${index} text-animate">${initialCityName}</div>
-                    <div class="first-text flight-number-${index}">${flight.flight}</div>
+                    <div class="first-text flight-number-${index}">${renderFlightNumber(flight)}</div>
                 </div>
                 <div class="time-weather-container">
                     <div>
@@ -296,7 +343,7 @@ function createFlightHTML(flight, index) {
                     <div class="logo-container ${flight.airline}">
                         <img src="/go/static/images/airlines/${flight.airline}.svg" alt="Airline Logo" class="airline-logo">
                     </div>
-                    <div class="first-text flight-number-${index}">${flight.flight}</div>
+                    <div class="first-text flight-number-${index}">${renderFlightNumber(flight)}</div>
                 </div>
                 <div class="destination-container">
                     <div class="destination destination-${index} text-animate">${initialCityName}</div>
@@ -322,14 +369,12 @@ function updateFlightInfo(flights) {
         console.error("Не найдены элементы с ID 'flightInfo' или <body>.");
         return;
     }
-    window.lastFlights = Array.isArray(flights) ? flights : [];
 
-    console.log('Все полученные рейсы:', window.lastFlights);
+    const rawFlights = Array.isArray(flights) ? flights : [];
+    const activeFlights = rawFlights.filter(flight => flight.status !== 'ENDED');
 
-    const activeFlights = window.lastFlights.filter(flight => {
-        console.log('Статус рейса:', flight.status);
-        return flight.status !== 'ENDED';
-    });
+    // Сохраняем отфильтрованные рейсы в глобальную переменную
+    window.lastFlights = activeFlights;
 
     console.log('Активные рейсы после фильтрации:', activeFlights);
 
@@ -404,7 +449,6 @@ function updateFlightInfo(flights) {
         `;
     }
 
-    window.lastFlights = activeFlights;
     updateTextsForCurrentLanguage(); // Обновляем текст после изменения HTML
 }
 
@@ -416,7 +460,7 @@ function connectWebSocket() {
     console.log(`Попытка подключения к ${wsUrl}`);
     ws = new WebSocket(wsUrl);
 
-    const pingInterval = setInterval(() => {
+    pingInterval = setInterval(() => {
         if (ws && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({ type: "ping" }));
         }
@@ -457,12 +501,14 @@ function connectWebSocket() {
         console.error("WebSocket error:", error);
         showError("Ошибка соединения WebSocket");
         clearInterval(langTimer);
+        clearInterval(pingInterval);
         setTimeout(connectWebSocket, 5000);
     };
 
     ws.onclose = function (event) {
         // console.log(`WebSocket connection closed: Code=${event.code}, Reason=${event.reason}`);
         clearInterval(langTimer);
+        clearInterval(pingInterval);
         if (!event.wasClean && document.getElementById('flightInfo')) {
             document.getElementById('flightInfo').innerHTML =
                 `<div class="error-message">Соединение WebSocket закрыто (Code: ${event.code})</div>`;

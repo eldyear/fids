@@ -117,6 +117,11 @@ body {
 
 }
 
+.RWZ {
+    background-color: #e5002b;
+
+}
+
 .airline-logo {
     max-width: 48vw;
     width: auto;
@@ -313,6 +318,9 @@ body {
     background-color: #ba0c2f !important;
 }
 
+.half-width .RWZ {
+    background-color: #e5002b !important;
+}
 .half-width .flight-block-0 {
     margin-left: 20vw;
 }
@@ -766,6 +774,10 @@ body.sky-priority-body .destination {
 
 .single-flight .U6 {
     background-color: #ba0c2f;
+}
+
+.single-flight .RWZ {
+    background-color: #e5002b;
 }
 
 /* Контейнер для логотипов */

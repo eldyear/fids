@@ -87,6 +87,7 @@ type Flight struct {
 	Direction   string        `json:"direction"`
 	Airline     string        `json:"airline"`
 	Flight      string        `json:"flight"`
+	Codeshare   string        `json:"codeshare,omitempty"`
 	Destination City          `json:"destination"`
 	Date1       string        `json:"date1"`
 	Time1       string        `json:"time1"`
@@ -257,7 +258,7 @@ func triggerHandler(w http.ResponseWriter, r *http.Request) {
 	// Notify Django
 	go func() {
 		// Replace with your actual Django endpoint
-		djangoURL := "http://127.0.0.1:8000/api/refresh"
+		djangoURL := "http://backend:8000/api/refresh/"
 		resp, err := http.Post(djangoURL, "application/json", strings.NewReader(`{"source":"fids_go"}`))
 		if err != nil {
 			log.Printf("Failed to notify Django: %v", err)
@@ -369,6 +370,7 @@ func processData(source []SourceFlight) {
 			Direction: dir,
 			Airline:   s.Al,
 			Flight:    s.Flt,
+			Codeshare: s.CodeShare,
 			Destination: City{
 				NameRu: s.Dest.Ru,
 				NameEn: s.Dest.En,
@@ -423,7 +425,15 @@ func processData(source []SourceFlight) {
 
 		// Handle Gate
 		if s.Gate != "" {
-			f.Gate = []GateInfo{{Number: s.Gate}}
+			parts := strings.Split(s.Gate, ",")
+			var gates []GateInfo
+			for _, p := range parts {
+				val := strings.TrimSpace(p)
+				if val != "" {
+					gates = append(gates, GateInfo{Number: val})
+				}
+			}
+			f.Gate = gates
 		}
 
 		// Handle Baggage (Carousel)
