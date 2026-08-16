@@ -379,7 +379,7 @@
         <div class="header-content">
             <h1>📊 Отчеты по сканированиям</h1>
             <div class="header-actions">
-                <span class="user-info">👤 {{ current_user.username }}</span>
+                <span class="user-info">👤 {{ current_user.first_name|default:current_user.username }}</span>
                 <!-- <a href="{% url 'get_barcode_scan' %}" class="btn btn-primary">К сканеру</a>
                 <a href="{% url 'all_scans_view' %}" class="btn btn-secondary">Все сканирования</a> -->
                 <a href="{% url 'logout_view' %}" class="btn btn-secondary">Выйти</a>
@@ -407,7 +407,8 @@
                         <select class="form-control" id="airline" name="airline">
                             <option value="">Все</option>
                             {% for airline in airlines %}
-                            <option value="{{ airline }}" {% if airline == airline_filter %}selected{% endif %}>{{ airline }}</option>
+                            <option value="{{ airline }}" {% if airline == airline_filter %}selected{% endif %}>{{ airline
+                                }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -506,14 +507,27 @@
                                 {% for scan in flight_data.scans %}
                                 <div class="passenger-item">
                                     <div class="passenger-name">{{ scan.passenger_name|default:"Не указан" }}</div>
+                                    <div class="info-item">
+                                        <div class="info-label">Дата/Время рейса</div>
+                                        <div class="info-value">
+                                            {% if scan.flight %}
+                                                {{ scan.flight.date1|date:"d.m.Y" }} {{ scan.flight.time1|time:"H:i" }}
+                                            {% else %}
+                                                {{ scan.flight_date|date:"d.m.Y"|default:"-" }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
                                     <div class="passenger-info">
                                         <strong>PNR:</strong> {{ scan.pnr|default:"-" }} |
                                         <strong>Место:</strong> {{ scan.seat_number|default:"-" }} |
                                         <strong>Тип:</strong> {{ scan.pax_type|default:"-" }} |
-                                        <strong>Дата вылета:</strong> {{ scan.flight_date|date:"d.m.Y"|default:"-" }} |
-                                        <strong>Время:</strong> {{ scan.timestamp|date:"H:i:s" }}
-                                        {% if current_user.is_staff %}
-                                        | <strong>Пользователь:</strong> {{ scan.user.username|default:"-" }}
+                                        <strong>Время рейса:</strong> 
+                                        {% if scan.flight %}
+                                            {{ scan.flight.time1|time:"H:i" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                        | <strong>Пользователь:</strong> {{ scan.user_display }}
                                         {% if scan.parsed_data_json %}
                                         <br>
                                         <details style="margin-top: 5px;">
@@ -523,13 +537,13 @@
                                                 style="background: #f5f5f5; padding: 10px; border-radius: 4px; margin-top: 5px; font-size: 0.85em; overflow-x: auto; border: 1px solid #ddd;">{{ scan.parsed_data_json|safe }}</pre>
                                         </details>
                                         {% endif %}
-                                        {% endif %}
                                         {% if scan.is_duplicate %}
                                         <span class="badge badge-danger">Дубликат</span>
                                         {% endif %}
-                                        
+
                                         {% if scan.is_suspicious %}
-                                        <span class="badge badge-warning" title="{{ scan.suspicious_reason }}">⚠️ Подозрительный: {{ scan.suspicious_reason }}</span>
+                                        <span class="badge badge-warning" title="{{ scan.suspicious_reason }}">⚠️
+                                            Подозрительный: {{ scan.suspicious_reason }}</span>
                                         {% endif %}
 
                                         {% if not scan.is_duplicate and not scan.is_suspicious %}

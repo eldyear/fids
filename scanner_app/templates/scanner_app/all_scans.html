@@ -195,10 +195,7 @@
             align-items: flex-end;
         }
 
-        .form-group {
-            /* Замена .col-md-3 */
-            /* grid item will handle margin */
-        }
+        /* .form-group handled by grid item */
 
         .form-label {
             /* Замена .form-label */
@@ -645,7 +642,7 @@
         <div class="header-content">
             <h1>Сканирования по рейсам</h1>
             <div class="user-info">
-                <span>{{ current_user.username }}</span>
+                <span>{{ current_user.first_name|default:current_user.username }}</span>
                 <a href="{% url 'get_barcode_scan' %}" class="action-button scanner-btn">К сканеру</a>
                 <a href="{% url 'logout_view' %}" class="action-button logout-btn">Выйти</a>
             </div>
@@ -755,9 +752,15 @@
                         {% for scan in flight_data.scans %}
                         <div class="passenger-item">
                             <div class="passenger-item-content">
-                                <div>
-                                    <div class="passenger-name">
-                                        {{ scan.passenger_name|default:"Не указан" }}
+                                    <div class="info-item">
+                                        <div class="info-label">Дата/Время рейса</div>
+                                        <div class="info-value">
+                                            {% if scan.flight %}
+                                                {{ scan.flight.date1|date:"d.m.Y" }} {{ scan.flight.time1|time:"H:i" }}
+                                            {% else %}
+                                                {{ scan.flight_date|date:"d.m.Y"|default:"-" }}
+                                            {% endif %}
+                                        </div>
                                     </div>
                                     <div class="passenger-details">
                                         <strong>PNR:</strong> {{ scan.pnr|default:"-" }} |
@@ -765,8 +768,7 @@
                                         <strong>Тип:</strong> {{ scan.pax_type|default:"-" }} |
                                         <strong>Дата вылета:</strong> {{ scan.flight_date|date:"d.m.Y"|default:"-" }} |
                                         <strong>Время сканирования:</strong> {{ scan.timestamp|date:"H:i:s" }}
-                                        {% if current_user.is_staff %}
-                                        <br><strong>Пользователь:</strong> {{ scan.user.username|default:"-" }}
+                                        <br><strong>Пользователь:</strong> {{ scan.user_display }}
                                         {% if scan.parsed_data_json %}
                                         <br>
                                         <details style="margin-top: 5px;">
@@ -776,7 +778,6 @@
                                             <pre
                                                 style="background: var(--log-raw-bg); padding: 10px; border-radius: 5px; margin-top: 5px; font-size: 0.85em; overflow-x: auto;">{{ scan.parsed_data_json|safe }}</pre>
                                         </details>
-                                        {% endif %}
                                         {% endif %}
                                     </div>
                                 </div>

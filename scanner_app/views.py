@@ -1,16 +1,18 @@
 # scanner_app/views.py
 import json
+import requests
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse, FileResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .models import BarcodeScan
-from app.models import InfTablo, FlightNumber, FlightsList, Cities # Импортируем модели из app
+from app.models import InfTablo, FlightNumber, FlightsList, Cities, Status
 from django.db.models import Count, Q
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, time
+from django.utils import timezone
 
 # Этот view будет отображать панель мониторинга, если она вам нужна как HTML-страница
 # Если вы используете barcode.html напрямую с файловой системы или другого сервера,
@@ -22,7 +24,7 @@ from datetime import datetime, timedelta, date
 
 @csrf_exempt # Отключаем CSRF защиту для простоты в рамках примера. В продакшене используйте CSRF токены!
 @require_POST # Убеждаемся, что принимаем только POST запросы
-@login_required(login_url='login_view')
+# @login_required(login_url='login_view') - отключено для доступа из scanner_gui.py
 def save_barcode_scan(request):
     try:
         data = json.loads(request.body)
@@ -87,25 +89,37 @@ def save_barcode_scan(request):
                         break
                 
                 flight_instance = None
-                current_date = date.today()
+                current_date = timezone.localdate()
+                now_time = timezone.localtime().time()
 
                 if flight_ref:
-                    # Если нашли в справочнике, ищем в InfTablo
-                    flight_instance = InfTablo.objects.filter(
+                    # Ищем ВСЕ подходящие рейсы в InfTablo на этот день
+                    potential_flights = InfTablo.objects.filter(
                         flight__flights=flight_ref.flight_number,
                         date1=current_date
-                    ).first()
+                    )
+                    
+                    if potential_flights.count() > 1:
+                        best_flight = None
+                        min_diff = None
+                        for pf in potential_flights:
+                            if pf.time1:
+                                diff = abs((pf.time1.hour * 3600 + pf.time1.minute * 60) - 
+                                           (now_time.hour * 3600 + now_time.minute * 60))
+                                if min_diff is None or diff < min_diff:
+                                    min_diff = diff
+                                    best_flight = pf
+                        flight_instance = best_flight
+                    else:
+                        flight_instance = potential_flights.first()
 
                     if not flight_instance:
-                        print(f"DEBUG: Рейс {flight_ref.flight_number} найден в справочнике, но нет в суточном плане на {current_date}. Создаем.")
-                        
                         # 1. Получаем/Создаем FlightNumber
                         flight_num_obj, created_fn = FlightNumber.objects.get_or_create(
                             flights=flight_ref.flight_number
                         )
                         
                         # 2. Получаем/Создаем Cities (Destination)
-                        # Пытаемся найти по ICAO, потом по названию
                         destination_obj = None
                         if flight_ref.destination_icao:
                             destination_obj = Cities.objects.filter(icao_code=flight_ref.destination_icao).first()
@@ -114,24 +128,18 @@ def save_barcode_scan(request):
                             destination_obj = Cities.objects.filter(city_name_ru__iexact=flight_ref.destination_city).first()
                             
                         if not destination_obj:
-                             # Если города нет, создаем заглушку (или лучше ошибку? лучше заглушку чтобы не ломать флоу)
-                             # Но для заглушки нужны данные. Используем то что есть в справочнике.
                              city_name = flight_ref.destination_city or "Unknown"
                              icao = flight_ref.destination_icao or "ZZZZ"
                              destination_obj = Cities.objects.create(
                                  city_name_ru=city_name,
                                  city_name_ky=city_name,
                                  city_name_en=city_name,
-                                 iata_code="ZZZ", # Заглушка
+                                 iata_code="ZZZ",
                                  icao_code=icao
                              )
-                             print(f"DEBUG: Создан новый город: {destination_obj}")
 
                         # 3. Определяем направление
-                        direction_map = {
-                            "ПРИЛЕТ": "arr",
-                            "ВЫЛЕТ": "dep"
-                        }
+                        direction_map = {"ПРИЛЕТ": "arr", "ВЫЛЕТ": "dep"}
                         direction_code = direction_map.get(flight_ref.direction.upper(), 'dep')
 
                         # 4. Создаем InfTablo
@@ -141,32 +149,43 @@ def save_barcode_scan(request):
                             date1=current_date,
                             direction=direction_code,
                             airline=flight_ref.airline,
-                            status=None # Или статус по умолчанию "По расписанию"?
+                            status=None
                         )
-                        print(f"DEBUG: Создан рейс в InfTablo: {flight_instance}")
 
                 else:
-                    # Если не нашли в справочнике, пробуем старую логику (прямой поиск в InfTablo по всем вариантам)
-                    print(f"DEBUG: Рейс не найден в FlightsList. Пробуем прямой поиск в InfTablo по вариантам: {potential_flight_numbers}")
+                    # Если не нашли в справочнике, пробуем прямой поиск в InfTablo
                     for f_num in potential_flight_numbers:
-                        flight_instance = InfTablo.objects.filter(
+                        potential_flights = InfTablo.objects.filter(
                             flight__flights=f_num,
                             date1=current_date
-                        ).first()
-                        if flight_instance:
-                            full_flight_number_searched = f_num
-                            print(f"DEBUG: Найдено совпадение в InfTablo (без справочника): {flight_instance}")
-                            break
+                        )
+                        
+                        if potential_flights.exists():
+                            if potential_flights.count() > 1:
+                                best_flight = None
+                                min_diff = None
+                                for pf in potential_flights:
+                                    if pf.time1:
+                                        diff = abs((pf.time1.hour * 3600 + pf.time1.minute * 60) - 
+                                                   (now_time.hour * 3600 + now_time.minute * 60))
+                                        if min_diff is None or diff < min_diff:
+                                            min_diff = diff
+                                            best_flight = pf
+                                flight_instance = best_flight
+                            else:
+                                flight_instance = potential_flights.first()
+                            
+                            if flight_instance:
+                                full_flight_number_searched = f_num
+                                break
 
             except Exception as e:
-                print(f"Ошибка при поиске/создании рейса: {e}")
-                import traceback
-                traceback.print_exc()
                 flight_instance = None
         
         # --- ИЗМЕНЕНИЕ: НЕ ПРЕРЫВАЕМ СОХРАНЕНИЕ, ЕСЛИ РЕЙС НЕ НАЙДЕН ---
         if not flight_instance:
-            print(f"WARNING: Рейс {full_flight_number_searched} не найден в FIDS, но сканирование будет сохранено.")
+            flight_num_tag = f"{carrier_code}{flight_number_part}"
+            print(f"WARNING: Рейс {flight_num_tag} не найден в FIDS, но сканирование будет сохранено.")
             # Мы больше не возвращаем ошибку, а продолжаем выполнение, чтобы сохранить данные
             # return JsonResponse({ ... }, status=404)
 
@@ -181,40 +200,60 @@ def save_barcode_scan(request):
         if seat_number and len(seat_number) > 50: seat_number = seat_number[:50]
         
         # Определяем дату рейса для проверки дубликатов
-        scan_flight_date = date.today()
+        scan_flight_date = timezone.localdate() # По умолчанию сегодня в местном времени
+        
+        # 1. Пробуем получить готовую дату от клиента (если есть)
         if parsed_data.get('flight_date') and parsed_data.get('flight_date') != 'N/A':
             try:
-                # Assuming format YYYY-MM-DD from parser
                 scan_flight_date = datetime.strptime(parsed_data.get('flight_date'), '%Y-%m-%d').date()
             except ValueError:
-                pass # Fallback to today
+                pass
+        # 2. Если даты нет, но есть flight_date_info (Julian date из BCBP, например "137Y")
+        elif parsed_data.get('flight_date_info') and parsed_data.get('flight_date_info') != 'N/A':
+            julian_str = str(parsed_data.get('flight_date_info'))
+            if julian_str[:3].isdigit():
+                try:
+                    day_of_year = int(julian_str[:3])
+                    today = timezone.localdate()
+                    # Вычисляем дату в текущем году
+                    potential_date = date(today.year, 1, 1) + timedelta(days=day_of_year - 1)
+                    # Корректировка года (если скан в конце года на рейс в начале следующего, или наоборот)
+                    diff = (potential_date - today).days
+                    if diff < -200: # Например, сегодня декабрь, а билет на январь
+                        potential_date = date(today.year + 1, 1, 1) + timedelta(days=day_of_year - 1)
+                    elif diff > 200: # Сегодня январь, а билет (зачем-то) за прошлый декабрь
+                        potential_date = date(today.year - 1, 1, 1) + timedelta(days=day_of_year - 1)
+                    scan_flight_date = potential_date
+                except:
+                    pass
 
         # Ищем существующие сканирования (Улучшенная логика)
         existing_scan = None
-        if raw_barcode:
-             existing_scan = BarcodeScan.objects.filter(
-                raw_barcode=raw_barcode,
-                timestamp__date=date.today()
-            ).first()
-
-        if not existing_scan and passenger_name and carrier_code and flight_number_part:
+        
+        if flight_instance:
+            # Если рейс FIDS определен, дубликат - это пассажир с тем же именем на ЭТОМ ЖЕ самом рейсе
             existing_scan = BarcodeScan.objects.filter(
                 passenger_name=passenger_name,
-                carrier_code=carrier_code,
-                flight_number_str=flight_number_part,
-                flight_date=scan_flight_date,
-                timestamp__date=date.today()  # Только за сегодня
+                flight=flight_instance
             ).first()
-            
-            # Если PNR есть, уточняем поиск
-            if not existing_scan and pnr and pnr != 'N/A':
+            pass
+        else:
+            # Если FIDS не нашел рейс, используем логику fallback только за сегодняшний день
+            if raw_barcode:
                  existing_scan = BarcodeScan.objects.filter(
-                    pnr=pnr,
-                    carrier_code=carrier_code,
-                    flight_number_str=flight_number_part,
+                    raw_barcode=raw_barcode,
                     timestamp__date=date.today()
                 ).first()
-
+    
+            if not existing_scan and passenger_name and carrier_code and flight_number_part:
+                existing_scan = BarcodeScan.objects.filter(
+                    passenger_name=passenger_name,
+                    carrier_code=carrier_code,
+                    flight_number_str=flight_number_part,
+                    flight_date=scan_flight_date,
+                    timestamp__date=date.today()  # Только за сегодня
+                ).first()
+                pass
         
         # Если найден дубликат, помечаем новое сканирование как дубликат
         is_duplicate_in_db = existing_scan is not None
@@ -245,9 +284,37 @@ def save_barcode_scan(request):
                 return str(val)[:max_len]
             return val
 
+        user_to_assign = request.user if request.user.is_authenticated else None
+        raw_barcode = data.get('raw_barcode')
+        
+        # Интеграция с локальными пользователями клиента (scanner_advanced_gui2.py)
+        client_user_data = data.get('client_user', {})
+        if client_user_data:
+            client_username = client_user_data.get('username') or client_user_data.get('full_name')
+            if client_username:
+                from django.contrib.auth.models import User
+                # Используем безопасное имя пользователя без спецсимволов для поиска и создания
+                safe_username = "".join(c for c in client_username if c.isalnum() or c in "._-")
+                if safe_username:
+                    # Пытаемся найти пользователя
+                    found_user = User.objects.filter(username__iexact=safe_username).first()
+                    if not found_user:
+                        # Если нет - создаем автоматически
+                        try:
+                            found_user = User.objects.create_user(
+                                username=safe_username,
+                                first_name=client_user_data.get('full_name', ''),
+                                password='defaultpassword123'
+                            )
+                        except Exception:
+                            found_user = None
+                
+                if found_user:
+                    user_to_assign = found_user
+
         # Создаем запись о сканировании
         barcode_scan = BarcodeScan.objects.create(
-            user=request.user,  # Привязываем к текущему пользователю
+            user=user_to_assign,  # Привязываем к текущему пользователю или None если без авторизации
             raw_barcode=raw_barcode,
             scanner_prefix=get_truncated('scanner_prefix', 50),
             pax_type=get_truncated('pax_type', 50),
@@ -347,18 +414,16 @@ def all_scans_view(request):
     flight_filter = request.GET.get('flight', '')
     passenger_search = request.GET.get('passenger', '').strip()
     user_filter = request.GET.get('user', '').strip()
-    
-    # Базовый queryset - для администратора все, для обычного пользователя только свои
-    if request.user.is_staff:
-        scans = BarcodeScan.objects.all()
-    else:
-        scans = BarcodeScan.objects.filter(user=request.user)
-    
+    # Базовый queryset - показываем все сканирования всем авторизованным пользователям
+    scans = BarcodeScan.objects.all()
     # Фильтр по дате
     if date_filter:
         try:
-            filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
-            scans = scans.filter(timestamp__date=filter_date)
+            date_obj = datetime.strptime(date_filter, '%Y-%m-%d').date()
+            # Используем осознанные (aware) datetime для точного поиска по часовому поясу
+            start_dt = timezone.make_aware(datetime.combine(date_obj, time.min))
+            end_dt = timezone.make_aware(datetime.combine(date_obj, time.max))
+            scans = scans.filter(timestamp__range=(start_dt, end_dt))
         except ValueError:
             pass
     
@@ -403,6 +468,12 @@ def all_scans_view(request):
                 'flight_info': None
             }
         
+        # Добавляем отображаемое имя пользователя прямо в Python, чтобы избежать
+        # ошибки шаблона при scan.user == None
+        if scan.user:
+            scan.user_display = scan.user.first_name or scan.user.username
+        else:
+            scan.user_display = '-'
         flights_data[flight_key]['scans'].append(scan)
         flights_data[flight_key]['passenger_count'] += 1
         if scan.passenger_name:
@@ -501,7 +572,8 @@ def reports_view(request):
     """Страница отчетов с расширенными фильтрами и экспортом"""
     # Получаем параметры фильтров
     # По умолчанию показываем только за сегодня, если даты не выбраны явно
-    today_str = date.today().strftime('%Y-%m-%d')
+    # Используем timezone.localdate() для учета TIME_ZONE из settings.py
+    today_str = timezone.localdate().strftime('%Y-%m-%d')
     
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
@@ -531,24 +603,23 @@ def reports_view(request):
     flight_number_filter = request.GET.get('flight_number', '').strip()
     passenger_search = request.GET.get('passenger', '').strip()
     
-    # Базовый queryset - для администратора все, для обычного пользователя только свои
-    if request.user.is_staff:
-        scans = BarcodeScan.objects.all()
-    else:
-        scans = BarcodeScan.objects.filter(user=request.user)
+    # Базовый queryset - показываем все сканирования всем авторизованным пользователям
+    scans = BarcodeScan.objects.all()
     
     # Фильтр по диапазону дат
     if start_date:
         try:
             start_date_obj = datetime.strptime(start_date, '%Y-%m-%d').date()
-            scans = scans.filter(timestamp__date__gte=start_date_obj)
+            start_dt = timezone.make_aware(datetime.combine(start_date_obj, time.min))
+            scans = scans.filter(timestamp__gte=start_dt)
         except ValueError:
             pass
     
     if end_date:
         try:
             end_date_obj = datetime.strptime(end_date, '%Y-%m-%d').date()
-            scans = scans.filter(timestamp__date__lte=end_date_obj)
+            end_dt = timezone.make_aware(datetime.combine(end_date_obj, time.max))
+            scans = scans.filter(timestamp__lte=end_dt)
         except ValueError:
             pass
     
@@ -587,6 +658,11 @@ def reports_view(request):
                 'flight_info': None
             }
         
+        # Добавляем отображаемое имя пользователя прямо в Python
+        if scan.user:
+            scan.user_display = scan.user.first_name or scan.user.username
+        else:
+            scan.user_display = '-'
         flights_data[flight_key]['scans'].append(scan)
         flights_data[flight_key]['passenger_count'] += 1
         if scan.passenger_name:
@@ -642,10 +718,7 @@ def export_to_excel(request):
         passenger_search = request.GET.get('passenger', '').strip()
         
         # Применяем те же фильтры
-        if request.user.is_staff:
-            scans = BarcodeScan.objects.all()
-        else:
-            scans = BarcodeScan.objects.filter(user=request.user)
+        scans = BarcodeScan.objects.all()
         
         if start_date:
             try:
@@ -755,11 +828,8 @@ def export_to_pdf(request):
         flight_number_filter = request.GET.get('flight_number', '').strip()
         passenger_search = request.GET.get('passenger', '').strip()
         
-        # Применяем фильтры
-        if request.user.is_staff:
-            scans = BarcodeScan.objects.all()
-        else:
-            scans = BarcodeScan.objects.filter(user=request.user)
+        # Базовый queryset - показываем все сканирования всем авторизованным пользователям
+        scans = BarcodeScan.objects.all()
         
         if start_date:
             try:
@@ -887,9 +957,20 @@ def export_to_pdf(request):
             if len(passenger_name) > 25:
                 passenger_name = passenger_name[:22] + '...'
             
+            # Формируем дату и время рейса
+            flight_dt_str = "-"
+            if scan.flight:
+                # Берем данные из FIDS (плановая дата и время)
+                f_date = scan.flight.date1.strftime('%d.%m.%Y') if scan.flight.date1 else "-"
+                f_time = scan.flight.time1.strftime('%H:%M') if scan.flight.time1 else ""
+                flight_dt_str = f"{f_date}\n{f_time}".strip()
+            elif scan.flight_date:
+                # Если связи с FIDS нет, берем расшифрованную дату из билета
+                flight_dt_str = scan.flight_date.strftime('%d.%m.%Y')
+            
             data.append([
                 str(idx),
-                scan.timestamp.strftime('%d.%m.%Y\n%H:%M'),
+                flight_dt_str,
                 f"{scan.carrier_code}{scan.flight_number_str}" if scan.carrier_code and scan.flight_number_str else '-',
                 passenger_name,
                 scan.pnr or '-',
@@ -940,3 +1021,101 @@ def export_to_pdf(request):
     except Exception as e:
         messages.error(request, f'Ошибка при создании PDF файла: {str(e)}')
         return redirect('reports_view')
+
+@csrf_exempt
+def refresh_fids_data(request):
+    """
+    Эндпоинт для синхронизации данных из fids_full.json.
+    Вызывается Go-приложением при обновлении данных.
+    """
+    api_url = "http://31.192.250.185/api/fids_full.json"
+    try:
+        response = requests.get(api_url, timeout=10)
+        response.raise_for_status()
+        flights_data = response.json()
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': f'Failed to fetch API: {e}'}, status=500)
+    
+    updated_count = 0
+    created_count = 0
+    
+    for item in flights_data:
+        try:
+            # Парсим основные данные
+            direction = 'dep' if item.get('dir') == 'O' else 'arr'
+            carrier = item.get('al', '')
+            full_flt = item.get('flt', '')
+            
+            sch_d_str = item.get('sch_d')
+            sch_t_str = item.get('sch_t', '').replace('.', ':')
+            
+            if not sch_d_str or not sch_t_str:
+                continue
+                
+            sch_date = datetime.strptime(sch_d_str, '%Y-%m-%d').date()
+            sch_time = datetime.strptime(sch_t_str, '%H:%M').time()
+            
+            # 1. Город (Destination)
+            dest_data = item.get('dest', {})
+            city_name_ru = dest_data.get('ru', 'Unknown')
+            city_obj, _ = Cities.objects.get_or_create(
+                city_name_ru=city_name_ru,
+                defaults={
+                    'city_name_en': dest_data.get('en', city_name_ru),
+                    'city_name_ky': dest_data.get('ky', city_name_ru),
+                }
+            )
+            
+            # 2. Статус
+            status_obj = None
+            status_data = item.get('status', {})
+            status_name_ru = status_data.get('ru')
+            if status_name_ru and status_name_ru.strip():
+                status_obj, _ = Status.objects.get_or_create(
+                    name_ru=status_name_ru.strip(),
+                    defaults={
+                        'name_en': status_data.get('en', status_name_ru),
+                        'name_ky': status_data.get('ky', status_name_ru),
+                    }
+                )
+            
+            # 3. Номер рейса
+            flight_num_obj, _ = FlightNumber.objects.get_or_create(flights=full_flt)
+            
+            # 4. Ищем или создаем запись в InfTablo
+            inf_tablo_item, created = InfTablo.objects.get_or_create(
+                flight=flight_num_obj,
+                date1=sch_date,
+                time1=sch_time,
+                defaults={
+                    'direction': direction,
+                    'airline': carrier,
+                    'destination': city_obj,
+                    'status': status_obj,
+                }
+            )
+            
+            if not created:
+                inf_tablo_item.status = status_obj
+                last_t_str = item.get('act_t') or item.get('est_t')
+                if last_t_str:
+                    try:
+                        last_t_str = last_t_str.replace('.', ':')
+                        inf_tablo_item.last_time = datetime.strptime(last_t_str, '%H:%M').time()
+                        inf_tablo_item.last_date = sch_date
+                    except:
+                        pass
+                inf_tablo_item.save()
+                updated_count += 1
+            else:
+                created_count += 1
+                
+        except Exception:
+            continue
+            
+    return JsonResponse({
+        'status': 'success', 
+        'created': created_count, 
+        'updated': updated_count,
+        'total_processed': len(flights_data)
+    })

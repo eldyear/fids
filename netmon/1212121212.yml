@@ -1,0 +1,20 @@
+services:
+  netmon:
+    build: .
+    container_name: netmon
+    restart: unless-stopped
+    ports:
+      - "5002:5000"
+    volumes:
+      - netmon_data:/data
+    environment:
+      - DB_PATH=/data/netmon.db
+      - CHECK_INTERVAL=10 # интервал проверки, секунды
+      - PING_HOST=8.8.8.8 # основной ping-хост
+      - PING_HOST2=1.1.1.1 # резервный ping-хост
+      - HTTP_URL=http://connectivitycheck.gstatic.com/generate_204 # HTTP-проверка интернета
+      - HTTP_URL2=http://www.msftconnecttest.com/connecttest.txt # резервная HTTP-проверка
+
+volumes:
+  netmon_data:
+    driver: local

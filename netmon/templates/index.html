@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NetMon — Мониторинг сети</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f5f5f5;
+  color: #1a1a1a;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* Layout */
+.page { max-width: 1100px; margin: 0 auto; padding: 24px 20px 48px; }
+
+/* Header */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #ddd;
+}
+
+.logo { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; }
+.logo span { color: #888; font-weight: 400; }
+
+.header-right {
+  font-size: 12px;
+  color: #888;
+  text-align: right;
+  line-height: 1.7;
+}
+
+/* Status banner */
+.status-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  margin-bottom: 16px;
+  transition: border-color 0.3s, background 0.3s;
+}
+
+.status-banner.up   { border-color: #22c55e; background: #f0fdf4; }
+.status-banner.down { border-color: #ef4444; background: #fef2f2; }
+
+.status-dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: #ccc;
+  flex-shrink: 0;
+}
+.status-banner.up   .status-dot { background: #22c55e; }
+.status-banner.down .status-dot { background: #ef4444; animation: blink 1s ease-in-out infinite; }
+
+@keyframes blink { 0%,100% { opacity:1 } 50% { opacity:.3 } }
+
+.status-label {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.status-banner.up   .status-label { color: #16a34a; }
+.status-banner.down .status-label { color: #dc2626; }
+
+.status-meta {
+  margin-left: auto;
+  display: flex;
+  gap: 32px;
+}
+
+.meta-item { text-align: right; }
+.meta-key  { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.05em; }
+.meta-val  { font-size: 14px; font-weight: 600; color: #333; font-variant-numeric: tabular-nums; }
+
+/* Check indicators */
+.checks-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.check-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  font-size: 13px;
+}
+
+.check-pill .pill-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #ccc;
+}
+
+.check-pill.ok   .pill-dot { background: #22c55e; }
+.check-pill.fail .pill-dot { background: #ef4444; }
+.check-pill.ok   { border-color: #bbf7d0; }
+.check-pill.fail { border-color: #fecaca; }
+
+.pill-label { color: #555; }
+.pill-val   { font-weight: 600; margin-left: 2px; }
+.check-pill.ok   .pill-val { color: #16a34a; }
+.check-pill.fail .pill-val { color: #dc2626; }
+
+/* Stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 700px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
+
+.stat-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px 18px;
+}
+
+.stat-key { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.stat-val { font-size: 22px; font-weight: 700; color: #111; font-variant-numeric: tabular-nums; }
+.stat-sub { font-size: 11px; color: #aaa; margin-top: 2px; }
+
+/* Two-column layout */
+.main-cols {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 16px;
+}
+
+@media (max-width: 900px) { .main-cols { grid-template-columns: 1fr; } }
+
+/* Panels */
+.panel {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.panel:last-child { margin-bottom: 0; }
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.panel-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #555; }
+.panel-info  { font-size: 11px; color: #aaa; }
+
+/* Chart */
+.chart-wrap { padding: 12px 16px; height: 140px; }
+#latencyChart { width: 100%; height: 100%; display: block; }
+
+/* Timeline */
+.timeline-wrap { padding: 12px 16px 14px; }
+
+.tl-bar {
+  display: flex;
+  height: 20px;
+  gap: 1px;
+  background: #f5f5f5;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.tl-seg { flex: 1; min-width: 2px; cursor: default; }
+.tl-seg.up      { background: #86efac; }
+.tl-seg.down    { background: #fca5a5; }
+.tl-seg.unknown { background: #e5e7eb; }
+
+.tl-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #aaa;
+  margin-top: 5px;
+}
+
+/* Uptime bar */
+.uptime-bar-wrap { padding: 0 16px 14px; }
+.uptime-bg { height: 4px; background: #f0f0f0; border-radius: 2px; overflow: hidden; }
+.uptime-fill { height: 100%; background: #22c55e; border-radius: 2px; transition: width 0.5s; }
+.uptime-lbl {
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: #aaa; margin-top: 4px;
+}
+
+/* Events log */
+.events-scroll {
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.event-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #f5f5f5;
+  animation: fadein 0.25s ease;
+}
+
+@keyframes fadein { from { opacity:0 } to { opacity:1 } }
+
+.event-row:last-child { border-bottom: none; }
+.event-row:hover { background: #fafafa; }
+
+.ev-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+.ev-dot.up   { background: #22c55e; }
+.ev-dot.down { background: #ef4444; }
+
+.ev-body { flex: 1; min-width: 0; }
+.ev-status { font-weight: 600; font-size: 13px; }
+.ev-status.up   { color: #16a34a; }
+.ev-status.down { color: #dc2626; }
+.ev-note { font-size: 12px; color: #888; margin-top: 1px; }
+.ev-checks { font-size: 11px; color: #bbb; margin-top: 2px; }
+
+.ev-time { font-size: 11px; color: #bbb; text-align: right; white-space: nowrap; line-height: 1.7; }
+
+/* Empty / loading */
+.empty { padding: 32px 16px; text-align: center; font-size: 13px; color: #aaa; }
+
+/* Footer */
+footer {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e5e5;
+  font-size: 11px;
+  color: #bbb;
+  text-align: center;
+}
+
+/* Live indicator */
+.live {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; color: #888;
+}
+.live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: blink 1.5s infinite;
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="logo">NetMon <span>/ мониторинг сети</span></div>
+    <div class="header-right">
+      <div class="live"><span class="live-dot"></span> live · обновление каждые {{ check_interval }}с</div>
+      <div id="clock">—</div>
+    </div>
+  </header>
+
+  <!-- Status banner -->
+  <div class="status-banner" id="statusBanner">
+    <div class="status-dot" id="statusDot"></div>
+    <div class="status-label" id="statusLabel">Инициализация...</div>
+    <div class="status-meta">
+      <div class="meta-item">
+        <div class="meta-key">Последняя проверка</div>
+        <div class="meta-val" id="metaLastCheck">—</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-key">Ping</div>
+        <div class="meta-val" id="metaLatency">—</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-key">Uptime</div>
+        <div class="meta-val" id="metaUptime">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Check indicators -->
+  <div class="checks-row">
+    <div class="check-pill" id="pillPing">
+      <div class="pill-dot"></div>
+      <span class="pill-label">Ping ({{ ping_host }})</span>
+      <span class="pill-val" id="pillPingVal">—</span>
+    </div>
+    <div class="check-pill" id="pillHttp">
+      <div class="pill-dot"></div>
+      <span class="pill-label">HTTP-интернет</span>
+      <span class="pill-val" id="pillHttpVal">—</span>
+    </div>
+    <div class="check-pill" id="pillHttpMs" style="border-color:#e0e0e0">
+      <div class="pill-dot" style="background:#ccc"></div>
+      <span class="pill-label">HTTP задержка</span>
+      <span class="pill-val" id="pillHttpMsVal" style="color:#555">—</span>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-key">Всего проверок</div>
+      <div class="stat-val" id="stTotal">—</div>
+      <div class="stat-sub">с запуска</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-key">Uptime</div>
+      <div class="stat-val" id="stUptime">—</div>
+      <div class="stat-sub">доступность</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-key">Ср. ping</div>
+      <div class="stat-val" id="stAvgLat">—</div>
+      <div class="stat-sub">ms</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-key">Outages</div>
+      <div class="stat-val" id="stOutages">—</div>
+      <div class="stat-sub">падений</div>
+    </div>
+  </div>
+
+  <!-- Main columns -->
+  <div class="main-cols">
+    <div>
+      <!-- Latency chart -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">График ping</div>
+          <div class="panel-info">последние 100 проверок</div>
+        </div>
+        <div class="chart-wrap"><canvas id="latencyChart"></canvas></div>
+      </div>
+
+      <!-- Timeline -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Timeline</div>
+          <div class="panel-info">последние 200 проверок · <span style="color:#86efac">■</span> up &nbsp;<span style="color:#fca5a5">■</span> down</div>
+        </div>
+        <div class="timeline-wrap">
+          <div class="tl-bar" id="tlBar"><div class="tl-seg unknown"></div></div>
+          <div class="tl-labels">
+            <span id="tlOld">—</span>
+            <span>сейчас →</span>
+          </div>
+        </div>
+        <div class="uptime-bar-wrap">
+          <div class="uptime-bg"><div class="uptime-fill" id="uptimeFill" style="width:0%"></div></div>
+          <div class="uptime-lbl"><span>0%</span><span id="uptimePct">—</span><span>100%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Events -->
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-head">
+        <div class="panel-title">Журнал событий</div>
+        <div class="panel-info" id="evCount">0</div>
+      </div>
+      <div class="events-scroll" id="evList">
+        <div class="empty">Загрузка...</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    NetMon · Python + Flask · ping {{ ping_host }}/{{ ping_host2 }} · http {{ http_url }} · интервал {{ check_interval }}с
+  </footer>
+</div>
+
+<script>
+// Clock
+function tick() {
+  const d = new Date();
+  document.getElementById('clock').textContent = d.toLocaleTimeString('ru-RU', {hour12:false});
+}
+setInterval(tick, 1000); tick();
+
+// Date formatting
+function fmtFull(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso.endsWith('Z') ? iso : iso + 'Z');
+  return d.toLocaleString('ru-RU', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+function fmtShort(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso.endsWith('Z') ? iso : iso + 'Z');
+  return d.toLocaleTimeString('ru-RU', {hour12:false, hour:'2-digit', minute:'2-digit', second:'2-digit'});
+}
+
+// Draw latency chart (plain canvas, no lib)
+function drawChart(checks) {
+  const canvas = document.getElementById('latencyChart');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const r = canvas.getBoundingClientRect();
+  canvas.width  = r.width  * dpr;
+  canvas.height = r.height * dpr;
+  ctx.scale(dpr, dpr);
+  const W = r.width, H = r.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const upChecks = checks.filter(c => c.status === 'up' && c.latency_ms);
+  if (upChecks.length < 2) return;
+
+  const vals = checks.map(c => c.latency_ms || 0);
+  const maxV = Math.max(...vals, 50);
+
+  // Grid
+  ctx.strokeStyle = '#f0f0f0';
+  ctx.lineWidth = 1;
+  [0.25, 0.5, 0.75, 1].forEach(p => {
+    const y = H - p * H * 0.85 - H * 0.05;
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    ctx.fillStyle = '#ccc'; ctx.font = '9px sans-serif';
+    ctx.fillText(Math.round(maxV * p) + 'ms', 2, y - 2);
+  });
+
+  // Down regions
+  checks.forEach((c, i) => {
+    if (c.status === 'down') {
+      const x = (i / (checks.length - 1)) * W;
+      const w = W / checks.length;
+      ctx.fillStyle = 'rgba(239,68,68,0.08)';
+      ctx.fillRect(x - w/2, 0, w + 1, H);
+    }
+  });
+
+  // Area
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, 'rgba(34,197,94,0.2)');
+  grad.addColorStop(1, 'rgba(34,197,94,0)');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  let first = true;
+  checks.forEach((c, i) => {
+    const x = (i / (checks.length - 1)) * W;
+    const v = c.status === 'up' ? (c.latency_ms || 0) : 0;
+    const y = H - (v / maxV) * H * 0.8 - H * 0.05;
+    if (first) { ctx.moveTo(x, H); first = false; }
+    ctx.lineTo(x, y);
+  });
+  ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+
+  // Line
+  ctx.strokeStyle = '#22c55e';
+  ctx.lineWidth = 1.5;
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  first = true;
+  checks.forEach((c, i) => {
+    if (c.status !== 'up') return;
+    const x = (i / (checks.length - 1)) * W;
+    const y = H - ((c.latency_ms||0) / maxV) * H * 0.8 - H * 0.05;
+    if (first) { ctx.moveTo(x, y); first = false; }
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+}
+
+// Timeline
+function drawTimeline(checks) {
+  const bar = document.getElementById('tlBar');
+  if (!checks.length) return;
+  bar.innerHTML = '';
+  checks.forEach(c => {
+    const s = document.createElement('div');
+    s.className = 'tl-seg ' + c.status;
+    s.title = fmtFull(c.timestamp) + ' · ' + c.status.toUpperCase() + (c.latency_ms ? ' · ' + c.latency_ms + 'ms' : '');
+    bar.appendChild(s);
+  });
+  document.getElementById('tlOld').textContent = fmtShort(checks[0].timestamp);
+}
+
+// Update hero banner
+function updateBanner(s) {
+  const b = document.getElementById('statusBanner');
+  const l = document.getElementById('statusLabel');
+  b.className = 'status-banner ' + (s.status === 'unknown' ? '' : s.status);
+
+  if (s.status === 'up') {
+    l.textContent = '▲  Сеть работает';
+  } else if (s.status === 'down') {
+    const d = s.note_detail;
+    if (d === 'ping_only') l.textContent = '▼  Интернет недоступен (роутер отвечает)';
+    else l.textContent = '▼  Сеть недоступна';
+  } else {
+    l.textContent = 'Инициализация...';
+  }
+
+  document.getElementById('metaLastCheck').textContent = fmtFull(s.last_check);
+  document.getElementById('metaLatency').textContent  = s.latency_ms ? s.latency_ms + ' ms' : '—';
+  const pct = s.check_count > 0 ? Math.round(s.up_count / s.check_count * 100) : null;
+  document.getElementById('metaUptime').textContent = pct != null ? pct + '%' : '—';
+
+  // Pills
+  function setPill(id, valId, ok, val) {
+    const pill = document.getElementById(id);
+    pill.className = 'check-pill ' + (ok === null ? '' : ok ? 'ok' : 'fail');
+    document.getElementById(valId).textContent = val;
+  }
+  setPill('pillPing',   'pillPingVal',   s.ping_ok, s.ping_ok === null ? '—' : s.ping_ok ? 'OK' : 'FAIL');
+  setPill('pillHttp',   'pillHttpVal',   s.http_ok, s.http_ok === null ? '—' : s.http_ok ? 'OK' : 'FAIL');
+  document.getElementById('pillHttpMsVal').textContent = s.http_latency_ms ? s.http_latency_ms + ' ms' : '—';
+}
+
+// Stats
+function updateStats(st) {
+  document.getElementById('stTotal').textContent   = st.total_checks ?? '—';
+  document.getElementById('stUptime').textContent  = st.uptime_pct != null ? st.uptime_pct + '%' : '—';
+  document.getElementById('stAvgLat').textContent  = st.avg_latency_ms ?? '—';
+  document.getElementById('stOutages').textContent = st.outages_count ?? '—';
+  const pct = st.uptime_pct || 0;
+  document.getElementById('uptimeFill').style.width = pct + '%';
+  document.getElementById('uptimePct').textContent = pct + '%';
+}
+
+// Events
+function renderEvents(events) {
+  document.getElementById('evCount').textContent = events.length + ' событий';
+  const list = document.getElementById('evList');
+  if (!events.length) {
+    list.innerHTML = '<div class="empty">Нет событий</div>';
+    return;
+  }
+  list.innerHTML = '';
+  events.forEach(e => {
+    const row = document.createElement('div');
+    row.className = 'event-row';
+    const d = new Date((e.timestamp.endsWith('Z') ? e.timestamp : e.timestamp + 'Z'));
+    const dateStr = d.toLocaleDateString('ru-RU', {day:'2-digit',month:'2-digit',year:'numeric'});
+    const timeStr = d.toLocaleTimeString('ru-RU', {hour12:false});
+
+    const pingMark = e.ping_ok != null ? (e.ping_ok ? '✓ ping' : '✗ ping') : '';
+    const httpMark = e.http_ok != null ? (e.http_ok ? '✓ http' : '✗ http') : '';
+    const checks = [pingMark, httpMark].filter(Boolean).join(' · ');
+
+    row.innerHTML = `
+      <div class="ev-dot ${e.status}"></div>
+      <div class="ev-body">
+        <div class="ev-status ${e.status}">${e.status === 'up' ? '▲ Восстановлено' : '▼ Упала'}</div>
+        <div class="ev-note">${e.note || ''}</div>
+        ${checks ? `<div class="ev-checks">${checks}${e.latency_ms ? ' · ' + e.latency_ms + 'ms' : ''}</div>` : ''}
+      </div>
+      <div class="ev-time"><div>${dateStr}</div><div>${timeStr}</div></div>
+    `;
+    list.appendChild(row);
+  });
+}
+
+// Main refresh
+async function refresh() {
+  try {
+    const [sr, er, cr, str] = await Promise.all([
+      fetch('/api/status'), fetch('/api/events?limit=60'),
+      fetch('/api/checks?limit=200'), fetch('/api/stats'),
+    ]);
+    const [s, events, checks, stats] = await Promise.all([sr.json(), er.json(), cr.json(), str.json()]);
+
+    updateBanner(s);
+    renderEvents(events);
+    drawTimeline(checks);
+    drawChart(checks.slice(-100));
+    updateStats(stats);
+  } catch(e) { console.error(e); }
+}
+
+window.addEventListener('resize', refresh);
+refresh();
+setInterval(refresh, {{ check_interval * 1000 }});
+</script>
+</body>
+</html>

@@ -27,6 +27,8 @@ from django.contrib.auth import views as auth_views
 def custom_links_view(request):
     return render(request, "admin/custom_links.html")
 
+from scanner_app import views as scanner_views
+
 urlpatterns = [
     path('', include('app.urls')),
     path('users/', include('users.urls')),
@@ -36,6 +38,7 @@ urlpatterns = [
     path('scanner/', include('scanner_app.urls')),
     path('api/billing/', include('billingAPI.urls')),
     path('bagscan/', include('barbag.urls')),
+    path('api/refresh/', scanner_views.refresh_fids_data, name='api_refresh_fids_data'),
 ]
 
 if settings.DEBUG:

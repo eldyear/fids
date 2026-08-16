@@ -14,4 +14,6 @@ urlpatterns = [
     path('reports/', views.reports_view, name='reports_view'),
     path('reports/export/excel/', views.export_to_excel, name='export_to_excel'),
     path('reports/export/pdf/', views.export_to_pdf, name='export_to_pdf'),
+    # API refresh endpoint (called by fids_go)
+    path('api/refresh/', views.refresh_fids_data, name='refresh_fids_data'),
 ]

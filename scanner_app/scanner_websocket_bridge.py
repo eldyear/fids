@@ -7,7 +7,7 @@ import re
 import datetime # Импортируем для получения текущего времени
 
 # Настройки COM-порта вашего сканера
-SERIAL_PORT = 'COM4'  # Измените на ваш COM-порт
+SERIAL_PORT = 'COM9'  # Измените на ваш COM-порт
 BAUD_RATE = 9600
 
 # Настройки WebSocket-сервера для веб-интерфейса
@@ -395,7 +395,7 @@ async def broadcast_parsed_data(parsed_data=None, status_message_type="info", st
     # Выполняем это только если у нас есть валидные распарсенные данные (не UNKNOWN_FORMAT или ERROR_PARSING)
     if parsed_data and parsed_data.get('passenger_name') not in ['N/A', 'ERROR_PARSING'] and \
        parsed_data.get('PNR') != 'N/A':
-        unique_id = f"{parsed_data['PNR']}_{parsed_data['passenger_name']}"
+        unique_id = f"{parsed_data.get('flight_date_info', 'N/A')}_{parsed_data.get('flight_number', 'N/A')}_{parsed_data['PNR']}_{parsed_data['passenger_name']}"
         if unique_id in scanned_pnr_and_name:
             is_duplicate = True
             print(f"DUPLICATE SCAN DETECTED: {unique_id}")

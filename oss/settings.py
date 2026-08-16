@@ -77,7 +77,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = False # Отключено, так как Nginx сам редиректит домены на HTTPS. Django не должен редиректить локальные запросы по IP (199.1.1.3)
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
@@ -125,16 +125,32 @@ CACHES = {
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': '/var/log/django/django.log',  # Замените на желаемый путь к файлу лога
+            'filename': '/var/log/django/django.log',
         },
     },
     'loggers': {
-        'users.views': {  # Замените 'app' на имя вашего приложения
-            'handlers': ['file'],
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'scanner_app': {
+            'handlers': ['console', 'file'],
             'level': 'INFO',
             'propagate': True,
         },
