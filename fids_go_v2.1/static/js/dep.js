@@ -88,17 +88,16 @@ let langIndex = 0;
 let currentPage = 1;
 let totalPages = 1;
 let paginationTimer;
+let notificationTimeout;
 
 function formatTime(timeString) {
     if (!timeString) return '';
     try {
-        // Если строка содержит дату и время (например, "0000-01-01T21:40")
         if (timeString.includes('T')) {
             const timePart = timeString.split('T')[1];
             const [hours, minutes] = timePart.split(':');
             return `${hours}:${minutes}`;
         }
-        // Если строка содержит только время (например, "21:40")
         const [hours, minutes] = timeString.split(':');
         return `${hours}:${minutes}`;
     } catch (e) {
@@ -112,8 +111,6 @@ function updateInterfaceLanguage() {
     document.getElementById('AirportName').textContent = translations[currentLang].AirportName;
     document.getElementById('Manas').textContent = translations[currentLang].Manas;
     document.getElementById('TimeTitle').textContent = translations[currentLang].TimeTitle;
-    document.getElementById('mainHeader').textContent = translations[currentLang].mainHeader;
-    document.getElementById('mainHeader').textContent = translations[currentLang].mainHeader;
 
     document.getElementById('colAirline').textContent = translations[currentLang].columns.airline;
     document.getElementById('colFlight').textContent = translations[currentLang].columns.flight;
@@ -139,7 +136,6 @@ function updatePageInfo() {
 function updateLanguage() {
     langIndex = (langIndex + 1) % langs.length;
     currentLang = langs[langIndex];
-    // document.getElementById('currentLang').textContent = currentLang;
     currentPage = 1; // Сброс на первую страницу
     updateInterfaceLanguage();
     startPagination(); // Перезапуск пагинации
@@ -149,10 +145,9 @@ function updateFlightsTable() {
     const flightsTableBody = document.getElementById('flightsTableBody');
     if (!flightsTableBody) return;
 
-    // Проверяем, что lastFlights является массивом
     if (!Array.isArray(lastFlights)) {
         console.error('lastFlights не является массивом:', lastFlights);
-        lastFlights = []; // Устанавливаем пустой массив, если это не массив
+        lastFlights = [];
     }
 
     const startIdx = (currentPage - 1) * FLIGHTS_PER_PAGE;
@@ -162,7 +157,7 @@ function updateFlightsTable() {
 
     paginatedFlights.forEach(flight => {
         const row = document.createElement('tr');
-        const city = flight.destination[`name_${currentLang}`] || '';
+        const city = flight.destination?.[`name_${currentLang}`] || '';
         const status = (flight.status?.[`name_${currentLang}`] || '').replace(/-/g, ' ');
 
         row.innerHTML = `
@@ -186,10 +181,10 @@ function updateFlightsTable() {
             </td>
             <td>${Array.isArray(flight.stoika) ? flight.stoika.map(s => s.number).join(', ') : ''}</td>
             <td class="remark">
-                    <div class="statusdiv ${flight.status.name_en || ''}">
-                        ${status}
-                    </div>
-                </td>
+                <div class="statusdiv ${flight.status?.name_en || ''}">
+                    ${status}
+                </div>
+            </td>
         `;
 
         flightsTableBody.appendChild(row);
@@ -198,12 +193,10 @@ function updateFlightsTable() {
 
 function handlePageTurn() {
     if (currentPage < totalPages) {
-        // Есть еще страницы - переключаем на следующую
         currentPage++;
         updateFlightsTable();
         updatePageInfo();
     } else {
-        // Страницы кончились - меняем язык
         updateLanguage();
     }
 }
@@ -217,7 +210,6 @@ function initWebSocket() {
     const connectionStatus = document.getElementById('connectionStatus');
     const socket = new WebSocket('ws://' + window.location.hostname + '/go/ws/dep');
 
-    // Добавляем пинг каждые 30 секунд
     const pingInterval = setInterval(() => {
         if (socket && socket.readyState === WebSocket.OPEN) {
             socket.send(JSON.stringify({ type: "ping" }));
@@ -234,23 +226,18 @@ function initWebSocket() {
             const data = JSON.parse(event.data);
             if (window.updateNewYearStatus) window.updateNewYearStatus(data);
 
-            // Notification Handling
             if (data.type === 'notification') {
                 showNotification(data);
                 return;
             }
 
-            // Проверяем, является ли сообщение временем сервера
             if (data && data.server_time) {
                 const currentTimeElem = document.getElementById('current-time');
-                // ... (rest of time handling)
                 if (currentTimeElem) currentTimeElem.textContent = data.server_time;
                 return;
             }
 
-            // Убеждаемся, что lastFlights всегда будет массивом
             lastFlights = Array.isArray(data) ? data : [];
-            // ... (rest of logic)
             totalPages = Math.ceil(lastFlights.length / FLIGHTS_PER_PAGE) || 1;
             currentPage = 1;
 
@@ -261,7 +248,6 @@ function initWebSocket() {
             connectionStatus.textContent = `${translations[currentLang].connectionStatus.updated} ${new Date().toLocaleTimeString()}`;
         } catch (e) {
             console.error('Ошибка обработки данных:', e);
-            // ...
         }
     };
 
@@ -270,7 +256,6 @@ function initWebSocket() {
         clearInterval(paginationTimer);
         clearInterval(pingInterval);
 
-        // Запланировать перезагрузку страницы через 10 секунд
         setTimeout(() => {
             location.reload();
         }, 10000);
@@ -284,7 +269,6 @@ function initWebSocket() {
     };
 }
 
-// Функция для обновления даты
 function updateDateTime() {
     const currentDate = document.getElementById('current-date');
     if (currentDate) {
@@ -292,53 +276,61 @@ function updateDateTime() {
     }
 }
 
-// Инициализация при загрузке
 document.addEventListener('DOMContentLoaded', function () {
     if (!document.getElementById('connectionStatus') ||
         !document.getElementById('flightsTableBody') ||
-        !document.getElementById('current-date') || // Проверяем наличие элемента даты
-        !document.getElementById('current-time')) { // Проверяем наличие элемента времени
+        !document.getElementById('current-date') ||
+        !document.getElementById('current-time')) {
         console.error('Не найдены необходимые элементы DOM');
         return;
     }
 
     updateInterfaceLanguage();
     initWebSocket();
-    updateDateTime(); // Вызываем один раз при загрузке
+    updateDateTime();
 
-    // Запускаем интервал для периодического обновления только даты (каждую секунду)
     setInterval(updateDateTime, 1000);
 });
 
-// Notification Logic
+// Улучшенная логика уведомления с анимацией и динамическим стилем
 function showNotification(data) {
     let notificationBar = document.getElementById('notification-bar');
+
     if (!notificationBar) {
         notificationBar = document.createElement('div');
         notificationBar.id = 'notification-bar';
+
+        // Базовые стили позиционирования и анимации перехода
         notificationBar.style.cssText = `
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            background-color: #d32f2f;
-            color: white;
-            padding: 15px;
+            padding: 18px 20px;
             text-align: center;
-            font-size: 2em;
+            font-size: 2.2em;
             font-weight: bold;
-            display: none;
             z-index: 1000;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
-            transition: transform 0.3s ease-in-out;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.4);
+            transform: translateX(-100%);
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            box-sizing: border-box;
         `;
         document.body.appendChild(notificationBar);
     }
 
-    const langKey = 'status_' + currentLang;
-    const statusText = data[langKey] || data.status_ru; // Fallback to RU
+    // Сбрасываем старый таймер, если пришло новое уведомление до истечения 7 секунд
+    clearTimeout(notificationTimeout);
 
-    // Get translations for "Flight" label
+    // Определяем имя класса статуса (например, CHECK-IN, DELAYED и т.д.)
+    const statusClass = data.status_en || data.status?.name_en || '';
+
+    // Присваиваем класс статуса плашке, чтобы подтянулся background-color из твоих CSS
+    notificationBar.className = statusClass;
+
+    const langKey = 'status_' + currentLang;
+    const statusText = data[langKey] || data.status_ru || (data.status?.[`name_${currentLang}`] || '');
+
     const flightLabel = {
         ru: "Рейс",
         en: "Flight",
@@ -346,15 +338,27 @@ function showNotification(data) {
     };
 
     notificationBar.innerHTML = `
-        <span style="font-size: 0.8em; opacity: 0.9;">${flightLabel[currentLang] || 'Flight'} ${data.flight}:</span>
-        <span style="text-transform: uppercase; margin-left: 10px;">${statusText}</span>
+        <span style="opacity: 0.9; margin-right: 15px;">${flightLabel[currentLang] || 'Flight'} ${data.flight}:</span>
+        <span style="text-transform: uppercase;">${statusText}</span>
     `;
 
-    // Show
-    notificationBar.style.display = 'block';
+    // Выезжает слева
+    requestAnimationFrame(() => {
+        notificationBar.style.transform = 'translateX(0)';
+    });
 
-    // Hide after 7 seconds
-    setTimeout(() => {
-        notificationBar.style.display = 'none';
+    // Через 7 секунд уезжает дальше вправо
+    notificationTimeout = setTimeout(() => {
+        notificationBar.style.transform = 'translateX(100%)';
+
+        // После окончания анимации возвращаем элемент за левую границу без прыжков
+        setTimeout(() => {
+            notificationBar.style.transition = 'none';
+            notificationBar.style.transform = 'translateX(-100%)';
+            // Возвращаем свойство transition обратно
+            requestAnimationFrame(() => {
+                notificationBar.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+            });
+        }, 600);
     }, 7000);
 }

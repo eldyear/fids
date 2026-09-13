@@ -1,0 +1,40 @@
+/* ==========================================================================
+   Flight Radar Clock — Sheremetyevo-style, adapted for Osh.
+   Geometry lives in JS (CONFIG); CSS only sets canvas/fonts.
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #000000;
+}
+
+#clockContainer {
+    width: 100vw;
+    height: 100vh;
+}
+
+#clockContainer svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+svg text {
+    font-family: 'Orbitron', 'Bahnschrift', 'DIN Alternate', sans-serif;
+}
+
+#connectionStatus {
+    position: fixed;
+    right: 1vw;
+    bottom: 1vh;
+    color: #3a444c;
+    font-family: 'Bahnschrift', 'Segoe UI', sans-serif;
+    font-size: 13px;
+    letter-spacing: 1px;
+    z-index: 10;
+}

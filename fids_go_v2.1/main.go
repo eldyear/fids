@@ -195,6 +195,8 @@ func main() {
 	r.HandleFunc("/go/ws/dispatcher", handleDispatcherWebSocket)
 	r.HandleFunc("/go/ws/flights", handleFlightsListWebSocket)
 
+	r.HandleFunc("/api/radar", handleRadarProxy)
+
 	// Static Pages (Placeholder - serving simple text or redirecting if static files exist)
 	// Assuming static files are served relative to running directory
 	r.HandleFunc("/dep", serveDepPage)
@@ -207,6 +209,9 @@ func main() {
 	r.HandleFunc("/dep_arr", serveDepArrPage)
 	r.HandleFunc("/dep_vert", serveDepVertPage)
 	r.HandleFunc("/arr_vert", serveArrVertPage)
+	r.HandleFunc("/dep_bilingual", serveDepBilingualPage)
+	r.HandleFunc("/dep_svo", serveDepSvoPage)
+
 
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "dep", http.StatusFound)
@@ -572,6 +577,42 @@ func serveArrVertPage(w http.ResponseWriter, r *http.Request) {
 }
 func serveFlightsPage(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./static/flights.html")
+}
+
+func serveDepBilingualPage(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./static/dep_bilingual.html")
+}
+
+func serveDepSvoPage(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./static/dep_svo.html")
+}
+
+func handleRadarProxy(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Content-Type", "application/json")
+
+	lamin := r.URL.Query().Get("lamin")
+	lomin := r.URL.Query().Get("lomin")
+	lamax := r.URL.Query().Get("lamax")
+	lomax := r.URL.Query().Get("lomax")
+	if lamin == "" || lomin == "" || lamax == "" || lomax == "" {
+		http.Error(w, `{"error":"missing bbox"}`, http.StatusBadRequest)
+		return
+	}
+
+	url := fmt.Sprintf("https://opensky-network.org/api/states/all?lamin=%s&lomin=%s&lamax=%s&lomax=%s",
+		lamin, lomin, lamax, lomax)
+
+	client := http.Client{Timeout: 15 * time.Second}
+	resp, err := client.Get(url)
+	if err != nil {
+		http.Error(w, `{"error":"upstream unavailable"}`, http.StatusBadGateway)
+		return
+	}
+	defer resp.Body.Close()
+
+	w.WriteHeader(resp.StatusCode)
+	io.Copy(w, resp.Body)
 }
 
 // --- WebSocket Handlers ---

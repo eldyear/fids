@@ -1,0 +1,409 @@
+/* ==========================================================================
+   FIDS Departures — Bilingual split board (Kyrgyz | Clocks | English)
+   Separate stylesheet for dep_bilingual.html
+   ========================================================================== */
+
+:root {
+    --bg: #151a1d;
+    --panel-bg: #1b2226;
+    --row-even: #20272c;
+    --row-odd: #2d373e;
+    --header-bg: #20272c;
+    --gold: #F1C14B;
+    --text: #ffffff;
+    --muted: #A2A0A1;
+    --dim: #696868;
+    --border: #151a1d;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Montserrat', 'Segoe UI', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+/* ==========================================================================
+   Board layout
+   ========================================================================== */
+.board {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* Header */
+.board-header {
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 1vh 2vw;
+    background-color: var(--bg);
+    border-bottom: 4px solid var(--border);
+}
+
+.header-info {
+    text-align: left;
+}
+.header-code {
+    color: var(--muted);
+    font-size: clamp(12px, 1.6vh, 20px);
+    letter-spacing: 2px;
+}
+.header-airport {
+    font-size: clamp(18px, 3.2vh, 34px);
+    font-weight: 700;
+}
+.header-sub {
+    color: var(--muted);
+    font-size: clamp(11px, 1.5vh, 18px);
+}
+
+.header-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    gap: 1vw;
+}
+.depart-logo {
+    height: 7vh;
+    max-height: 60px;
+}
+.depart-text {
+    font-size: clamp(18px, 3.5vh, 40px);
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.header-status {
+    text-align: right;
+    color: var(--dim);
+    font-size: clamp(10px, 1.4vh, 16px);
+}
+
+/* Body: 3 columns */
+.board-body {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1.5vw;
+    padding: 1.5vh 1.5vw;
+    min-height: 0;
+}
+
+/* ==========================================================================
+   Flight panels (left / right)
+   ========================================================================== */
+.panel {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    background-color: var(--panel-bg);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.panel-title {
+    flex: 0 0 auto;
+    padding: 1vh 1.2vw;
+    font-size: clamp(16px, 2.6vh, 26px);
+    font-weight: 700;
+    color: var(--gold);
+    background-color: var(--header-bg);
+    border-bottom: 3px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+.panel-lang {
+    font-size: 0.6em;
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.panel-table-wrap {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+}
+
+.flights-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.flights-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: var(--header-bg);
+    color: var(--muted);
+    font-size: clamp(11px, 1.7vh, 18px);
+    font-weight: 600;
+    padding: 1vh 0.4vw;
+    border-bottom: 3px solid var(--border);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.flights-table tbody td {
+    padding: 0.6vh 0.4vw;
+    font-size: clamp(12px, 2.1vh, 22px);
+    color: var(--text);
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.flights-table tbody tr:nth-child(even) {
+    background-color: var(--row-even);
+}
+.flights-table tbody tr:nth-child(odd) {
+    background-color: var(--row-odd);
+}
+
+/* Column widths */
+.c-airline { width: 18%; }
+.c-flight  { width: 12%; }
+.c-dest    { width: 27%; }
+.c-time    { width: 14%; }
+.c-counters{ width: 13%; }
+.c-status  { width: 16%; }
+
+/* Airline logo */
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    border-radius: 3px;
+    height: 3.6vh;
+    min-height: 22px;
+    max-height: 42px;
+    width: 92%;
+    margin: 0 auto;
+    padding: 2px 4px;
+}
+.logo {
+    max-width: 100%;
+    max-height: 3.2vh;
+    width: auto;
+    height: auto;
+}
+
+/* Scheduled / updated time */
+.time-strike {
+    text-decoration: line-through;
+    color: var(--muted);
+    margin-right: 4px;
+}
+
+/* Date separator rows (table split by date) */
+tr.date-row td {
+    background-color: #0f1316;
+    padding: 0.8vh 1vw;
+    text-align: left;
+    white-space: nowrap;
+}
+.date-label {
+    display: inline-block;
+    font-weight: 700;
+    font-size: clamp(12px, 1.9vh, 20px);
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Status badge */
+.statusdiv {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+    padding: 0.4vh 0.6vw;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+.DELAYED   { background-color: #ff4d4d; color: #fff; }
+.BOARDING  { background-color: #ffcc00; color: #000; }
+.CHECK-IN  { background-color: #16af56; color: #fff; }
+.DEPARTED  { background-color: #3498db; color: #fff; }
+.ARRIVED   { background-color: #3498db; color: #fff; }
+.CANCELLED { background-color: #555555; color: #fff; }
+.DEFAULT   { background-color: #dddddd; color: #000; }
+.ASAP      { background-color: #dddddd; color: #000; }
+
+/* ==========================================================================
+   Clocks panel (center)
+   ========================================================================== */
+.clocks-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3vh;
+    padding: 1vh 1vw;
+    min-width: 0;
+}
+
+.main-clock {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6vh;
+}
+.main-clock-city {
+    font-size: clamp(14px, 2.2vh, 22px);
+    color: var(--muted);
+    letter-spacing: 1px;
+}
+.main-clock-digital {
+    font-size: clamp(16px, 2.6vh, 28px);
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 2px;
+    font-variant-numeric: tabular-nums;
+}
+
+.mini-clocks {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    gap: 2vh 2vw;
+}
+
+/* Individual clock (svg + labels) */
+.clock {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5vh;
+}
+.clock-city {
+    font-size: clamp(11px, 1.7vh, 17px);
+    color: var(--text);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+.clock-country {
+    font-size: clamp(9px, 1.3vh, 14px);
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    margin-top: -0.3vh;
+}
+
+/* Clock face sizes */
+#mainClock .clock-face {
+    width: clamp(180px, 26vh, 300px);
+    height: clamp(180px, 26vh, 300px);
+}
+.mini-clocks .clock-face {
+    width: clamp(80px, 13vh, 130px);
+    height: clamp(80px, 13vh, 130px);
+}
+
+/* SVG styling */
+.clock-face {
+    display: block;
+}
+.face-bg {
+    fill: #232b31;
+}
+.face-rim {
+    fill: none;
+    stroke: #3a454c;
+    stroke-width: 1.5;
+}
+.tick-major {
+    stroke: var(--gold);
+    stroke-width: 2;
+    stroke-linecap: round;
+}
+.tick-minor {
+    stroke: #5a666d;
+    stroke-width: 1;
+    stroke-linecap: round;
+}
+.clock-numeral {
+    fill: var(--muted);
+    font-family: 'Montserrat', 'Segoe UI', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+.hour-line {
+    stroke: #ffffff;
+    stroke-width: 3.4;
+    stroke-linecap: round;
+}
+.minute-line {
+    stroke: #dfe4e8;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+}
+.second-line {
+    stroke: #ff5a5a;
+    stroke-width: 1;
+    stroke-linecap: round;
+}
+.center-dot {
+    fill: var(--gold);
+}
+
+/* ==========================================================================
+   Notification bar
+   ========================================================================== */
+#notification-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 18px 20px;
+    text-align: center;
+    font-size: 2.2em;
+    font-weight: bold;
+    z-index: 1000;
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.4);
+    transform: translateX(-100%);
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    box-sizing: border-box;
+    color: #fff;
+}
+
+/* Scrollbar */
+.panel-table-wrap::-webkit-scrollbar {
+    width: 6px;
+}
+.panel-table-wrap::-webkit-scrollbar-thumb {
+    background: #3a454c;
+    border-radius: 3px;
+}
+.panel-table-wrap::-webkit-scrollbar-track {
+    background: transparent;
+}

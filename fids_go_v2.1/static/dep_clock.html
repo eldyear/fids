@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Departures Clock — OSS</title>
+    <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+    <link rel="stylesheet" href="static/css/dep_clock.css">
+</head>
+<body>
+    <div class="board">
+
+        <header class="topbar">
+            <div class="top-left">
+                <span class="top-code">OSS/UCFO</span>
+                <span class="top-airport">Ош</span>
+            </div>
+            <div class="top-center">ВЫЛЕТЫ · DEPARTURES</div>
+            <div class="top-right" id="connectionStatus">Подключение...</div>
+        </header>
+
+        <main class="layout">
+
+            <!-- Left: nearest departures -->
+            <section class="list-panel">
+                <h2 class="panel-h">Ближайшие вылеты</h2>
+                <div class="list-scroll" id="nextFlights"></div>
+            </section>
+
+            <!-- Center: clock with per-hour ring -->
+            <section class="clock-panel">
+                <div id="clockWrap"></div>
+                <div class="clock-digital" id="clockDigital">--:--:--</div>
+                <div class="clock-date" id="clockDate"></div>
+                <div class="hour-counter" id="hourCounter">—</div>
+            </section>
+
+            <!-- Right: aircraft radar (OpenSky via /api/radar proxy) -->
+            <section class="radar-panel">
+                <h2 class="panel-h">Воздушная обстановка</h2>
+                <div id="radarWrap"></div>
+                <div class="radar-legend">
+                    <span><i class="dot dot-air"></i> в воздухе</span>
+                    <span><i class="dot dot-ground"></i> на земле</span>
+                    <span><i class="dot dot-fids"></i> рейс Ош</span>
+                </div>
+                <div class="radar-status" id="radarStatus">Запрос к OpenSky...</div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="static/js/dep_clock.js"></script>
+</body>
+</html>

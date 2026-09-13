@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Departures OSS</title>
+    <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+    <link rel="stylesheet" href="static/css/dep_bilingual.css">
+</head>
+<body>
+    <div class="board">
+
+        <header class="board-header">
+            <div class="header-info">
+                <p class="header-code">OSS/UCFO</p>
+                <p class="header-airport">Ош Аэропорту · Osh Airport</p>
+                <p class="header-sub">Кыргызстан аэропорттору · Airports of Kyrgyzstan</p>
+            </div>
+            <div class="header-title">
+                <img src="static/images/departplane.png" alt="Departures" class="depart-logo">
+                <span class="depart-text">УЧУУЛАР · DEPARTURES</span>
+            </div>
+            <div class="header-status">
+                <span id="connectionStatus">Туташуу...</span>
+            </div>
+        </header>
+
+        <main class="board-body">
+
+            <!-- Left: Kyrgyz -->
+            <section class="panel panel-ky">
+                <h2 class="panel-title">УЧУУЛАР <span class="panel-lang">Кыргызча</span></h2>
+                <div class="panel-table-wrap">
+                    <table class="flights-table">
+                        <thead>
+                            <tr>
+                                <th class="c-airline">Авиакомпания</th>
+                                <th class="c-flight">Каттам</th>
+                                <th class="c-dest">Багыт</th>
+                                <th class="c-time">Убакыт</th>
+                                <th class="c-counters">Стойкалар</th>
+                                <th class="c-status">Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody id="kyBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Center: clocks -->
+            <section class="clocks-panel">
+                <div class="main-clock">
+                    <div id="mainClock"></div>
+                    <div class="main-clock-city">Ош · Бишкек</div>
+                    <div class="main-clock-digital" id="mainClockDigital">--:--:--</div>
+                </div>
+                <div class="mini-clocks" id="miniClocks"></div>
+            </section>
+
+            <!-- Right: English -->
+            <section class="panel panel-en">
+                <h2 class="panel-title">DEPARTURES <span class="panel-lang">English</span></h2>
+                <div class="panel-table-wrap">
+                    <table class="flights-table">
+                        <thead>
+                            <tr>
+                                <th class="c-airline">Airline</th>
+                                <th class="c-flight">Flight</th>
+                                <th class="c-dest">Destination</th>
+                                <th class="c-time">Time</th>
+                                <th class="c-counters">Counters</th>
+                                <th class="c-status">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="enBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="static/js/dep_bilingual.js"></script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+/* ==========================================================================
+   FIDS Departures Clock — Sheremetyevo-style
+   ========================================================================== */
+
+:root {
+    --bg: #151a1d;
+    --panel: #1b2226;
+    --row-even: #20272c;
+    --row-odd: #2d373e;
+    --gold: #F1C14B;
+    --text: #ffffff;
+    --muted: #A2A0A1;
+    --dim: #696868;
+    --border: #151a1d;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Montserrat', 'Segoe UI', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+.board {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* Header */
+.topbar {
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 1vh 2vw;
+    border-bottom: 4px solid var(--border);
+    background-color: var(--bg);
+}
+.top-left { display: flex; align-items: baseline; gap: 1vw; }
+.top-code { color: var(--muted); font-size: clamp(12px, 1.6vh, 20px); letter-spacing: 2px; }
+.top-airport { font-size: clamp(18px, 3vh, 34px); font-weight: 700; }
+.top-center {
+    color: var(--gold);
+    font-size: clamp(16px, 3vh, 34px);
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+.top-right { text-align: right; color: var(--dim); font-size: clamp(10px, 1.4vh, 16px); }
+
+/* Layout */
+.layout {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: minmax(260px, 1fr) auto minmax(300px, 1fr);
+    gap: 1.5vw;
+    padding: 1.5vh 1.5vw;
+    min-height: 0;
+}
+
+.panel-h {
+    color: var(--gold);
+    font-size: clamp(14px, 2.2vh, 22px);
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding-bottom: 0.8vh;
+    border-bottom: 3px solid var(--border);
+}
+
+/* --- Left: flights list --- */
+.list-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    background-color: var(--panel);
+    border-radius: 6px;
+    padding: 1.2vh 1vw;
+}
+.list-scroll { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
+
+.flight-item {
+    display: grid;
+    grid-template-columns: 3.2em 1fr auto;
+    gap: 0.6vw;
+    align-items: center;
+    padding: 0.8vh 0.4vw;
+    border-radius: 4px;
+    font-size: clamp(13px, 2.1vh, 22px);
+}
+.flight-item:nth-child(even) { background-color: var(--row-even); }
+.flight-item:nth-child(odd)  { background-color: var(--row-odd); }
+
+.fi-time { font-weight: 700; color: var(--gold); font-variant-numeric: tabular-nums; }
+.fi-meta { display: flex; flex-direction: column; line-height: 1.1; min-width: 0; }
+.fi-flight { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fi-dest { color: var(--muted); font-size: 0.82em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.status-pill {
+    padding: 0.25em 0.6em;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.78em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+.st-CHECK-IN  { background-color: #16af56; color: #fff; }
+.st-BOARDING  { background-color: #ffcc00; color: #000; }
+.st-DELAYED   { background-color: #ff4d4d; color: #fff; }
+.st-DEPARTED  { background-color: #3498db; color: #fff; }
+.st-CANCELLED { background-color: #7a8288; color: #fff; }
+.st-DEFAULT   { background-color: #cfd6db; color: #000; }
+
+/* --- Center: clock --- */
+.clock-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6vh;
+    padding: 1vh 0;
+    min-width: 0;
+}
+#clockWrap svg {
+    width: clamp(260px, 52vh, 560px);
+    height: clamp(260px, 52vh, 560px);
+}
+.clock-digital {
+    font-size: clamp(22px, 4.2vh, 46px);
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 3px;
+    font-variant-numeric: tabular-nums;
+}
+.clock-date { color: var(--muted); font-size: clamp(12px, 1.8vh, 18px); }
+.hour-counter {
+    margin-top: 0.6vh;
+    color: var(--text);
+    font-size: clamp(13px, 2vh, 20px);
+}
+.hour-counter b { color: var(--gold); }
+
+/* Clock SVG styles */
+.face-bg { fill: #232b31; }
+.face-rim { fill: none; stroke: #3a454c; stroke-width: 2; }
+.tick-major { stroke: var(--gold); stroke-width: 2.4; stroke-linecap: round; }
+.tick-minor { stroke: #5a666d; stroke-width: 1; stroke-linecap: round; }
+.clock-numeral {
+    fill: var(--muted);
+    font-family: 'Montserrat', 'Segoe UI', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+.ring-guide { fill: none; stroke: #3a454c; stroke-width: 1; stroke-dasharray: 2 4; }
+.hour-line   { stroke: #ffffff; stroke-width: 5; stroke-linecap: round; }
+.minute-line { stroke: #dfe4e8; stroke-width: 3; stroke-linecap: round; }
+.second-line { stroke: #ff5a5a; stroke-width: 1.2; stroke-linecap: round; }
+.center-dot  { fill: var(--gold); }
+.ring-marker-count {
+    fill: #ffffff;
+    font-family: 'Montserrat', 'Segoe UI', sans-serif;
+    font-size: 7px;
+    font-weight: 700;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+/* --- Right: radar --- */
+.radar-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    background-color: var(--panel);
+    border-radius: 6px;
+    padding: 1.2vh 1vw;
+}
+#radarWrap { display: flex; align-items: center; justify-content: center; flex: 1 1 auto; min-height: 0; }
+#radarWrap svg {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+}
+.radar-legend {
+    display: flex;
+    gap: 1.2vw;
+    justify-content: center;
+    color: var(--muted);
+    font-size: clamp(10px, 1.5vh, 15px);
+    padding-top: 0.8vh;
+}
+.dot { display: inline-block; width: 0.8em; height: 0.8em; border-radius: 50%; margin-right: 0.3em; }
+.dot-air    { background-color: #37d67a; }
+.dot-ground { background-color: #ffb020; }
+.dot-fids   { background-color: #ffd24d; }
+.radar-status { text-align: center; color: var(--dim); font-size: clamp(9px, 1.3vh, 14px); padding-top: 0.4vh; }
+
+/* Radar SVG styles */
+.radar-bg { fill: #0d1114; }
+.range-ring { fill: none; stroke: #23303a; stroke-width: 1; }
+.range-ring.outer { stroke: #3a454c; }
+.range-label { fill: #4a565e; font-family: 'Montserrat', sans-serif; font-size: 9px; }
+.crosshair { stroke: #23303a; stroke-width: 1; }
+.plane-air    { fill: #37d67a; stroke: #0d1114; stroke-width: 0.4; }
+.plane-ground { fill: #ffb020; stroke: #0d1114; stroke-width: 0.4; }
+.plane-fids   { fill: #ffd24d; stroke: #0d1114; stroke-width: 0.4; }
+.plane-label { fill: #a9b6bf; font-family: 'Montserrat', sans-serif; font-size: 8px; }
+.plane-fids-ring { fill: none; stroke: #ffd24d; stroke-width: 1; }
+.airport-dot { fill: var(--gold); }
+.airport-label { fill: var(--gold); font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; }
+
+/* Scrollbars */
+.list-scroll::-webkit-scrollbar { width: 6px; }
+.list-scroll::-webkit-scrollbar-thumb { background: #3a454c; border-radius: 3px; }
+.list-scroll::-webkit-scrollbar-track { background: transparent; }
