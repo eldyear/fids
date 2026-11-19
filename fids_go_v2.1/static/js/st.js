@@ -320,7 +320,7 @@ function createFlightHTML(flight, index) {
             return `
                 <div class="check-in-header">
                     <div class="logo-container ${flight.airline}">
-                        <img src="/go/static/images/airlines/${flight.airline}.svg" alt="Airline Logo" class="airline-logo">
+                        <img src="/go/static/images/airlines/st/${flight.airline}.svg" alt="Airline Logo" class="airline-logo">
                     </div>
                 </div>
                 <div class="destination-container">

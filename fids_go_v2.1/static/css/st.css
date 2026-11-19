@@ -117,6 +117,16 @@ body {
 
 }
 
+.G9 {
+    background-color: #ff0010;
+
+}
+
+.OMS {
+    background-color: #81B43F;
+
+}
+
 .RWZ {
     background-color: #e5002b;
 
@@ -316,6 +326,14 @@ body {
 
 .half-width .U6 {
     background-color: #ba0c2f !important;
+}
+
+.half-width .G9 {
+    background-color: #ff0010 !important;
+}
+
+.half-width .OMS {
+    background-color: #81B43F !important;
 }
 
 .half-width .RWZ {
@@ -774,6 +792,14 @@ body.sky-priority-body .destination {
 
 .single-flight .U6 {
     background-color: #ba0c2f;
+}
+
+.single-flight .G9 {
+    background-color: #ff0010;
+}
+
+.single-flight .OMS {
+    background-color: #81B43F;
 }
 
 .single-flight .RWZ {

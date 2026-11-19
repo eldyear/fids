@@ -127,6 +127,21 @@ body {
 
 }
 
+.G9 {
+    background-color: #ff0010;
+
+}
+
+.OMS {
+    background-color: #81B43F;
+
+}
+
+.RWZ {
+    background-color: #e5002b;
+
+}
+
 .airline-logo {
     max-width: 48vw;
     width: auto;
@@ -326,6 +341,18 @@ body {
 
 .half-flight .SU {
     background-color: #10349e !important;
+}
+
+.half-width .G9 {
+    background-color: #ff0010 !important;
+}
+
+.half-width .OMS {
+    background-color: #81B43F !important;
+}
+
+.half-width .RWZ {
+    background-color: #e5002b !important;
 }
 
 .half-flight .flight-block-0 {
@@ -710,6 +737,18 @@ body.sky-priority-body .destination {
 
 .single-flight .SU {
     background-color: #10349e;
+}
+
+.single-flight .G9 {
+    background-color: #ff0010;
+}
+
+.single-flight .OMS {
+    background-color: #81B43F;
+}
+
+.single-flight .RWZ {
+    background-color: #e5002b;
 }
 
 /* Контейнер для логотипов */
